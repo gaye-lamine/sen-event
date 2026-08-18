@@ -113,7 +113,7 @@ export const EventCard: React.FC<EventCardProps> = ({
             )}
           </div>
 
-          {/* Action Button: Pill 'Réserver ->' or Circle '->' */}
+          {/* Action Button: Pill 'Réserver ->' with #FFC23C circle on hover or Circle '->' */}
           {variant === 'featured' ? (
             <button
               onClick={(e) => {
@@ -121,10 +121,12 @@ export const EventCard: React.FC<EventCardProps> = ({
                 onBook?.(event);
               }}
               type="button"
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 sm:py-2 bg-[#0F141C] text-white text-xs font-semibold rounded-full hover:bg-black active:scale-95 transition-all shadow-sm"
+              className="group/btn inline-flex items-center gap-2 pl-4 pr-1.5 py-1.5 bg-[#0F141C] text-white text-xs font-semibold rounded-full hover:bg-black active:scale-95 transition-all shadow-sm cursor-pointer"
             >
               <span>Réserver</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white/10 text-white flex items-center justify-center transition-all duration-200 group-hover/btn:bg-[#FFC23C] group-hover/btn:text-gray-950">
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2.2]" />
+              </span>
             </button>
           ) : (
             <button
@@ -133,7 +135,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                 onBook?.(event);
               }}
               type="button"
-              className="w-8 h-8 rounded-full bg-[#0F141C] text-white flex items-center justify-center hover:bg-black hover:scale-105 active:scale-95 transition-all shadow-sm"
+              className="w-8 h-8 rounded-full bg-[#0F141C] text-white flex items-center justify-center hover:bg-[#FFC23C] hover:text-gray-950 active:scale-95 transition-all shadow-sm cursor-pointer"
               aria-label="Voir l'événement"
             >
               <ArrowRight className="w-4 h-4 stroke-[2.2]" />
