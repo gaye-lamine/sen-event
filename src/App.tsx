@@ -41,19 +41,13 @@ export const App: React.FC = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // --------------------------------------------------------------------------
-  // ÉTATS DES MODALES : DÉTAIL / RÉSERVATION, LOGIN, CRÉER UN COMPTE & PANIER
+  // ÉTATS DES MODALES (EN ATTENTE DE CONNEXION BACKEND)
   // --------------------------------------------------------------------------
-  
-  // 1. Modale Détail & Réservation d'un événement (Paiement Wave / Orange Money)
   const [selectedEventForBooking, setSelectedEventForBooking] = useState<EventItem | null>(null);
-
-  // 2. Modale d'Authentification (Se connecter / Créer un compte)
   const [authModalState, setAuthModalState] = useState<{
     isOpen: boolean;
     mode: 'login' | 'signup';
   }>({ isOpen: false, mode: 'login' });
-
-  // 3. Tiroir latéral du Panier
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<
     { event: EventItem; quantity: number; tierName: string; price: number }[]
@@ -130,9 +124,12 @@ export const App: React.FC = () => {
     setCurrentPage((prev) => prev + 1);
   };
 
-  /** Ouvre la modale de détail et de réservation pour l'événement sélectionné */
-  const handleOpenBooking = (event: EventItem) => {
-    setSelectedEventForBooking(event);
+  /**
+   * Action d'ouverture du détail / réservation de billet
+   * NOTE: Commentée pour ne pas déclencher la modale popup actuellement.
+   */
+  const handleOpenBooking = (_event: EventItem) => {
+    // setSelectedEventForBooking(_event); // Décommenter pour activer la modale de réservation
   };
 
   /** Traite le succès d'une réservation */
@@ -151,10 +148,10 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans selection:bg-brand-300 selection:text-gray-900">
       
-      {/* 1. Barre de navigation avec accès Login / Créer un compte / Panier */}
+      {/* 1. Barre de navigation (Actions Se connecter / Créer un compte désactivées pour l'instant) */}
       <Navbar
         onSearch={handleSearch}
-        onOpenAuth={(mode) => setAuthModalState({ isOpen: true, mode })}
+        /* onOpenAuth={(mode) => setAuthModalState({ isOpen: true, mode })} // Décommenter pour activer les modales d'authentification */
         cartCount={cartItems.length}
         onOpenCart={() => setIsCartOpen(true)}
       />
@@ -194,30 +191,34 @@ export const App: React.FC = () => {
 
       {/* 7. Bannière CTA pour organisateurs */}
       <OrganizerBanner
-        onBecomeOrganizer={() => setAuthModalState({ isOpen: true, mode: 'signup' })}
+        /* onBecomeOrganizer={() => setAuthModalState({ isOpen: true, mode: 'signup' })} // Décommenter pour activer */
       />
 
       {/* 8. Pied de page (Footer) */}
       <Footer />
 
       {/* =================================================================== */}
-      {/* MODALE : DÉTAILS DE L'ÉVÉNEMENT, RÉSERVATION & PAIEMENT WAVE / OM    */}
+      {/* MODALE : DÉTAILS DE L'ÉVÉNEMENT (COMMENTÉE / DÉSACTIVÉE ACTUELLEMENT)*/}
       {/* =================================================================== */}
+      {/*
       <BookingModal
         event={selectedEventForBooking}
         isOpen={!!selectedEventForBooking}
         onClose={() => setSelectedEventForBooking(null)}
         onBookingSuccess={handleBookingSuccess}
       />
+      */}
 
       {/* =================================================================== */}
-      {/* MODALE : AUTHENTIFICATION (SE CONNECTER / CRÉER UN COMPTE)          */}
+      {/* MODALE : AUTHENTIFICATION LOGIN / SIGNUP (COMMENTÉE ACTUELLEMENT)   */}
       {/* =================================================================== */}
+      {/*
       <AuthModal
         isOpen={authModalState.isOpen}
         initialMode={authModalState.mode}
         onClose={() => setAuthModalState({ isOpen: false, mode: 'login' })}
       />
+      */}
 
       {/* =================================================================== */}
       {/* TIROIR : PANIER D'ACHATS                                            */}
