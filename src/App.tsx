@@ -20,6 +20,7 @@ import { BookingModal } from './components/events/BookingModal';
 import { AuthModal } from './components/auth/AuthModal';
 import { CartDrawer } from './components/cart/CartDrawer';
 import { EventDetailPage } from './pages/EventDetailPage';
+import { CheckoutPage } from './pages/CheckoutPage';
 
 /**
  * ============================================================================
@@ -29,10 +30,13 @@ import { EventDetailPage } from './pages/EventDetailPage';
 
 export const App: React.FC = () => {
   // --------------------------------------------------------------------------
-  // VUE ACTIVE : 'home' (Page d'accueil) | 'event-detail' (Détail de l'événement)
+  // VUE ACTIVE : 'home' | 'event-detail' | 'checkout'
   // --------------------------------------------------------------------------
-  const [currentView, setCurrentView] = useState<'home' | 'event-detail'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'event-detail' | 'checkout'>('home');
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
+  const [selectedCheckoutTiers, setSelectedCheckoutTiers] = useState<
+    { tier: TicketTier; quantity: number }[]
+  >([]);
 
   // --------------------------------------------------------------------------
   // ÉTATS GLOBAUX : ÉVÉNEMENTS, CATÉGORIES ET FILTRES
@@ -70,7 +74,6 @@ export const App: React.FC = () => {
       const featured = await eventService.getFeaturedEvents();
       setFeaturedEvents(featured);
 
-      // Default selected event for detail view preview if needed
       if (featured.length > 0) {
         setSelectedEvent(featured[0]);
       }
@@ -131,6 +134,16 @@ export const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleOpenCheckout = (
+    tiers?: { tier: TicketTier; quantity: number }[]
+  ) => {
+    if (tiers) {
+      setSelectedCheckoutTiers(tiers);
+    }
+    setCurrentView('checkout');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleCategorySelect = (category: EventCategory) => {
     setSelectedCategory(category);
     setCurrentPage(1);
@@ -161,19 +174,11 @@ export const App: React.FC = () => {
     setCurrentPage((prev) => prev + 1);
   };
 
-  /** Traite le panier / checkout depuis la page de détail */
+  /** Traite le checkout depuis la page de détail */
   const handleProceedToCheckout = (
     selectedTiers: { tier: TicketTier; quantity: number }[]
   ) => {
-    if (!selectedEvent) return;
-    const newItems = selectedTiers.map((item) => ({
-      event: selectedEvent,
-      quantity: item.quantity,
-      tierName: item.tier.name,
-      price: item.tier.price,
-    }));
-    setCartItems((prev) => [...prev, ...newItems]);
-    setIsCartOpen(true);
+    handleOpenCheckout(selectedTiers);
   };
 
   /** Traite le succès d'une réservation */
@@ -209,7 +214,7 @@ export const App: React.FC = () => {
           onOpenCart={() => setIsCartOpen(true)}
         />
 
-        {/* 2. Filtres par catégorie (Visibles sur la page d'accueil) */}
+        {/* 2. Filtres par catégorie (Visibles uniquement sur la page d'accueil) */}
         {currentView === 'home' && (
           <CategoryPills
             categories={categories}
@@ -220,9 +225,20 @@ export const App: React.FC = () => {
       </header>
 
       {/* =================================================================== */}
-      {/* VUE 1 : PAGE DE DÉTAIL D'UN ÉVÉNEMENT                              */}
+      {/* VUE 1 : TUNNEL D'ACHAT & RÉSERVATION (CHECKOUT STEPPER)             */}
       {/* =================================================================== */}
-      {currentView === 'event-detail' && selectedEvent ? (
+      {currentView === 'checkout' && selectedEvent ? (
+        <main className="flex-1">
+          <CheckoutPage
+            event={selectedEvent}
+            initialTiers={selectedCheckoutTiers}
+            onNavigateHome={handleNavigateHome}
+          />
+        </main>
+      ) : currentView === 'event-detail' && selectedEvent ? (
+        /* ================================================================= */
+        /* VUE 2 : PAGE DE DÉTAIL D'UN ÉVÉNEMENT                             */
+        /* ================================================================= */
         <main className="flex-1">
           <EventDetailPage
             event={selectedEvent}
@@ -234,7 +250,7 @@ export const App: React.FC = () => {
         </main>
       ) : (
         /* ================================================================= */
-        /* VUE 2 : PAGE D'ACCUEIL PRINCIPALE                                 */
+        /* VUE 3 : PAGE D'ACCUEIL PRINCIPALE                                 */
         /* ================================================================= */
         <main className="flex-1">
           {/* Section Hero principale avec recherche en direct */}
@@ -313,6 +329,7 @@ export const App: React.FC = () => {
         }
         onCheckout={() => {
           setIsCartOpen(false);
+          handleOpenCheckout();
         }}
       />
     </div>
