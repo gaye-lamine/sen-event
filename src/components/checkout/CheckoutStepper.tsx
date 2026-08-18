@@ -1,4 +1,5 @@
 import React from 'react';
+import { Check } from 'lucide-react';
 
 export type CheckoutStep = 1 | 2 | 3;
 
@@ -18,7 +19,7 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
   ];
 
   return (
-    <div className="flex items-center justify-center max-w-xl mx-auto py-8 sm:py-12">
+    <div className="flex items-center justify-center max-w-xl mx-auto py-6 sm:py-10">
       {steps.map((step, idx) => {
         const isActive = currentStep === step.number;
         const isPassed = currentStep > step.number;
@@ -29,25 +30,33 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
             {/* Step Item */}
             <div className="flex flex-col items-center">
               <button
-                onClick={() => isPassed && onStepClick?.(step.number)}
-                disabled={!isPassed}
+                onClick={() => onStepClick?.(step.number)}
+                disabled={!isPassed && !isActive}
                 type="button"
                 className={`
                   w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all
                   ${
-                    isActive
-                      ? 'bg-transparent border-2 border-[#FF4747] text-[#FF4747] shadow-sm'
-                      : isPassed
-                      ? 'bg-[#FF4747] text-white border-2 border-[#FF4747] cursor-pointer'
+                    isPassed
+                      ? 'bg-[#10B981] text-white shadow-xs cursor-pointer'
+                      : isActive
+                      ? 'bg-transparent border-2 border-[#FF4747] text-[#FF4747] shadow-xs'
                       : 'bg-white border border-gray-200 text-gray-400'
                   }
                 `}
               >
-                {step.number}
+                {isPassed ? (
+                  <Check className="w-4 h-4 text-white stroke-[2.5]" />
+                ) : (
+                  step.number
+                )}
               </button>
               <span
                 className={`text-[11px] sm:text-xs font-semibold mt-1.5 transition-colors ${
-                  isActive || isPassed ? 'text-gray-900' : 'text-gray-400'
+                  isActive
+                    ? 'text-gray-900 font-extrabold'
+                    : isPassed
+                    ? 'text-gray-600 font-medium'
+                    : 'text-gray-400'
                 }`}
               >
                 {step.label}
@@ -60,13 +69,13 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
                 <div className="w-full relative flex items-center justify-center">
                   <div
                     className={`h-[1px] w-full transition-colors ${
-                      isPassed ? 'bg-[#FF4747]' : 'bg-gray-200'
+                      isPassed ? 'bg-[#10B981]' : 'bg-gray-200'
                     }`}
                   />
                   {/* Subtle midpoint dot */}
                   <div
                     className={`absolute w-1.5 h-1.5 rounded-full ${
-                      isPassed ? 'bg-[#FF4747]' : 'bg-gray-300'
+                      isPassed ? 'bg-[#10B981]' : 'bg-gray-300'
                     }`}
                   />
                 </div>

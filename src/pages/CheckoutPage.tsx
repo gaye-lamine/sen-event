@@ -62,9 +62,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   });
 
   // Customer info state
-  const [customerName, setCustomerName] = useState('Moussa Diop');
+  const [customerFirstName, setCustomerFirstName] = useState('Aminata');
+  const [customerLastName, setCustomerLastName] = useState('Diop');
   const [customerPhone, setCustomerPhone] = useState('77 123 45 67');
-  const [customerEmail, setCustomerEmail] = useState('moussa.diop@gmail.com');
+  const [customerEmail, setCustomerEmail] = useState('aminata.diop@email.com');
 
   const handleUpdateQuantity = (tierId: string, delta: number) => {
     setQuantities((prev) => {
@@ -80,6 +81,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     return subtotal + serviceFees;
   };
 
+  const customerFullName = `${customerFirstName} ${customerLastName}`.trim();
+
   return (
     <div className="w-full bg-[#F4F5F7]/70 py-8 sm:py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
       <div className="max-w-6xl mx-auto">
@@ -94,7 +97,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
           />
 
           {/* Two-Column Checkout Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start mt-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start mt-2 sm:mt-4">
             
             {/* Left Column: Active Step Form (7 of 12) */}
             <div className="lg:col-span-7 xl:col-span-8">
@@ -110,10 +113,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
               {currentStep === 2 && (
                 <CustomerInfoStep
-                  customerName={customerName}
+                  tiers={tiers}
+                  quantities={quantities}
+                  customerFirstName={customerFirstName}
+                  customerLastName={customerLastName}
                   customerPhone={customerPhone}
                   customerEmail={customerEmail}
-                  onChangeName={setCustomerName}
+                  onChangeFirstName={setCustomerFirstName}
+                  onChangeLastName={setCustomerLastName}
                   onChangePhone={setCustomerPhone}
                   onChangeEmail={setCustomerEmail}
                   onBack={() => setCurrentStep(1)}
@@ -125,7 +132,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                 <PaymentStep
                   event={event}
                   totalAmount={calculateTotal()}
-                  customerName={customerName}
+                  customerName={customerFullName}
                   customerPhone={customerPhone}
                   customerEmail={customerEmail}
                   onBack={() => setCurrentStep(2)}
