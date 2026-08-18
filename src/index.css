@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer utilities {
+  /* Exact yellow/amber highlight marker underline */
+  .highlight-underline {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .highlight-underline::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: -2px;
+    right: -2px;
+    height: 9px;
+    background-color: #FFC23C;
+    opacity: 0.75;
+    border-radius: 2px;
+    z-index: -1;
+  }
+
+  /* Pulsating/Breathing animation for the #FFC23C top-right glow */
+  @keyframes orbPulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.35;
+      filter: blur(50px);
+    }
+    50% {
+      transform: scale(1.15);
+      opacity: 0.55;
+      filter: blur(62px);
+    }
+  }
+
+  .animate-orb-pulse {
+    animation: orbPulse 4.5s ease-in-out infinite;
+  }
+
+  /*
+   * Left ticket stack:
+   * Final position = rotate(-18deg) so top leans to the RIGHT (towards center)
+   * Enters sliding in from the left (negative translateX)
+   */
+  @keyframes fluidEntranceLeft {
+    0% {
+      opacity: 0;
+      transform: rotate(-18deg) translate3d(-80px, 50px, 0) scale(0.92);
+    }
+    65% {
+      opacity: 1;
+      transform: rotate(-18deg) translate3d(5px, -4px, 0) scale(1.01);
+    }
+    100% {
+      opacity: 1;
+      transform: rotate(-18deg) translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  /*
+   * Right ticket stack:
+   * Final position = rotate(18deg) so top leans to the LEFT (towards center)
+   * Enters sliding in from the right (positive translateX)
+   */
+  @keyframes fluidEntranceRight {
+    0% {
+      opacity: 0;
+      transform: rotate(18deg) translate3d(80px, 50px, 0) scale(0.92);
+    }
+    65% {
+      opacity: 1;
+      transform: rotate(18deg) translate3d(-5px, -4px, 0) scale(1.01);
+    }
+    100% {
+      opacity: 1;
+      transform: rotate(18deg) translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  .animate-fluid-left {
+    animation: fluidEntranceLeft 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    will-change: transform, opacity;
+  }
+
+  .animate-fluid-right {
+    animation: fluidEntranceRight 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    will-change: transform, opacity;
+  }
+}
+
+/* Custom scrollbar for horizontal categories */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
