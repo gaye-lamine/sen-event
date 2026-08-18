@@ -14,9 +14,9 @@ export const CategoryPills: React.FC<CategoryPillsProps> = ({
   onSelectCategory,
 }) => {
   return (
-    <div className="w-full py-3.5 bg-white border-b border-gray-100/60">
+    <div className="w-full py-2.5 sm:py-3">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-start sm:justify-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar py-1">
+        <div className="flex items-center justify-start sm:justify-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar py-0.5">
           {categories.map((cat) => {
             const isActive = selectedCategory === cat.id;
 

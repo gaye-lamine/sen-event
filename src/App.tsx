@@ -153,21 +153,24 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans selection:bg-brand-300 selection:text-gray-900">
       
-      {/* 1. Barre de navigation avec recherche synchronisée */}
-      <Navbar
-        searchQuery={searchQuery}
-        onSearch={handleSearch}
-        /* onOpenAuth={(mode) => setAuthModalState({ isOpen: true, mode })} // Décommenter pour activer les modales d'authentification */
-        cartCount={cartItems.length}
-        onOpenCart={() => setIsCartOpen(true)}
-      />
+      {/* Header Fixe / Sticky (Navbar + Filtres de Catégories) */}
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-xs transition-all">
+        {/* 1. Barre de navigation principale */}
+        <Navbar
+          searchQuery={searchQuery}
+          onSearch={handleSearch}
+          /* onOpenAuth={(mode) => setAuthModalState({ isOpen: true, mode })} // Décommenter pour activer les modales d'authentification */
+          cartCount={cartItems.length}
+          onOpenCart={() => setIsCartOpen(true)}
+        />
 
-      {/* 2. Filtres par catégorie */}
-      <CategoryPills
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={handleCategorySelect}
-      />
+        {/* 2. Filtres par catégorie */}
+        <CategoryPills
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onSelectCategory={handleCategorySelect}
+        />
+      </header>
 
       {/* 3. Section Hero principale avec recherche en direct */}
       <HeroSection
