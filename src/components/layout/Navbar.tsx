@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import { Search, ShoppingCart, Menu, X, Ticket } from 'lucide-react';
 
+/**
+ * ============================================================================
+ * BARRE DE NAVIGATION (NAVBAR) AVEC ACCÈS RAPIDE LOGIN & CRÉER UN COMPTE
+ * ============================================================================
+ */
+
 interface NavbarProps {
   onSearch?: (query: string) => void;
+  /** Déclencheur pour ouvrir la modale d'authentification (mode 'login' ou 'signup') */
   onOpenAuth?: (mode: 'login' | 'signup') => void;
   cartCount?: number;
   onOpenCart?: () => void;
@@ -29,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
           
-          {/* Brand Logo */}
+          {/* Logo officiel Sunu Events */}
           <a
             href="#"
             className="flex items-center gap-2 font-extrabold text-xl sm:text-2xl tracking-tight text-gray-900 group"
@@ -39,7 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
           </a>
 
-          {/* Quick Search Bar (Desktop) */}
+          {/* Barre de recherche rapide (Desktop) */}
           <form
             onSubmit={handleSearchSubmit}
             className="hidden md:flex flex-1 max-w-md mx-4 items-center bg-[#F3F4F6] rounded-full px-4 py-2 focus-within:ring-2 focus-within:ring-gray-900/20 focus-within:bg-white border border-transparent focus-within:border-gray-200 transition-all"
@@ -54,10 +61,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             />
           </form>
 
-          {/* Right Action Buttons */}
+          {/* Boutons d'actions à droite */}
           <div className="flex items-center gap-2.5 sm:gap-3">
             
-            {/* Cart Button */}
+            {/* Bouton Panier */}
             <button
               onClick={onOpenCart}
               type="button"
@@ -72,7 +79,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
 
-            {/* Login Button */}
+            {/* ============================================================= */}
+            {/* BOUTON 1 : SE CONNECTER (LOGIN)                                */}
+            {/* Ouvre la modale d'authentification en mode 'login'            */}
+            {/* ============================================================= */}
             <button
               onClick={() => onOpenAuth?.('login')}
               type="button"
@@ -81,7 +91,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               Se connecter
             </button>
 
-            {/* Register Button */}
+            {/* ============================================================= */}
+            {/* BOUTON 2 : CRÉER UN COMPTE (SIGNUP)                            */}
+            {/* Ouvre la modale d'authentification en mode 'signup'           */}
+            {/* ============================================================= */}
             <button
               onClick={() => onOpenAuth?.('signup')}
               type="button"
@@ -90,7 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               Créer un compte
             </button>
 
-            {/* Mobile Menu Toggle */}
+            {/* Menu Mobile Hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               type="button"
@@ -101,7 +114,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Mobile Search Bar (Expanded) */}
+        {/* Barre de recherche sur Mobile */}
         <div className="md:hidden pb-3">
           <form
             onSubmit={handleSearchSubmit}
@@ -118,7 +131,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </form>
         </div>
 
-        {/* Mobile Navigation Drawer */}
+        {/* Tiroir de navigation mobile avec boutons Se connecter / Créer un compte */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-100 space-y-2">
             <button

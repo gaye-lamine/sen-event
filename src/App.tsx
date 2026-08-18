@@ -19,8 +19,16 @@ import { BookingModal } from './components/events/BookingModal';
 import { AuthModal } from './components/auth/AuthModal';
 import { CartDrawer } from './components/cart/CartDrawer';
 
+/**
+ * ============================================================================
+ * COMPOSANT PRINCIPAL : SUNUEVENTS APPLICATION
+ * ============================================================================
+ */
+
 export const App: React.FC = () => {
-  // State Management
+  // --------------------------------------------------------------------------
+  // ÉTATS GLOBAUX : ÉVÉNEMENTS, CATÉGORIES ET FILTRES
+  // --------------------------------------------------------------------------
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<EventCategory>('all');
   const [featuredEvents, setFeaturedEvents] = useState<EventItem[]>([]);
@@ -32,18 +40,26 @@ export const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Modals & Drawers State
+  // --------------------------------------------------------------------------
+  // ÉTATS DES MODALES : DÉTAIL / RÉSERVATION, LOGIN, CRÉER UN COMPTE & PANIER
+  // --------------------------------------------------------------------------
+  
+  // 1. Modale Détail & Réservation d'un événement (Paiement Wave / Orange Money)
   const [selectedEventForBooking, setSelectedEventForBooking] = useState<EventItem | null>(null);
+
+  // 2. Modale d'Authentification (Se connecter / Créer un compte)
   const [authModalState, setAuthModalState] = useState<{
     isOpen: boolean;
     mode: 'login' | 'signup';
   }>({ isOpen: false, mode: 'login' });
+
+  // 3. Tiroir latéral du Panier
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<
     { event: EventItem; quantity: number; tierName: string; price: number }[]
   >([]);
 
-  // 1. Fetch initial categories and featured events
+  // 1. Chargement initial des catégories et des événements vedettes
   useEffect(() => {
     const loadInitialData = async () => {
       const cats = await eventService.getCategories();
@@ -56,7 +72,7 @@ export const App: React.FC = () => {
     loadInitialData();
   }, []);
 
-  // 2. Fetch events when Date filter tab changes ("C'est quand, la sortie ?")
+  // 2. Chargement des événements selon le filtre temporel ("C'est quand, la sortie ?")
   useEffect(() => {
     const loadDateEvents = async () => {
       const events = await eventService.getEventsByDateFilter(dateFilter);
@@ -66,7 +82,7 @@ export const App: React.FC = () => {
     loadDateEvents();
   }, [dateFilter]);
 
-  // 3. Fetch all events when category, search query, or page changes
+  // 3. Chargement des événements avec recherche et pagination
   useEffect(() => {
     const loadAllEvents = async () => {
       const response = await eventService.getAllEvents(
@@ -94,7 +110,9 @@ export const App: React.FC = () => {
     loadAllEvents();
   }, [selectedCategory, searchQuery, currentPage]);
 
-  // Handlers
+  // --------------------------------------------------------------------------
+  // GESTIONNAIRES D'ACTIONS
+  // --------------------------------------------------------------------------
   const handleCategorySelect = (category: EventCategory) => {
     setSelectedCategory(category);
     setCurrentPage(1);
@@ -112,12 +130,13 @@ export const App: React.FC = () => {
     setCurrentPage((prev) => prev + 1);
   };
 
+  /** Ouvre la modale de détail et de réservation pour l'événement sélectionné */
   const handleOpenBooking = (event: EventItem) => {
     setSelectedEventForBooking(event);
   };
 
+  /** Traite le succès d'une réservation */
   const handleBookingSuccess = (confirmation: BookingConfirmation) => {
-    // Add to cart history
     setCartItems((prev) => [
       ...prev,
       {
@@ -132,7 +151,7 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans selection:bg-brand-300 selection:text-gray-900">
       
-      {/* 1. Header Navigation */}
+      {/* 1. Barre de navigation avec accès Login / Créer un compte / Panier */}
       <Navbar
         onSearch={handleSearch}
         onOpenAuth={(mode) => setAuthModalState({ isOpen: true, mode })}
@@ -140,23 +159,23 @@ export const App: React.FC = () => {
         onOpenCart={() => setIsCartOpen(true)}
       />
 
-      {/* 2. Top Category Pills Filter Bar */}
+      {/* 2. Filtres par catégorie */}
       <CategoryPills
         categories={categories}
         selectedCategory={selectedCategory}
         onSelectCategory={handleCategorySelect}
       />
 
-      {/* 3. Hero Section with Glows, Floating 3D Tickets, Headline and Search */}
+      {/* 3. Section Hero principale */}
       <HeroSection onSearch={handleSearch} />
 
-      {/* 4. Section 1: "Évènements vedettes" */}
+      {/* 4. Section 1 : "Évènements vedettes" */}
       <FeaturedEventsSection
         events={featuredEvents}
         onBook={handleOpenBooking}
       />
 
-      {/* 5. Section 2: "C'est quand, la sortie ?" */}
+      {/* 5. Section 2 : "C'est quand, la sortie ?" */}
       <DateFilterSection
         activeFilter={dateFilter}
         onFilterChange={setDateFilter}
@@ -164,7 +183,7 @@ export const App: React.FC = () => {
         onBook={handleOpenBooking}
       />
 
-      {/* 6. Section 3: "Tous les évènements" */}
+      {/* 6. Section 3 : "Tous les évènements" */}
       <AllEventsSection
         events={allEvents}
         hasMore={hasMoreEvents}
@@ -173,15 +192,17 @@ export const App: React.FC = () => {
         onBook={handleOpenBooking}
       />
 
-      {/* 7. Organizer CTA Banner */}
+      {/* 7. Bannière CTA pour organisateurs */}
       <OrganizerBanner
         onBecomeOrganizer={() => setAuthModalState({ isOpen: true, mode: 'signup' })}
       />
 
-      {/* 8. Footer */}
+      {/* 8. Pied de page (Footer) */}
       <Footer />
 
-      {/* Interactive Reservation / Booking Modal */}
+      {/* =================================================================== */}
+      {/* MODALE : DÉTAILS DE L'ÉVÉNEMENT, RÉSERVATION & PAIEMENT WAVE / OM    */}
+      {/* =================================================================== */}
       <BookingModal
         event={selectedEventForBooking}
         isOpen={!!selectedEventForBooking}
@@ -189,14 +210,18 @@ export const App: React.FC = () => {
         onBookingSuccess={handleBookingSuccess}
       />
 
-      {/* Authentication Modal */}
+      {/* =================================================================== */}
+      {/* MODALE : AUTHENTIFICATION (SE CONNECTER / CRÉER UN COMPTE)          */}
+      {/* =================================================================== */}
       <AuthModal
         isOpen={authModalState.isOpen}
         initialMode={authModalState.mode}
         onClose={() => setAuthModalState({ isOpen: false, mode: 'login' })}
       />
 
-      {/* Shopping Cart Drawer */}
+      {/* =================================================================== */}
+      {/* TIROIR : PANIER D'ACHATS                                            */}
+      {/* =================================================================== */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
