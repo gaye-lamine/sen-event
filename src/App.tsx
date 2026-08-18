@@ -119,6 +119,11 @@ export const App: React.FC = () => {
     setCurrentPage(1);
   };
 
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setCurrentPage(1);
+  };
+
   const handleLoadMore = () => {
     setIsLoadingMore(true);
     setCurrentPage((prev) => prev + 1);
@@ -148,8 +153,9 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans selection:bg-brand-300 selection:text-gray-900">
       
-      {/* 1. Barre de navigation (Actions Se connecter / Créer un compte désactivées pour l'instant) */}
+      {/* 1. Barre de navigation avec recherche synchronisée */}
       <Navbar
+        searchQuery={searchQuery}
         onSearch={handleSearch}
         /* onOpenAuth={(mode) => setAuthModalState({ isOpen: true, mode })} // Décommenter pour activer les modales d'authentification */
         cartCount={cartItems.length}
@@ -163,8 +169,11 @@ export const App: React.FC = () => {
         onSelectCategory={handleCategorySelect}
       />
 
-      {/* 3. Section Hero principale */}
-      <HeroSection onSearch={handleSearch} />
+      {/* 3. Section Hero principale avec recherche en direct */}
+      <HeroSection
+        searchQuery={searchQuery}
+        onSearch={handleSearch}
+      />
 
       {/* 4. Section 1 : "Évènements vedettes" */}
       <FeaturedEventsSection
@@ -180,13 +189,15 @@ export const App: React.FC = () => {
         onBook={handleOpenBooking}
       />
 
-      {/* 6. Section 3 : "Tous les évènements" */}
+      {/* 6. Section 3 : "Tous les évènements" avec résultats de recherche en direct */}
       <AllEventsSection
         events={allEvents}
         hasMore={hasMoreEvents}
         onLoadMore={handleLoadMore}
         isLoadingMore={isLoadingMore}
         onBook={handleOpenBooking}
+        searchQuery={searchQuery}
+        onClearSearch={handleClearSearch}
       />
 
       {/* 7. Bannière CTA pour organisateurs */}

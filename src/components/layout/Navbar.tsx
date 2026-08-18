@@ -1,33 +1,36 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Search, ShoppingCart, Menu, X, Ticket } from 'lucide-react';
 
 /**
  * ============================================================================
- * BARRE DE NAVIGATION (NAVBAR) AVEC ACCÈS RAPIDE LOGIN & CRÉER UN COMPTE
+ * BARRE DE NAVIGATION (NAVBAR) AVEC RECHERCHE ET ACCÈS LOGIN / COMPTE
  * ============================================================================
  */
 
 interface NavbarProps {
+  searchQuery?: string;
   onSearch?: (query: string) => void;
-  /** Déclencheur pour ouvrir la modale d'authentification (mode 'login' ou 'signup') */
   onOpenAuth?: (mode: 'login' | 'signup') => void;
   cartCount?: number;
   onOpenCart?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
+  searchQuery = '',
   onSearch,
   onOpenAuth,
   cartCount = 0,
   onOpenCart,
 }) => {
-  const [searchValue, setSearchValue] = useState('');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSearch) {
-      onSearch(searchValue);
+    if (searchQuery.trim()) {
+      const target = document.getElementById('all-events-section');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -54,8 +57,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Search className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
             <input
               type="text"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => onSearch?.(e.target.value)}
               placeholder="Un artiste, une salle, un match..."
               className="w-full bg-transparent text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
             />
@@ -68,7 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={onOpenCart}
               type="button"
-              className="relative p-2.5 text-gray-700 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors"
+              className="relative p-2.5 text-gray-700 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
               aria-label="Mon panier"
             >
               <ShoppingCart className="w-5 h-5 stroke-[1.8]" />
@@ -81,24 +84,22 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             {/* ============================================================= */}
             {/* BOUTON 1 : SE CONNECTER (LOGIN)                                */}
-            {/* Ouvre la modale d'authentification en mode 'login'            */}
             {/* ============================================================= */}
             <button
               onClick={() => onOpenAuth?.('login')}
               type="button"
-              className="hidden sm:inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-gray-800 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all"
+              className="hidden sm:inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-gray-800 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:border-gray-300 transition-all cursor-pointer"
             >
               Se connecter
             </button>
 
             {/* ============================================================= */}
             {/* BOUTON 2 : CRÉER UN COMPTE (SIGNUP)                            */}
-            {/* Ouvre la modale d'authentification en mode 'signup'           */}
             {/* ============================================================= */}
             <button
               onClick={() => onOpenAuth?.('signup')}
               type="button"
-              className="inline-flex items-center justify-center px-5 py-2 text-xs font-semibold text-white bg-[#0F141C] rounded-full hover:bg-black shadow-sm hover:shadow transition-all"
+              className="inline-flex items-center justify-center px-5 py-2 text-xs font-semibold text-white bg-[#0F141C] rounded-full hover:bg-black shadow-sm hover:shadow transition-all cursor-pointer"
             >
               Créer un compte
             </button>
@@ -123,15 +124,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Search className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
             <input
               type="text"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => onSearch?.(e.target.value)}
               placeholder="Un artiste, une salle, un match..."
               className="w-full bg-transparent text-xs text-gray-800 placeholder-gray-400 focus:outline-none"
             />
           </form>
         </div>
 
-        {/* Tiroir de navigation mobile avec boutons Se connecter / Créer un compte */}
+        {/* Tiroir de navigation mobile */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-100 space-y-2">
             <button

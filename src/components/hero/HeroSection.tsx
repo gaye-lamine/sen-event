@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Search } from 'lucide-react';
 import { FloatingTickets } from './FloatingTickets';
 
 interface HeroSectionProps {
+  searchQuery?: string;
   onSearch: (query: string) => void;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
-  const [query, setQuery] = useState('');
-
+export const HeroSection: React.FC<HeroSectionProps> = ({
+  searchQuery = '',
+  onSearch,
+}) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) {
-      onSearch(query.trim());
+    if (searchQuery.trim()) {
       const target = document.getElementById('all-events-section');
       if (target) {
         target.scrollIntoView({ behavior: 'smooth' });
@@ -61,7 +62,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
           Concerts, matchs, festivals, formations... trouve ton prochain sortie et paie en 2 clics avec Wave ou Orange Money. Ton billet arrive direct par mail, prêt à scanner.
         </p>
 
-        {/* Centered Pill Search Bar */}
+        {/* Centered Pill Search Bar with Instant Filtering */}
         <div className="mt-7 sm:mt-9 max-w-xl mx-auto">
           <form
             onSubmit={handleSubmit}
@@ -70,8 +71,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSearch }) => {
             <Search className="w-4 h-4 text-gray-400 mr-3 flex-shrink-0" />
             <input
               type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => onSearch(e.target.value)}
               placeholder="Wally Seck, Dakar Arena, Sénégal vs..."
               className="w-full bg-transparent text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none"
             />
