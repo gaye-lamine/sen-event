@@ -10,6 +10,7 @@ import { Search, ShoppingCart, Menu, X, Ticket } from 'lucide-react';
 interface NavbarProps {
   searchQuery?: string;
   onSearch?: (query: string) => void;
+  onNavigateHome?: () => void;
   onOpenAuth?: (mode: 'login' | 'signup') => void;
   cartCount?: number;
   onOpenCart?: () => void;
@@ -18,6 +19,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   searchQuery = '',
   onSearch,
+  onNavigateHome,
   onOpenAuth,
   cartCount = 0,
   onOpenCart,
@@ -40,14 +42,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
           
           {/* Logo officiel Sunu Events */}
-          <a
-            href="#"
-            className="flex items-center gap-2 font-extrabold text-xl sm:text-2xl tracking-tight text-gray-900 group"
+          <button
+            onClick={() => onNavigateHome?.()}
+            type="button"
+            className="flex items-center gap-2 font-extrabold text-xl sm:text-2xl tracking-tight text-gray-900 group cursor-pointer text-left"
           >
             <span className="text-gray-900 group-hover:text-brand-600 transition-colors">
               Sunu Events
             </span>
-          </a>
+          </button>
 
           {/* Barre de recherche rapide (Desktop) */}
           <form

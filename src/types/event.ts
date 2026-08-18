@@ -17,6 +17,22 @@ export interface TicketTier {
   price: number;
   description?: string;
   available: boolean;
+  remainingCount?: number;
+  isSoldOut?: boolean;
+}
+
+export interface OrganizerInfo {
+  name: string;
+  initials?: string;
+  eventsCount?: number;
+  memberSince?: string;
+  verified?: boolean;
+  phone?: string;
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
 }
 
 export interface EventItem {
@@ -37,13 +53,13 @@ export interface EventItem {
   currency: string;
   isFeatured?: boolean;
   dateCategory?: DateFilterType[];
-  organizer?: {
-    name: string;
-    verified: boolean;
-    phone?: string;
-  };
+  attendeesCount?: number;
+  rating?: number;
+  reviewsCount?: number;
+  organizer?: OrganizerInfo;
   ticketTiers?: TicketTier[];
   description?: string;
+  faq?: FaqItem[];
 }
 
 export interface CategoryItem {

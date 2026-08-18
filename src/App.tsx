@@ -5,6 +5,7 @@ import {
   EventCategory,
   DateFilterType,
   BookingConfirmation,
+  TicketTier,
 } from './types/event';
 import { eventService } from './services/api/eventService';
 import { Navbar } from './components/layout/Navbar';
@@ -18,6 +19,7 @@ import { Footer } from './components/layout/Footer';
 import { BookingModal } from './components/events/BookingModal';
 import { AuthModal } from './components/auth/AuthModal';
 import { CartDrawer } from './components/cart/CartDrawer';
+import { EventDetailPage } from './pages/EventDetailPage';
 
 /**
  * ============================================================================
@@ -26,6 +28,12 @@ import { CartDrawer } from './components/cart/CartDrawer';
  */
 
 export const App: React.FC = () => {
+  // --------------------------------------------------------------------------
+  // VUE ACTIVE : 'home' (Page d'accueil) | 'event-detail' (Détail de l'événement)
+  // --------------------------------------------------------------------------
+  const [currentView, setCurrentView] = useState<'home' | 'event-detail'>('home');
+  const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
+
   // --------------------------------------------------------------------------
   // ÉTATS GLOBAUX : ÉVÉNEMENTS, CATÉGORIES ET FILTRES
   // --------------------------------------------------------------------------
@@ -61,6 +69,11 @@ export const App: React.FC = () => {
 
       const featured = await eventService.getFeaturedEvents();
       setFeaturedEvents(featured);
+
+      // Default selected event for detail view preview if needed
+      if (featured.length > 0) {
+        setSelectedEvent(featured[0]);
+      }
     };
 
     loadInitialData();
@@ -105,18 +118,37 @@ export const App: React.FC = () => {
   }, [selectedCategory, searchQuery, currentPage]);
 
   // --------------------------------------------------------------------------
-  // GESTIONNAIRES D'ACTIONS
+  // GESTIONNAIRES D'ACTIONS & NAVIGATION
   // --------------------------------------------------------------------------
+  const handleNavigateHome = () => {
+    setCurrentView('home');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenEventDetail = (event: EventItem) => {
+    setSelectedEvent(event);
+    setCurrentView('event-detail');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleCategorySelect = (category: EventCategory) => {
     setSelectedCategory(category);
     setCurrentPage(1);
-    const el = document.getElementById('all-events-section');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    if (currentView !== 'home') {
+      setCurrentView('home');
+    }
+    setTimeout(() => {
+      const el = document.getElementById('all-events-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1);
+    if (currentView !== 'home' && query.trim()) {
+      setCurrentView('home');
+    }
   };
 
   const handleClearSearch = () => {
@@ -129,12 +161,19 @@ export const App: React.FC = () => {
     setCurrentPage((prev) => prev + 1);
   };
 
-  /**
-   * Action d'ouverture du détail / réservation de billet
-   * NOTE: Commentée pour ne pas déclencher la modale popup actuellement.
-   */
-  const handleOpenBooking = (_event: EventItem) => {
-    // setSelectedEventForBooking(_event); // Décommenter pour activer la modale de réservation
+  /** Traite le panier / checkout depuis la page de détail */
+  const handleProceedToCheckout = (
+    selectedTiers: { tier: TicketTier; quantity: number }[]
+  ) => {
+    if (!selectedEvent) return;
+    const newItems = selectedTiers.map((item) => ({
+      event: selectedEvent,
+      quantity: item.quantity,
+      tierName: item.tier.name,
+      price: item.tier.price,
+    }));
+    setCartItems((prev) => [...prev, ...newItems]);
+    setIsCartOpen(true);
   };
 
   /** Traite le succès d'une réservation */
@@ -150,65 +189,93 @@ export const App: React.FC = () => {
     ]);
   };
 
+  // Récupération des événements similaires (excluant l'événement actuel)
+  const similarEvents = allEvents.filter(
+    (e) => !selectedEvent || e.id !== selectedEvent.id
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans selection:bg-brand-300 selection:text-gray-900">
       
-      {/* Header Fixe / Sticky (Navbar + Filtres de Catégories) */}
+      {/* Header Fixe / Sticky (Navbar + Filtres de Catégories sur la page d'accueil) */}
       <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-xs transition-all">
         {/* 1. Barre de navigation principale */}
         <Navbar
           searchQuery={searchQuery}
           onSearch={handleSearch}
+          onNavigateHome={handleNavigateHome}
           /* onOpenAuth={(mode) => setAuthModalState({ isOpen: true, mode })} // Décommenter pour activer les modales d'authentification */
           cartCount={cartItems.length}
           onOpenCart={() => setIsCartOpen(true)}
         />
 
-        {/* 2. Filtres par catégorie */}
-        <CategoryPills
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onSelectCategory={handleCategorySelect}
-        />
+        {/* 2. Filtres par catégorie (Visibles sur la page d'accueil) */}
+        {currentView === 'home' && (
+          <CategoryPills
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={handleCategorySelect}
+          />
+        )}
       </header>
 
-      {/* 3. Section Hero principale avec recherche en direct */}
-      <HeroSection
-        searchQuery={searchQuery}
-        onSearch={handleSearch}
-      />
+      {/* =================================================================== */}
+      {/* VUE 1 : PAGE DE DÉTAIL D'UN ÉVÉNEMENT                              */}
+      {/* =================================================================== */}
+      {currentView === 'event-detail' && selectedEvent ? (
+        <main className="flex-1">
+          <EventDetailPage
+            event={selectedEvent}
+            similarEvents={similarEvents}
+            onNavigateHome={handleNavigateHome}
+            onSelectEvent={handleOpenEventDetail}
+            onProceedToCheckout={handleProceedToCheckout}
+          />
+        </main>
+      ) : (
+        /* ================================================================= */
+        /* VUE 2 : PAGE D'ACCUEIL PRINCIPALE                                 */
+        /* ================================================================= */
+        <main className="flex-1">
+          {/* Section Hero principale avec recherche en direct */}
+          <HeroSection
+            searchQuery={searchQuery}
+            onSearch={handleSearch}
+          />
 
-      {/* 4. Section 1 : "Évènements vedettes" */}
-      <FeaturedEventsSection
-        events={featuredEvents}
-        onBook={handleOpenBooking}
-      />
+          {/* Section 1 : "Évènements vedettes" */}
+          <FeaturedEventsSection
+            events={featuredEvents}
+            onBook={handleOpenEventDetail}
+          />
 
-      {/* 5. Section 2 : "C'est quand, la sortie ?" */}
-      <DateFilterSection
-        activeFilter={dateFilter}
-        onFilterChange={setDateFilter}
-        events={dateFilteredEvents}
-        onBook={handleOpenBooking}
-      />
+          {/* Section 2 : "C'est quand, la sortie ?" */}
+          <DateFilterSection
+            activeFilter={dateFilter}
+            onFilterChange={setDateFilter}
+            events={dateFilteredEvents}
+            onBook={handleOpenEventDetail}
+          />
 
-      {/* 6. Section 3 : "Tous les évènements" avec résultats de recherche en direct */}
-      <AllEventsSection
-        events={allEvents}
-        hasMore={hasMoreEvents}
-        onLoadMore={handleLoadMore}
-        isLoadingMore={isLoadingMore}
-        onBook={handleOpenBooking}
-        searchQuery={searchQuery}
-        onClearSearch={handleClearSearch}
-      />
+          {/* Section 3 : "Tous les évènements" avec résultats de recherche en direct */}
+          <AllEventsSection
+            events={allEvents}
+            hasMore={hasMoreEvents}
+            onLoadMore={handleLoadMore}
+            isLoadingMore={isLoadingMore}
+            onBook={handleOpenEventDetail}
+            searchQuery={searchQuery}
+            onClearSearch={handleClearSearch}
+          />
 
-      {/* 7. Bannière CTA pour organisateurs */}
-      <OrganizerBanner
-        /* onBecomeOrganizer={() => setAuthModalState({ isOpen: true, mode: 'signup' })} // Décommenter pour activer */
-      />
+          {/* Bannière CTA pour organisateurs */}
+          <OrganizerBanner
+            /* onBecomeOrganizer={() => setAuthModalState({ isOpen: true, mode: 'signup' })} // Décommenter pour activer */
+          />
+        </main>
+      )}
 
-      {/* 8. Pied de page (Footer) */}
+      {/* Pied de page (Footer) */}
       <Footer />
 
       {/* =================================================================== */}
@@ -246,9 +313,6 @@ export const App: React.FC = () => {
         }
         onCheckout={() => {
           setIsCartOpen(false);
-          if (cartItems.length > 0) {
-            setSelectedEventForBooking(cartItems[0].event);
-          }
         }}
       />
     </div>
