@@ -1,0 +1,32 @@
+image: node:20-alpine
+
+stages:
+  - build
+
+variables:
+  # Empêche l'exécution automatique des jobs Auto DevOps lourds (comme Code Climate)
+  CODE_QUALITY_DISABLED: "true"
+  AUTO_DEVOPS_EXPLICITLY_ENABLED: "false"
+
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - .npm/
+
+before_script:
+  - npm ci --cache .npm --prefer-offline
+
+build_frontend:
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    name: "sunuevents-dist"
+    expire_in: 7 days
+    paths:
+      - dist/
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
