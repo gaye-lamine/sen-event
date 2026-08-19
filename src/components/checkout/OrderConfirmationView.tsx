@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, Check } from 'lucide-react';
+import { Download } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface OrderConfirmationViewProps {
@@ -24,7 +24,6 @@ export const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({
   }, []);
 
   const handleDownloadTickets = () => {
-    // Generate simple printable view / download notification
     window.print();
   };
 
@@ -48,63 +47,14 @@ export const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({
       <div className="relative z-10 max-w-xl mx-auto flex flex-col items-center">
         
         {/* ------------------------------------------------------------- */}
-        {/* 1. CARTE BANCAIRE / BILLET ILLUSTRATION AVEC BADGE CHECK      */}
+        {/* 1. ANIMATION GIF : CARTE BANCAIRE AVEC BADGE APPROUVÉ          */}
         {/* ------------------------------------------------------------- */}
-        <div className="relative mb-6">
-          <svg
-            width="84"
-            height="64"
-            viewBox="0 0 84 64"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="drop-shadow-sm"
-          >
-            {/* Credit Card Body */}
-            <rect
-              x="3"
-              y="3"
-              width="68"
-              height="46"
-              rx="9"
-              fill="#FFFFFF"
-              stroke="#0F141C"
-              strokeWidth="2.5"
-            />
-            {/* Cyan Card Top Bar */}
-            <path
-              d="M4.5 14H69.5"
-              stroke="#06B6D4"
-              strokeWidth="4"
-              strokeLinecap="round"
-            />
-            {/* Chip / Card Mini Details */}
-            <rect
-              x="12"
-              y="26"
-              width="14"
-              height="10"
-              rx="2.5"
-              stroke="#0F141C"
-              strokeWidth="2"
-              fill="#F9FAFB"
-            />
-            {/* Bottom-Right Overlapping Cyan Success Check Badge */}
-            <circle
-              cx="58"
-              cy="45"
-              r="12"
-              fill="#A5F3FC"
-              stroke="#0F141C"
-              strokeWidth="2.5"
-            />
-            <path
-              d="M53 45.5L56.5 49L63.5 41.5"
-              stroke="#0F141C"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+        <div className="relative mb-5 flex items-center justify-center">
+          <img
+            src="/gif/approuve.gif"
+            alt="Paiement approuvé"
+            className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-sm select-none"
+          />
         </div>
 
         {/* ------------------------------------------------------------- */}
@@ -119,7 +69,7 @@ export const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({
         </p>
 
         <p className="text-xs text-gray-400 mt-1 max-w-md leading-relaxed">
-          Les billets ont été envoyés à <span className="text-gray-600">{customerEmail}</span> — retrouve-les aussi dans "Mes billets"
+          Les billets ont été envoyés à <span className="text-gray-600 font-medium">{customerEmail}</span> — retrouve-les aussi dans "Mes billets"
         </p>
 
         {/* ------------------------------------------------------------- */}
