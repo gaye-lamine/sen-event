@@ -1,14 +1,6 @@
 import React from 'react';
 import { Minus, Plus, ArrowRight, X } from 'lucide-react';
-import { EventItem, TicketTier } from '../../types';
-
-interface TicketSelectionStepProps {
-  event: EventItem;
-  tiers: TicketTier[];
-  quantities: Record<string, number>;
-  onUpdateQuantity: (tierId: string, delta: number) => void;
-  onContinue: () => void;
-}
+import { TicketSelectionStepProps } from '../../types';
 
 export const TicketSelectionStep: React.FC<TicketSelectionStepProps> = ({
   event,

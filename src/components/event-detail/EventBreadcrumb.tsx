@@ -1,12 +1,6 @@
 import React from 'react';
-import { ChevronRight, Home } from 'lucide-react';
-import { EventItem } from '../../types/event';
-
-interface EventBreadcrumbProps {
-  event: EventItem;
-  onNavigateHome: () => void;
-  onNavigateCategory?: (category: string) => void;
-}
+import { ChevronRight } from 'lucide-react';
+import { EventBreadcrumbProps } from '../../types';
 
 export const EventBreadcrumb: React.FC<EventBreadcrumbProps> = ({
   event,

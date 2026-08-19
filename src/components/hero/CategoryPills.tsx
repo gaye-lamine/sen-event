@@ -1,12 +1,6 @@
 import React from 'react';
-import { EventCategory, CategoryItem } from '../../types/event';
+import { CategoryPillsProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
-
-interface CategoryPillsProps {
-  categories: CategoryItem[];
-  selectedCategory: EventCategory;
-  onSelectCategory: (category: EventCategory) => void;
-}
 
 export const CategoryPills: React.FC<CategoryPillsProps> = ({
   categories,

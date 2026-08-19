@@ -1,17 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldCheck, CheckCircle, QrCode, CreditCard, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { EventItem, PaymentMethodType } from '../../types';
-
-interface PaymentStepProps {
-  event: EventItem;
-  totalAmount: number;
-  customerName: string;
-  customerPhone: string;
-  customerEmail: string;
-  onBack: () => void;
-  onPaymentComplete?: () => void;
-}
+import { PaymentMethodType, PaymentStepProps } from '../../types';
 
 export const PaymentStep: React.FC<PaymentStepProps> = ({
   event,

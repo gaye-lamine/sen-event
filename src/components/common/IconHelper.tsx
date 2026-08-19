@@ -25,12 +25,7 @@ import {
   Ticket,
   Clock,
 } from 'lucide-react';
-
-interface IconHelperProps {
-  name: string;
-  className?: string;
-  size?: number;
-}
+import { IconHelperProps } from '../../types';
 
 export const IconHelper: React.FC<IconHelperProps> = ({ name, className = 'w-4 h-4', size }) => {
   switch (name.toLowerCase()) {

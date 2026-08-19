@@ -1,10 +1,6 @@
 import React from 'react';
 import { MapPin, Navigation, ExternalLink } from 'lucide-react';
-import { EventItem } from '../../types/event';
-
-interface EventLocationMapProps {
-  event: EventItem;
-}
+import { EventLocationMapProps } from '../../types';
 
 export const EventLocationMap: React.FC<EventLocationMapProps> = ({ event }) => {
   const venueTitle = event.venue || 'Dakar Arena';

@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, Calendar, Heart, ArrowRight } from 'lucide-react';
-import { EventItem } from '../../types/event';
+import { EventItem, EventCardProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
-
-interface EventCardProps {
-  event: EventItem;
-  variant?: 'featured' | 'date-section' | 'grid';
-  onBook?: (event: EventItem) => void;
-  onToggleFavorite?: (event: EventItem) => void;
-}
 
 export const EventCard: React.FC<EventCardProps> = ({
   event,

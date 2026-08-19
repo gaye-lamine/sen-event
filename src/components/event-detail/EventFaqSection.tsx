@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { FaqItem } from '../../types/event';
-
-interface EventFaqSectionProps {
-  faq?: FaqItem[];
-}
+import { FaqItem, EventFaqSectionProps } from '../../types';
 
 export const EventFaqSection: React.FC<EventFaqSectionProps> = ({ faq }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);

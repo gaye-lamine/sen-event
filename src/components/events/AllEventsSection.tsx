@@ -1,17 +1,7 @@
 import React from 'react';
 import { ArrowDown } from 'lucide-react';
-import { EventItem } from '../../types/event';
+import { AllEventsSectionProps } from '../../types';
 import { EventCard } from './EventCard';
-
-interface AllEventsSectionProps {
-  events: EventItem[];
-  hasMore: boolean;
-  onLoadMore: () => void;
-  isLoadingMore?: boolean;
-  onBook: (event: EventItem) => void;
-  searchQuery?: string;
-  onClearSearch?: () => void;
-}
 
 export const AllEventsSection: React.FC<AllEventsSectionProps> = ({
   events,

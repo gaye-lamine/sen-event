@@ -1,11 +1,6 @@
 import React from 'react';
-import { EventItem } from '../../types/event';
+import { SimilarEventsSectionProps } from '../../types';
 import { EventCard } from '../events/EventCard';
-
-interface SimilarEventsSectionProps {
-  events: EventItem[];
-  onSelectEvent: (event: EventItem) => void;
-}
 
 export const SimilarEventsSection: React.FC<SimilarEventsSectionProps> = ({
   events,

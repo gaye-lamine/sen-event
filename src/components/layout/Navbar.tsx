@@ -1,20 +1,6 @@
-import React from 'react';
-import { Search, ShoppingCart, Menu, X, Ticket } from 'lucide-react';
-
-/**
- * ============================================================================
- * BARRE DE NAVIGATION (NAVBAR) AVEC RECHERCHE ET ACCÈS LOGIN / COMPTE
- * ============================================================================
- */
-
-interface NavbarProps {
-  searchQuery?: string;
-  onSearch?: (query: string) => void;
-  onNavigateHome?: () => void;
-  onOpenAuth?: (mode: 'login' | 'signup') => void;
-  cartCount?: number;
-  onOpenCart?: () => void;
-}
+import React, { useState } from 'react';
+import { Search, ShoppingCart, Menu, X } from 'lucide-react';
+import { NavbarProps } from '../../types';
 
 export const Navbar: React.FC<NavbarProps> = ({
   searchQuery = '',
@@ -24,7 +10,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   cartCount = 0,
   onOpenCart,
 }) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +26,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     <div className="w-full border-b border-gray-100/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
-          
           {/* Logo officiel Sunu Events */}
           <button
             onClick={() => onNavigateHome?.()}
@@ -69,7 +54,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Boutons d'actions à droite */}
           <div className="flex items-center gap-2.5 sm:gap-3">
-            
             {/* Bouton Panier */}
             <button
               onClick={onOpenCart}
@@ -85,9 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
 
-            {/* ============================================================= */}
-            {/* BOUTON 1 : SE CONNECTER (LOGIN)                                */}
-            {/* ============================================================= */}
+            {/* Bouton Se connecter */}
             <button
               onClick={() => onOpenAuth?.('login')}
               type="button"
@@ -96,9 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               Se connecter
             </button>
 
-            {/* ============================================================= */}
-            {/* BOUTON 2 : CRÉER UN COMPTE (SIGNUP)                            */}
-            {/* ============================================================= */}
+            {/* Bouton Créer un compte */}
             <button
               onClick={() => onOpenAuth?.('signup')}
               type="button"
@@ -107,7 +87,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               Créer un compte
             </button>
 
-            {/* Menu Mobile Hamburger */}
+            {/* Menu Mobile */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               type="button"

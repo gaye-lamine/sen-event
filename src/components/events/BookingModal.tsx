@@ -1,31 +1,8 @@
 import React, { useState } from 'react';
 import { X, Calendar, MapPin, CheckCircle, ShieldCheck, Ticket, QrCode } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { EventItem, TicketTier, BookingConfirmation } from '../../types/event';
+import { EventItem, TicketTier, BookingConfirmation, BookingModalProps } from '../../types';
 import { eventService } from '../../services/api/eventService';
-
-/**
- * ============================================================================
- * MODULE : DÉTAIL D'UN ÉVÉNEMENT, RÉSERVATION & PAIEMENT (WAVE / ORANGE MONEY)
- * ============================================================================
- * 
- * Cette modale interactive permet à l'utilisateur :
- * 1. De visualiser les DÉTAILS COMPLETS de l'événement (titre, date, lieu, description, affiche)
- * 2. De choisir sa CATÉGORIE DE BILLET (Pass Simple, Pass VIP, etc.) et la QUANTITÉ
- * 3. De sélectionner son MODE DE PAIEMENT SÉNÉGALAIS (Wave ou Orange Money)
- * 4. D'obtenir instantanément son BILLET SÉCURISÉ avec QR Code infalsifiable
- */
-
-interface BookingModalProps {
-  /** Objet contenant toutes les informations détaillées de l'événement cliqué */
-  event: EventItem | null;
-  /** État d'ouverture de la modale */
-  isOpen: boolean;
-  /** Fonction de rappel pour fermer la modale */
-  onClose: () => void;
-  /** Fonction de rappel optionnelle appelée après confirmation réussie */
-  onBookingSuccess?: (confirmation: BookingConfirmation) => void;
-}
 
 export const BookingModal: React.FC<BookingModalProps> = ({
   event,

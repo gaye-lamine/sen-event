@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EventItem, SelectedTierItem, EventTabType } from '../types';
+import { EventTabType, EventDetailPageProps } from '../types';
 import { EventBreadcrumb } from '../components/event-detail/EventBreadcrumb';
 import { EventHeroBanner } from '../components/event-detail/EventHeroBanner';
 import { EventTabs } from '../components/event-detail/EventTabs';
@@ -8,14 +8,6 @@ import { EventLocationMap } from '../components/event-detail/EventLocationMap';
 import { SimilarEventsSection } from '../components/event-detail/SimilarEventsSection';
 import { TicketSelectionCard } from '../components/event-detail/TicketSelectionCard';
 import { EventFaqSection } from '../components/event-detail/EventFaqSection';
-
-interface EventDetailPageProps {
-  event: EventItem;
-  similarEvents: EventItem[];
-  onNavigateHome: () => void;
-  onSelectEvent: (event: EventItem) => void;
-  onProceedToCheckout?: (selectedTiers: SelectedTierItem[]) => void;
-}
 
 export const EventDetailPage: React.FC<EventDetailPageProps> = ({
   event,

@@ -1,6 +1,7 @@
 import React from 'react';
+import { FooterProps } from '../../types';
 
-export const Footer: React.FC = () => {
+export const Footer: React.FC<FooterProps> = ({ onNavigateHome }) => {
   return (
     <footer className="relative overflow-hidden bg-[#12142B] text-white pt-14 sm:pt-16 pb-12">
       {/* Left #FFC23C9C Ambient Glow */}
@@ -28,21 +29,23 @@ export const Footer: React.FC = () => {
       />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-        
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-12 pb-10">
-          
-          {/* Brand Column (Spans 5 of 12 columns on desktop) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-12 pb-10 text-left">
+          {/* Brand Column */}
           <div className="lg:col-span-5 pr-0 lg:pr-8">
-            <h3 className="font-bold text-lg sm:text-xl tracking-tight text-white">
+            <button
+              onClick={onNavigateHome}
+              type="button"
+              className="font-bold text-lg sm:text-xl tracking-tight text-white hover:text-amber-400 transition-colors cursor-pointer text-left"
+            >
               Sunu Events
-            </h3>
+            </button>
             <p className="mt-3.5 text-xs sm:text-sm text-[#8E92BC] leading-relaxed max-w-sm">
               La billetterie faite pour le Sénégal : paiement local, billets QR infalsifiables, et une équipe basée à Dakar.
             </p>
           </div>
 
-          {/* EXPLORER Column (Spans 2 of 12) */}
+          {/* EXPLORER Column */}
           <div className="lg:col-span-2">
             <h4 className="font-bold text-xs uppercase tracking-wider text-white mb-4">
               EXPLORER
@@ -71,7 +74,7 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* SUNU EVENTS Column (Spans 2 of 12) */}
+          {/* SUNU EVENTS Column */}
           <div className="lg:col-span-2">
             <h4 className="font-bold text-xs uppercase tracking-wider text-white mb-4">
               SUNU EVENTS
@@ -100,7 +103,7 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* LÉGAL Column (Spans 3 of 12) */}
+          {/* LÉGAL Column */}
           <div className="lg:col-span-3">
             <h4 className="font-bold text-xs uppercase tracking-wider text-white mb-4">
               LÉGAL
@@ -126,7 +129,7 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Divider Line */}
-        <div className="border-t border-[#23264A] pt-8">
+        <div className="border-t border-[#23264A] pt-8 text-left">
           <p className="text-xs text-[#8E92BC]">
             © 2026 NIANE TECHNOLOGIES SUARL — Dakar, Sénégal
           </p>

@@ -1,11 +1,6 @@
 import React from 'react';
 import { Check } from 'lucide-react';
-import { CheckoutStep } from '../../types';
-
-interface CheckoutStepperProps {
-  currentStep: CheckoutStep;
-  onStepClick?: (step: CheckoutStep) => void;
-}
+import { CheckoutStep, CheckoutStepperProps } from '../../types';
 
 export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
   currentStep,

@@ -1,11 +1,7 @@
 import React from 'react';
 import { Search } from 'lucide-react';
+import { HeroSectionProps } from '../../types';
 import { FloatingTickets } from './FloatingTickets';
-
-interface HeroSectionProps {
-  searchQuery?: string;
-  onSearch: (query: string) => void;
-}
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   searchQuery = '',
@@ -23,7 +19,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
   return (
     <section className="relative overflow-hidden pt-12 pb-24 sm:pt-16 sm:pb-28 lg:pt-20 lg:pb-32 bg-white">
-      
       {/* Exact Figma Specs for #FFC23C Glow with Breathing / Pulse Animation */}
       <div
         className="absolute pointer-events-none -z-0 animate-orb-pulse"
@@ -42,14 +37,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-20">
-        
         {/* Main Headline */}
         <h1 className="font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-[52px] tracking-tight text-gray-900 leading-[1.18] max-w-3xl mx-auto">
           <span>Sunu moments, sunu</span>
           <br className="hidden sm:block" />{' '}
           <span className="relative inline-block mt-1 sm:mt-0">
             <span className="relative z-10">tickets</span>
-            {/* Highlight marker behind 'tickets' */}
             <span
               className="absolute bottom-[3px] left-[-4px] right-[-4px] h-[10px] sm:h-[13px] bg-[#FFC23C]/75 rounded-xs -z-0"
               aria-hidden="true"

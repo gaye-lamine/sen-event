@@ -1,13 +1,6 @@
 import React from 'react';
 import { Calendar, MapPin, ShieldCheck } from 'lucide-react';
-import { EventItem, TicketTier } from '../../types';
-
-interface OrderSummaryCardProps {
-  event: EventItem;
-  tiers: TicketTier[];
-  quantities: Record<string, number>;
-  onModifyTickets?: () => void;
-}
+import { OrderSummaryCardProps } from '../../types';
 
 export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
   event,

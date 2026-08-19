@@ -1,9 +1,5 @@
 import React from 'react';
-import { EventItem } from '../../types/event';
-
-interface EventAboutSectionProps {
-  event: EventItem;
-}
+import { EventAboutSectionProps } from '../../types';
 
 export const EventAboutSection: React.FC<EventAboutSectionProps> = ({ event }) => {
   const organizer = event.organizer || {

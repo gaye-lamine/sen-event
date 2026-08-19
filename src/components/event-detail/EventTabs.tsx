@@ -1,10 +1,5 @@
 import React from 'react';
-import { EventTabType } from '../../types';
-
-interface EventTabsProps {
-  activeTab: EventTabType;
-  onTabChange: (tab: EventTabType) => void;
-}
+import { EventTabType, EventTabsProps } from '../../types';
 
 export const EventTabs: React.FC<EventTabsProps> = ({
   activeTab,

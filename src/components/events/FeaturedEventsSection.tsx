@@ -1,12 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { EventItem } from '../../types/event';
+import { FeaturedEventsSectionProps } from '../../types';
 import { EventCard } from './EventCard';
-
-interface FeaturedEventsSectionProps {
-  events: EventItem[];
-  onBook: (event: EventItem) => void;
-}
 
 export const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
   events,

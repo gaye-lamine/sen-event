@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, MapPin, Heart, ArrowRight, Users, Star } from 'lucide-react';
-import { EventItem } from '../../types/event';
+import { EventItem, EventHeroBannerProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
-
-interface EventHeroBannerProps {
-  event: EventItem;
-  onScrollToTickets?: () => void;
-}
 
 export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
   event,

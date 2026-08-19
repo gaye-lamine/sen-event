@@ -1,12 +1,7 @@
 import React from 'react';
 import { Download } from 'lucide-react';
 import confetti from 'canvas-confetti';
-
-interface OrderConfirmationViewProps {
-  orderNumber?: string;
-  customerEmail?: string;
-  onNavigateHome: () => void;
-}
+import { OrderConfirmationViewProps } from '../../types';
 
 export const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({
   orderNumber = 'SN-284916',

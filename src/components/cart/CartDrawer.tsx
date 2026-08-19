@@ -1,14 +1,6 @@
 import React from 'react';
 import { X, ShoppingBag, ArrowRight, Trash2 } from 'lucide-react';
-import { CartItem } from '../../types';
-
-interface CartDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  items: CartItem[];
-  onRemoveItem: (index: number) => void;
-  onCheckout: () => void;
-}
+import { CartDrawerProps } from '../../types';
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
   isOpen,

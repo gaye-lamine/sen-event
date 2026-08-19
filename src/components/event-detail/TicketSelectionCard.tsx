@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { Minus, Plus, ShieldCheck, X } from 'lucide-react';
-import { EventItem, TicketTier } from '../../types/event';
-
-interface TicketSelectionCardProps {
-  event: EventItem;
-  onProceedToCheckout?: (selectedTiers: { tier: TicketTier; quantity: number }[]) => void;
-}
+import { TicketTier, TicketSelectionCardProps } from '../../types';
 
 export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
   event,

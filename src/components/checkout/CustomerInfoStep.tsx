@@ -1,21 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { TicketTier, TicketHolder } from '../../types';
-
-interface CustomerInfoStepProps {
-  tiers: TicketTier[];
-  quantities: Record<string, number>;
-  customerFirstName: string;
-  customerLastName: string;
-  customerPhone: string;
-  customerEmail: string;
-  onChangeFirstName: (value: string) => void;
-  onChangeLastName: (value: string) => void;
-  onChangePhone: (value: string) => void;
-  onChangeEmail: (value: string) => void;
-  onBack: () => void;
-  onContinue: () => void;
-}
+import { TicketHolder, CustomerInfoStepProps } from '../../types';
 
 export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
   tiers,

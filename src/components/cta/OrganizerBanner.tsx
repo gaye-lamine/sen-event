@@ -1,9 +1,6 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-
-interface OrganizerBannerProps {
-  onBecomeOrganizer?: () => void;
-}
+import { OrganizerBannerProps } from '../../types';
 
 export const OrganizerBanner: React.FC<OrganizerBannerProps> = ({
   onBecomeOrganizer,
@@ -11,10 +8,8 @@ export const OrganizerBanner: React.FC<OrganizerBannerProps> = ({
   return (
     <section className="py-8 sm:py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         {/* Banner Card with Dark Metallic Gold Gradient */}
         <div className="relative overflow-hidden rounded-3xl sm:rounded-[32px] bg-cta-gradient text-white p-7 sm:p-10 lg:p-14 shadow-2xl border border-white/5">
-          
           {/* Subtle warm lighting bloom in right background */}
           <div
             className="absolute top-0 right-0 w-[400px] h-full bg-gradient-to-l from-amber-500/20 via-amber-600/10 to-transparent pointer-events-none"
@@ -22,9 +17,8 @@ export const OrganizerBanner: React.FC<OrganizerBannerProps> = ({
           />
 
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6 sm:gap-8">
-            
             {/* Left Content */}
-            <div className="max-w-2xl">
+            <div className="max-w-2xl text-left">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">
                 <div>Tu organises un évènement ?</div>
                 <div className="mt-1">

@@ -1,17 +1,11 @@
 import React, { useState } from 'react';
-import { EventItem, TicketTier, CheckoutStep, SelectedTierItem } from '../types';
+import { EventItem, TicketTier, CheckoutStep, CheckoutPageProps } from '../types';
 import { CheckoutStepper } from '../components/checkout/CheckoutStepper';
 import { TicketSelectionStep } from '../components/checkout/TicketSelectionStep';
 import { OrderSummaryCard } from '../components/checkout/OrderSummaryCard';
 import { CustomerInfoStep } from '../components/checkout/CustomerInfoStep';
 import { PaymentStep } from '../components/checkout/PaymentStep';
 import { OrderConfirmationView } from '../components/checkout/OrderConfirmationView';
-
-interface CheckoutPageProps {
-  event: EventItem;
-  initialTiers?: SelectedTierItem[];
-  onNavigateHome: () => void;
-}
 
 export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   event,

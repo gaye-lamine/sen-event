@@ -1,13 +1,6 @@
 import React from 'react';
-import { DateFilterType, EventItem } from '../../types/event';
+import { DateFilterType, DateFilterSectionProps } from '../../types';
 import { EventCard } from './EventCard';
-
-interface DateFilterSectionProps {
-  activeFilter: DateFilterType;
-  onFilterChange: (filter: DateFilterType) => void;
-  events: EventItem[];
-  onBook: (event: EventItem) => void;
-}
 
 const DATE_TABS: { id: DateFilterType; label: string }[] = [
   { id: 'today', label: "Aujourd'hui" },
