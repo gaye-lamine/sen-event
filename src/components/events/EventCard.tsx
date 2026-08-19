@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MapPin, Calendar, Heart, ArrowRight } from 'lucide-react';
 import { EventCardProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
+import { formatPrice } from '../../utils';
 
 /**
  * @component EventCard
@@ -26,8 +27,6 @@ export const EventCard: React.FC<EventCardProps> = ({
   const handleCardClick = () => {
     onBook?.(event);
   };
-
-  const formattedPrice = new Intl.NumberFormat('fr-FR').format(event.startingPrice);
 
   return (
     <div
@@ -97,7 +96,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           <div className="flex flex-col">
             <span className="text-[10px] text-gray-400 font-medium">À partir de</span>
             <span className="font-black text-sm sm:text-base text-gray-900 tracking-tight">
-              {formattedPrice} {event.currency || 'F'}
+              {formatPrice(event.startingPrice, event.currency)}
             </span>
           </div>
 

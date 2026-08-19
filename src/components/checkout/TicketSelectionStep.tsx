@@ -1,6 +1,7 @@
 import React from 'react';
 import { Minus, Plus, ArrowRight, X } from 'lucide-react';
 import { TicketSelectionStepProps } from '../../types';
+import { formatPrice } from '../../utils';
 
 /**
  * @component TicketSelectionStep
@@ -56,7 +57,7 @@ export const TicketSelectionStep: React.FC<TicketSelectionStepProps> = ({
                     </p>
                   )}
                   <div className="font-extrabold text-sm sm:text-base text-gray-900 mt-2">
-                    {new Intl.NumberFormat('fr-FR').format(tier.price)} {event.currency || 'F'}
+                    {formatPrice(tier.price, event.currency)}
                   </div>
                 </div>
 

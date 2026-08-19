@@ -1,14 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import {
-  EventItem,
-  CategoryItem,
-  EventCategory,
-  DateFilterType,
-  SelectedTierItem,
-  AppView,
-  CartItem,
-} from './types';
-import { eventService } from './services/api/eventService';
+import React, { useState } from 'react';
+import { EventItem, SelectedTierItem, AppView } from './types';
+import { useEvents, useCart } from './hooks';
 import { Navbar } from './components/layout/Navbar';
 import { CategoryPills } from './components/hero/CategoryPills';
 import { HeroSection } from './components/hero/HeroSection';
@@ -24,79 +16,38 @@ import { CheckoutPage } from './pages/CheckoutPage';
 /**
  * @component App
  * @description Composant racine et orchestrateur d'état de l'application Sunu Events.
- * Gère le routage par état entre la page d'accueil, la fiche de détail et le tunnel de commande,
- * ainsi que la synchronisation des filtres et du panier.
+ * Gère le routage par état entre la page d'accueil, la fiche de détail et le tunnel de commande.
  */
 export const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<AppView>('home');
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [selectedCheckoutTiers, setSelectedCheckoutTiers] = useState<SelectedTierItem[]>([]);
 
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<EventCategory>('all');
-  const [featuredEvents, setFeaturedEvents] = useState<EventItem[]>([]);
-  const [dateFilter, setDateFilter] = useState<DateFilterType>('today');
-  const [dateFilteredEvents, setDateFilteredEvents] = useState<EventItem[]>([]);
-  const [allEvents, setAllEvents] = useState<EventItem[]>([]);
-  const [hasMoreEvents, setHasMoreEvents] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const {
+    categories,
+    selectedCategory,
+    featuredEvents,
+    dateFilter,
+    dateFilteredEvents,
+    allEvents,
+    hasMoreEvents,
+    isLoadingMore,
+    searchQuery,
+    setDateFilter,
+    handleCategorySelect,
+    handleSearch,
+    handleClearSearch,
+    handleLoadMore,
+  } = useEvents();
 
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-
-  useEffect(() => {
-    const loadInitialData = async () => {
-      const cats = await eventService.getCategories();
-      setCategories(cats);
-
-      const featured = await eventService.getFeaturedEvents();
-      setFeaturedEvents(featured);
-
-      if (featured.length > 0) {
-        setSelectedEvent(featured[0]);
-      }
-    };
-
-    loadInitialData();
-  }, []);
-
-  useEffect(() => {
-    const loadDateEvents = async () => {
-      const events = await eventService.getEventsByDateFilter(dateFilter);
-      setDateFilteredEvents(events);
-    };
-
-    loadDateEvents();
-  }, [dateFilter]);
-
-  useEffect(() => {
-    const loadAllEvents = async () => {
-      const response = await eventService.getAllEvents(
-        {
-          category: selectedCategory,
-          query: searchQuery,
-        },
-        currentPage,
-        8
-      );
-
-      if (currentPage === 1) {
-        setAllEvents(response.data);
-      } else {
-        setAllEvents((prev) => {
-          const ids = new Set(prev.map((e) => e.id));
-          const newItems = response.data.filter((e) => !ids.has(e.id));
-          return [...prev, ...newItems];
-        });
-      }
-      setHasMoreEvents(response.hasMore);
-      setIsLoadingMore(false);
-    };
-
-    loadAllEvents();
-  }, [selectedCategory, searchQuery, currentPage]);
+  const {
+    isCartOpen,
+    cartItems,
+    cartCount,
+    openCart,
+    closeCart,
+    removeItem,
+  } = useCart();
 
   const handleNavigateHome = () => {
     setCurrentView('home');
@@ -117,38 +68,18 @@ export const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleCategorySelect = (category: EventCategory) => {
-    setSelectedCategory(category);
-    setCurrentPage(1);
+  const handleSelectCategoryAndNavigate = (cat: typeof selectedCategory) => {
+    handleCategorySelect(cat);
     if (currentView !== 'home') {
       setCurrentView('home');
     }
-    setTimeout(() => {
-      const el = document.getElementById('all-events-section');
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
   };
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
-    if (currentView !== 'home' && query.trim()) {
+  const handleSearchAndNavigate = (q: string) => {
+    handleSearch(q);
+    if (currentView !== 'home' && q.trim()) {
       setCurrentView('home');
     }
-  };
-
-  const handleClearSearch = () => {
-    setSearchQuery('');
-    setCurrentPage(1);
-  };
-
-  const handleLoadMore = () => {
-    setIsLoadingMore(true);
-    setCurrentPage((prev) => prev + 1);
-  };
-
-  const handleProceedToCheckout = (selectedTiers: SelectedTierItem[]) => {
-    handleOpenCheckout(selectedTiers);
   };
 
   const similarEvents = allEvents.filter(
@@ -160,44 +91,44 @@ export const App: React.FC = () => {
       <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-xs transition-all">
         <Navbar
           searchQuery={searchQuery}
-          onSearch={handleSearch}
+          onSearch={handleSearchAndNavigate}
           onNavigateHome={handleNavigateHome}
-          cartCount={cartItems.length}
-          onOpenCart={() => setIsCartOpen(true)}
+          cartCount={cartCount}
+          onOpenCart={openCart}
         />
 
         {currentView === 'home' && (
           <CategoryPills
             categories={categories}
             selectedCategory={selectedCategory}
-            onSelectCategory={handleCategorySelect}
+            onSelectCategory={handleSelectCategoryAndNavigate}
           />
         )}
       </header>
 
-      {currentView === 'checkout' && selectedEvent ? (
+      {currentView === 'checkout' && (selectedEvent || featuredEvents[0]) ? (
         <main className="flex-1">
           <CheckoutPage
-            event={selectedEvent}
+            event={selectedEvent || featuredEvents[0]}
             initialTiers={selectedCheckoutTiers}
             onNavigateHome={handleNavigateHome}
           />
         </main>
-      ) : currentView === 'event-detail' && selectedEvent ? (
+      ) : currentView === 'event-detail' && (selectedEvent || featuredEvents[0]) ? (
         <main className="flex-1">
           <EventDetailPage
-            event={selectedEvent}
+            event={selectedEvent || featuredEvents[0]}
             similarEvents={similarEvents}
             onNavigateHome={handleNavigateHome}
             onSelectEvent={handleOpenEventDetail}
-            onProceedToCheckout={handleProceedToCheckout}
+            onProceedToCheckout={handleOpenCheckout}
           />
         </main>
       ) : (
         <main className="flex-1">
           <HeroSection
             searchQuery={searchQuery}
-            onSearch={handleSearch}
+            onSearch={handleSearchAndNavigate}
           />
 
           <FeaturedEventsSection
@@ -230,13 +161,11 @@ export const App: React.FC = () => {
 
       <CartDrawer
         isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
+        onClose={closeCart}
         items={cartItems}
-        onRemoveItem={(index) =>
-          setCartItems((prev) => prev.filter((_, i) => i !== index))
-        }
+        onRemoveItem={removeItem}
         onCheckout={() => {
-          setIsCartOpen(false);
+          closeCart();
           handleOpenCheckout();
         }}
       />

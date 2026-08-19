@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, ShoppingBag, ArrowRight, Trash2 } from 'lucide-react';
 import { CartDrawerProps } from '../../types';
+import { formatPrice } from '../../utils';
 
 /**
  * @component CartDrawer
@@ -18,7 +19,6 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   if (!isOpen) return null;
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const formattedTotal = new Intl.NumberFormat('fr-FR').format(total);
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-black/50 backdrop-blur-xs flex justify-end">
@@ -69,8 +69,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     {item.tierName} × {item.quantity}
                   </p>
                   <p className="text-xs font-black text-gray-900 mt-1">
-                    {new Intl.NumberFormat('fr-FR').format(item.price * item.quantity)}{' '}
-                    {item.event.currency || 'F'}
+                    {formatPrice(item.price * item.quantity, item.event.currency)}
                   </p>
                 </div>
                 <button
@@ -91,7 +90,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             <div className="flex justify-between items-center text-sm font-semibold text-gray-700">
               <span>Total estimé</span>
               <span className="font-black text-base text-gray-900">
-                {formattedTotal} F
+                {formatPrice(total)}
               </span>
             </div>
             <button

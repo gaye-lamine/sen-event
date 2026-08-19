@@ -6,6 +6,7 @@ import { OrderSummaryCard } from '../components/checkout/OrderSummaryCard';
 import { CustomerInfoStep } from '../components/checkout/CustomerInfoStep';
 import { PaymentStep } from '../components/checkout/PaymentStep';
 import { OrderConfirmationView } from '../components/checkout/OrderConfirmationView';
+import { CHECKOUT_CONSTANTS } from '../constants';
 
 /**
  * @page CheckoutPage
@@ -61,10 +62,18 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     };
   });
 
-  const [customerFirstName, setCustomerFirstName] = useState('Aminata');
-  const [customerLastName, setCustomerLastName] = useState('Diop');
-  const [customerPhone, setCustomerPhone] = useState('77 123 45 67');
-  const [customerEmail, setCustomerEmail] = useState('aminata.diop@email.com');
+  const [customerFirstName, setCustomerFirstName] = useState<string>(
+    CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.FIRST_NAME
+  );
+  const [customerLastName, setCustomerLastName] = useState<string>(
+    CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.LAST_NAME
+  );
+  const [customerPhone, setCustomerPhone] = useState<string>(
+    CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.PHONE
+  );
+  const [customerEmail, setCustomerEmail] = useState<string>(
+    CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.EMAIL
+  );
 
   const handleUpdateQuantity = (tierId: string, delta: number) => {
     setQuantities((prev) => {
@@ -76,7 +85,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
   const calculateTotal = () => {
     const subtotal = tiers.reduce((acc, t) => acc + t.price * (quantities[t.id] || 0), 0);
-    const serviceFees = subtotal > 0 ? 1500 : 0;
+    const serviceFees = subtotal > 0 ? CHECKOUT_CONSTANTS.SERVICE_FEE : 0;
     return subtotal + serviceFees;
   };
 
@@ -86,7 +95,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     return (
       <div className="w-full bg-white">
         <OrderConfirmationView
-          orderNumber="SN-284916"
+          orderNumber={CHECKOUT_CONSTANTS.DEFAULT_ORDER_NUMBER}
           customerEmail={customerEmail}
           onNavigateHome={onNavigateHome}
         />

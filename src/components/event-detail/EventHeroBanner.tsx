@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calendar, MapPin, Heart, ArrowRight, Users, Star } from 'lucide-react';
 import { EventHeroBannerProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
+import { formatNumber, formatRating } from '../../utils';
 
 /**
  * @component EventHeroBanner
@@ -16,9 +17,9 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
   const [isFavorite, setIsFavorite] = useState(false);
 
   const formattedAttendees = event.attendeesCount
-    ? new Intl.NumberFormat('fr-FR').format(event.attendeesCount)
+    ? formatNumber(event.attendeesCount)
     : '2 480';
-  const rating = event.rating ? event.rating.toFixed(1).replace('.', ',') : '4,8';
+  const rating = event.rating ? formatRating(event.rating) : '4,8';
   const reviewsCount = event.reviewsCount || 320;
 
   return (

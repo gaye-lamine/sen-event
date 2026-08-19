@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Download } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { OrderConfirmationViewProps } from '../../types';
+import { CHECKOUT_CONSTANTS } from '../../constants';
 
 /**
  * @component OrderConfirmationView
@@ -10,8 +11,8 @@ import { OrderConfirmationViewProps } from '../../types';
  * @param {OrderConfirmationViewProps} props - Contrat de propriétés du composant
  */
 export const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({
-  orderNumber = 'SN-284916',
-  customerEmail = 'aminata.diop@email.com',
+  orderNumber = CHECKOUT_CONSTANTS.DEFAULT_ORDER_NUMBER,
+  customerEmail = CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.EMAIL,
   onNavigateHome,
 }) => {
   useEffect(() => {

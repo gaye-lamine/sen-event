@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Minus, Plus, ShieldCheck, X } from 'lucide-react';
 import { TicketTier, TicketSelectionCardProps } from '../../types';
+import { formatPrice } from '../../utils';
+import { CHECKOUT_CONSTANTS } from '../../constants';
 
 /**
  * @component TicketSelectionCard
@@ -58,7 +60,7 @@ export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
     return acc + tier.price * qty;
   }, 0);
 
-  const serviceFees = totalTickets > 0 ? 1500 : 0;
+  const serviceFees = totalTickets > 0 ? CHECKOUT_CONSTANTS.SERVICE_FEE : 0;
   const grandTotal = subtotal + serviceFees;
 
   const handleCheckout = () => {
@@ -122,7 +124,7 @@ export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
                     </p>
                   )}
                   <div className="font-extrabold text-xs sm:text-sm text-gray-900 mt-1.5">
-                    {new Intl.NumberFormat('fr-FR').format(tier.price)} {event.currency || 'F'}
+                    {formatPrice(tier.price, event.currency)}
                   </div>
                 </div>
 
@@ -166,19 +168,19 @@ export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
         <div className="flex justify-between items-center text-gray-500">
           <span>Sous-total</span>
           <span className="font-semibold text-gray-800">
-            {new Intl.NumberFormat('fr-FR').format(subtotal)} {event.currency || 'F'}
+            {formatPrice(subtotal, event.currency)}
           </span>
         </div>
         <div className="flex justify-between items-center text-gray-500">
           <span>Frais de service</span>
           <span className="font-semibold text-gray-800">
-            {new Intl.NumberFormat('fr-FR').format(serviceFees)} {event.currency || 'F'}
+            {formatPrice(serviceFees, event.currency)}
           </span>
         </div>
         <div className="flex justify-between items-center pt-2 border-t border-gray-200 text-sm font-extrabold text-gray-900">
           <span>Total</span>
           <span className="text-base font-black">
-            {new Intl.NumberFormat('fr-FR').format(grandTotal)} {event.currency || 'F'}
+            {formatPrice(grandTotal, event.currency)}
           </span>
         </div>
       </div>
@@ -191,7 +193,7 @@ export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
       >
         <span>Continuer</span>
         <span className="text-white/60">•</span>
-        <span>{new Intl.NumberFormat('fr-FR').format(grandTotal)} {event.currency || 'F'}</span>
+        <span>{formatPrice(grandTotal, event.currency)}</span>
       </button>
 
       <div className="pt-1 text-center flex items-center justify-center gap-1.5 text-[11px] text-gray-400">

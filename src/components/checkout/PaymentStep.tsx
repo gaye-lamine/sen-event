@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ShieldCheck, CheckCircle, QrCode, CreditCard, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { PaymentMethodType, PaymentStepProps } from '../../types';
+import { formatPrice } from '../../utils';
+import { CHECKOUT_CONSTANTS } from '../../constants';
 
 /**
  * @component PaymentStep
@@ -19,7 +21,9 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
   onPaymentComplete,
 }) => {
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethodType>('wave');
-  const [phone, setPhone] = useState(customerPhone || '77 123 45 67');
+  const [phone, setPhone] = useState(
+    customerPhone || CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.PHONE
+  );
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvc, setCardCvc] = useState('');
@@ -27,8 +31,6 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-
-  const formattedAmount = new Intl.NumberFormat('fr-FR').format(totalAmount);
 
   const handlePaySubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,8 +65,13 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
         </h2>
         <p className="text-xs sm:text-sm text-gray-500 mt-1 max-w-md mx-auto">
           Vos billets ont été confirmés. Un SMS vous a été envoyé au{' '}
-          <strong className="text-gray-900">{phone || '77 123 45 67'}</strong> et vos e-tickets à{' '}
-          <strong className="text-gray-900">{customerEmail || 'aminata.diop@email.com'}</strong>.
+          <strong className="text-gray-900">
+            {phone || CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.PHONE}
+          </strong>{' '}
+          et vos e-tickets à{' '}
+          <strong className="text-gray-900">
+            {customerEmail || CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.EMAIL}
+          </strong>.
         </p>
 
         <div className="my-6 p-5 sm:p-6 bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-2xl text-left shadow-lg">
@@ -92,11 +99,16 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
           <div className="mt-4 pt-3 border-t border-gray-700/60 flex justify-between items-center text-xs text-gray-300">
             <div>
               <span className="text-gray-400">Titulaire : </span>
-              <span className="font-semibold text-white">{customerName || 'Aminata Diop'}</span>
+              <span className="font-semibold text-white">
+                {customerName ||
+                  `${CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.FIRST_NAME} ${CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.LAST_NAME}`}
+              </span>
             </div>
             <div>
               <span className="text-gray-400">Total payé : </span>
-              <span className="font-bold text-amber-400">{formattedAmount} {event.currency || 'F'}</span>
+              <span className="font-bold text-amber-400">
+                {formatPrice(totalAmount, event.currency)}
+              </span>
             </div>
           </div>
         </div>
@@ -178,7 +190,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
             </label>
             <div className="flex rounded-2xl overflow-hidden border border-gray-200 focus-within:ring-2 focus-within:ring-gray-900 transition-all">
               <span className="inline-flex items-center px-4 bg-gray-50 text-gray-600 text-xs sm:text-sm font-semibold border-r border-gray-200 select-none">
-                +221
+                {CHECKOUT_CONSTANTS.PHONE_PREFIX}
               </span>
               <input
                 type="tel"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { TicketHolder, CustomerInfoStepProps } from '../../types';
+import { CHECKOUT_CONSTANTS } from '../../constants';
 
 /**
  * @component CustomerInfoStep
@@ -132,7 +133,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
           </label>
           <div className="flex rounded-2xl overflow-hidden border border-gray-200 focus-within:ring-2 focus-within:ring-gray-900 transition-all">
             <span className="inline-flex items-center px-4 bg-gray-50 text-gray-600 text-xs sm:text-sm font-semibold border-r border-gray-200 select-none">
-              +221
+              {CHECKOUT_CONSTANTS.PHONE_PREFIX}
             </span>
             <input
               type="tel"

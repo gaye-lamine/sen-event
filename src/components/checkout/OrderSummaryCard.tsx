@@ -1,6 +1,8 @@
 import React from 'react';
 import { Calendar, MapPin, ShieldCheck } from 'lucide-react';
 import { OrderSummaryCardProps } from '../../types';
+import { formatPrice } from '../../utils';
+import { CHECKOUT_CONSTANTS } from '../../constants';
 
 /**
  * @component OrderSummaryCard
@@ -22,7 +24,7 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
     return acc + tier.price * qty;
   }, 0);
 
-  const serviceFees = totalTickets > 0 ? 1500 : 0;
+  const serviceFees = totalTickets > 0 ? CHECKOUT_CONSTANTS.SERVICE_FEE : 0;
   const grandTotal = subtotal + serviceFees;
 
   return (
@@ -62,7 +64,7 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
                   <strong className="font-bold text-gray-900">{qty}</strong>
                 </span>
                 <span className="font-bold text-gray-900">
-                  {new Intl.NumberFormat('fr-FR').format(lineTotal)} {event.currency || 'F'}
+                  {formatPrice(lineTotal, event.currency)}
                 </span>
               </div>
             );
@@ -84,20 +86,20 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
         <div className="flex justify-between items-center text-gray-500">
           <span>Sous-total</span>
           <span className="font-semibold text-gray-800">
-            {new Intl.NumberFormat('fr-FR').format(subtotal)} {event.currency || 'F'}
+            {formatPrice(subtotal, event.currency)}
           </span>
         </div>
         <div className="flex justify-between items-center text-gray-500">
           <span>Frais de service</span>
           <span className="font-semibold text-gray-800">
-            {new Intl.NumberFormat('fr-FR').format(serviceFees)} {event.currency || 'F'}
+            {formatPrice(serviceFees, event.currency)}
           </span>
         </div>
 
         <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-sm font-extrabold text-gray-900">
           <span>Total</span>
           <span className="text-base font-black">
-            {new Intl.NumberFormat('fr-FR').format(grandTotal)} {event.currency || 'F'}
+            {formatPrice(grandTotal, event.currency)}
           </span>
         </div>
       </div>
