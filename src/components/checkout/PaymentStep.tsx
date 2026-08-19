@@ -134,62 +134,62 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
         {/* ------------------------------------------------------------- */}
         {/* 2. SÉLECTION DU MODE DE PAIEMENT (3 CARTES : WAVE, OM, CARTE) */}
         {/* ------------------------------------------------------------- */}
-        <div className="grid grid-cols-3 gap-2.5 sm:gap-3.5">
+        <div className="grid grid-cols-3 gap-3 sm:gap-4">
           
           {/* Option 1: Wave */}
           <button
             type="button"
             onClick={() => setSelectedMethod('wave')}
-            className={`py-3.5 px-2 rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`py-4 sm:py-5 px-3 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all cursor-pointer ${
               selectedMethod === 'wave'
-                ? 'border-gray-900 bg-white ring-1 ring-gray-900 shadow-xs'
+                ? 'border-gray-900 bg-white ring-2 ring-gray-900/90 shadow-sm'
                 : 'border-gray-200 hover:border-gray-300 bg-white'
             }`}
           >
-            <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-gray-50">
+            <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl flex items-center justify-center bg-cyan-50/60 p-1">
               <img
                 src="/images/wave.png"
                 alt="Wave"
-                className="w-full h-full object-contain p-0.5"
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
               />
             </div>
-            <span className="text-xs font-bold text-gray-900">Wave</span>
+            <span className="text-xs sm:text-[13px] font-bold text-gray-900">Wave</span>
           </button>
 
           {/* Option 2: Orange Money */}
           <button
             type="button"
             onClick={() => setSelectedMethod('orange_money')}
-            className={`py-3.5 px-2 rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`py-4 sm:py-5 px-3 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all cursor-pointer ${
               selectedMethod === 'orange_money'
-                ? 'border-gray-900 bg-white ring-1 ring-gray-900 shadow-xs'
+                ? 'border-gray-900 bg-white ring-2 ring-gray-900/90 shadow-sm'
                 : 'border-gray-200 hover:border-gray-300 bg-white'
             }`}
           >
-            <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
+            <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl flex items-center justify-center bg-orange-50/60 p-1">
               <img
                 src="/images/orange-money.png"
                 alt="Orange Money"
-                className="w-full h-full object-contain p-0.5"
+                className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
               />
             </div>
-            <span className="text-xs font-bold text-gray-900">Orange Money</span>
+            <span className="text-xs sm:text-[13px] font-bold text-gray-900">Orange Money</span>
           </button>
 
           {/* Option 3: Carte bancaire */}
           <button
             type="button"
             onClick={() => setSelectedMethod('card')}
-            className={`py-3.5 px-2 rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            className={`py-4 sm:py-5 px-3 rounded-2xl border flex flex-col items-center justify-center gap-2 transition-all cursor-pointer ${
               selectedMethod === 'card'
-                ? 'border-gray-900 bg-white ring-1 ring-gray-900 shadow-xs'
+                ? 'border-gray-900 bg-white ring-2 ring-gray-900/90 shadow-sm'
                 : 'border-gray-200 hover:border-gray-300 bg-white'
             }`}
           >
-            <div className="w-8 h-8 rounded-full bg-[#111328] text-white flex items-center justify-center shadow-xs">
-              <CreditCard className="w-4 h-4 text-white" />
+            <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-[#0F141C] text-white flex items-center justify-center shadow-xs">
+              <CreditCard className="w-5 h-5 sm:w-6 sm:h-6 text-white stroke-[2]" />
             </div>
-            <span className="text-xs font-bold text-gray-900">Carte bancaire</span>
+            <span className="text-xs sm:text-[13px] font-bold text-gray-900">Carte bancaire</span>
           </button>
         </div>
 
