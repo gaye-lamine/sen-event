@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EventItem, TicketTier, CheckoutStep, CheckoutPageProps } from '../types';
+import { TicketTier, CheckoutStep, CheckoutPageProps } from '../types';
 import { CheckoutStepper } from '../components/checkout/CheckoutStepper';
 import { TicketSelectionStep } from '../components/checkout/TicketSelectionStep';
 import { OrderSummaryCard } from '../components/checkout/OrderSummaryCard';

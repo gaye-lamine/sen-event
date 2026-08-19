@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Calendar, MapPin, Heart, ArrowRight, Users, Star } from 'lucide-react';
-import { EventItem, EventHeroBannerProps } from '../../types';
+import { EventHeroBannerProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
 
 export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({

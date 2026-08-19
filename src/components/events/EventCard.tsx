@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MapPin, Calendar, Heart, ArrowRight } from 'lucide-react';
-import { EventItem, EventCardProps } from '../../types';
+import { EventCardProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
 
 export const EventCard: React.FC<EventCardProps> = ({

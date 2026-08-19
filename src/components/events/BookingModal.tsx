@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Calendar, MapPin, CheckCircle, ShieldCheck, Ticket, QrCode } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { EventItem, TicketTier, BookingConfirmation, BookingModalProps } from '../../types';
+import { TicketTier, BookingConfirmation, BookingModalProps } from '../../types';
 import { eventService } from '../../services/api/eventService';
 
 export const BookingModal: React.FC<BookingModalProps> = ({
