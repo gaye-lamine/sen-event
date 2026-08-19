@@ -5,6 +5,7 @@ import { TicketSelectionStep } from '../components/checkout/TicketSelectionStep'
 import { OrderSummaryCard } from '../components/checkout/OrderSummaryCard';
 import { CustomerInfoStep } from '../components/checkout/CustomerInfoStep';
 import { PaymentStep } from '../components/checkout/PaymentStep';
+import { OrderConfirmationView } from '../components/checkout/OrderConfirmationView';
 
 interface CheckoutPageProps {
   event: EventItem;
@@ -18,6 +19,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   onNavigateHome,
 }) => {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>(1);
+  const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
 
   // Available ticket tiers
   const tiers: TicketTier[] = event.ticketTiers || [
@@ -83,6 +85,19 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
   const customerFullName = `${customerFirstName} ${customerLastName}`.trim();
 
+  // If payment confirmed, render the final success confirmation screen
+  if (isPaymentConfirmed) {
+    return (
+      <div className="w-full bg-white">
+        <OrderConfirmationView
+          orderNumber="SN-284916"
+          customerEmail={customerEmail}
+          onNavigateHome={onNavigateHome}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full bg-[#F4F5F7]/70 py-8 sm:py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
       <div className="max-w-6xl mx-auto">
@@ -136,7 +151,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                   customerPhone={customerPhone}
                   customerEmail={customerEmail}
                   onBack={() => setCurrentStep(2)}
-                  onPaymentComplete={() => {}}
+                  onPaymentComplete={() => setIsPaymentConfirmed(true)}
                 />
               )}
             </div>
