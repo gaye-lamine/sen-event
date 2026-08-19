@@ -1,7 +1,6 @@
 import React from 'react';
 import { Check } from 'lucide-react';
-
-export type CheckoutStep = 1 | 2 | 3;
+import { CheckoutStep } from '../../types';
 
 interface CheckoutStepperProps {
   currentStep: CheckoutStep;
@@ -27,7 +26,7 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
 
         return (
           <React.Fragment key={step.number}>
-            {/* Step Item */}
+            {/* Step Node */}
             <div className="flex flex-col items-center">
               <button
                 onClick={() => onStepClick?.(step.number)}
@@ -72,7 +71,6 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
                       isPassed ? 'bg-[#10B981]' : 'bg-gray-200'
                     }`}
                   />
-                  {/* Subtle midpoint dot */}
                   <div
                     className={`absolute w-1.5 h-1.5 rounded-full ${
                       isPassed ? 'bg-[#10B981]' : 'bg-gray-300'

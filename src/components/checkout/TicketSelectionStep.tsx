@@ -1,6 +1,6 @@
 import React from 'react';
 import { Minus, Plus, ArrowRight, X } from 'lucide-react';
-import { EventItem, TicketTier } from '../../types/event';
+import { EventItem, TicketTier } from '../../types';
 
 interface TicketSelectionStepProps {
   event: EventItem;
@@ -65,7 +65,7 @@ export const TicketSelectionStep: React.FC<TicketSelectionStepProps> = ({
                   </div>
                 </div>
 
-                {/* Quantity Controls or Sold Out */}
+                {/* Quantity Controls */}
                 <div className="flex items-center self-center flex-shrink-0">
                   {isSoldOut ? (
                     <span className="text-xs font-medium text-gray-400 flex items-center gap-1">
@@ -102,7 +102,7 @@ export const TicketSelectionStep: React.FC<TicketSelectionStepProps> = ({
         })}
       </div>
 
-      {/* Action Row - Continuer aligned right */}
+      {/* Action Row */}
       <div className="flex justify-end pt-2">
         <button
           onClick={onContinue}

@@ -1,13 +1,6 @@
 import React from 'react';
 import { X, ShoppingBag, ArrowRight, Trash2 } from 'lucide-react';
-import { EventItem } from '../../types/event';
-
-interface CartItem {
-  event: EventItem;
-  quantity: number;
-  tierName: string;
-  price: number;
-}
+import { CartItem } from '../../types';
 
 interface CartDrawerProps {
   isOpen: boolean;

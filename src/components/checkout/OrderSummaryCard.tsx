@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar, MapPin, ShieldCheck } from 'lucide-react';
-import { EventItem, TicketTier } from '../../types/event';
+import { EventItem, TicketTier } from '../../types';
 
 interface OrderSummaryCardProps {
   event: EventItem;
@@ -15,24 +15,19 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
   quantities,
   onModifyTickets,
 }) => {
-  // Selected items with count > 0
   const selectedItems = tiers.filter((t) => (quantities[t.id] || 0) > 0);
-  
   const totalTickets = Object.values(quantities).reduce((acc, q) => acc + q, 0);
   
-  // Calculate subtotal
   const subtotal = tiers.reduce((acc, tier) => {
     const qty = quantities[tier.id] || 0;
     return acc + tier.price * qty;
   }, 0);
 
-  // Service fees: 1 500 F when tickets selected, 0 otherwise
   const serviceFees = totalTickets > 0 ? 1500 : 0;
   const grandTotal = subtotal + serviceFees;
 
   return (
     <div className="relative bg-white rounded-3xl sm:rounded-[32px] border border-gray-100/90 shadow-sm p-6 sm:p-7 text-left overflow-hidden">
-      
       {/* Event Header */}
       <div className="flex items-start gap-3.5 pb-5 border-b border-gray-100">
         <img
@@ -84,11 +79,8 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
 
       {/* Dashed Ticket Separator with side notches */}
       <div className="relative my-3">
-        {/* Left Cutout */}
         <div className="absolute -left-9 -top-3 w-6 h-6 rounded-full bg-[#F9FAFB] border-r border-gray-100" />
-        {/* Right Cutout */}
         <div className="absolute -right-9 -top-3 w-6 h-6 rounded-full bg-[#F9FAFB] border-l border-gray-100" />
-        {/* Dashed Line */}
         <div className="w-full border-t border-dashed border-gray-200" />
       </div>
 
@@ -132,7 +124,7 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
         )}
       </div>
 
-      {/* Trust & Security Badge */}
+      {/* Security Badge */}
       <div className="mt-2 pt-3 border-t border-gray-100 text-center flex items-center justify-center gap-1.5 text-[10px] text-gray-400">
         <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
         <span>Paiement sécurisé • Wave • Orange Money • CB</span>

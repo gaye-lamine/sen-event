@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { EventItem, TicketTier } from '../types/event';
-import { CheckoutStepper, CheckoutStep } from '../components/checkout/CheckoutStepper';
+import { EventItem, TicketTier, CheckoutStep, SelectedTierItem } from '../types';
+import { CheckoutStepper } from '../components/checkout/CheckoutStepper';
 import { TicketSelectionStep } from '../components/checkout/TicketSelectionStep';
 import { OrderSummaryCard } from '../components/checkout/OrderSummaryCard';
 import { CustomerInfoStep } from '../components/checkout/CustomerInfoStep';
@@ -9,7 +9,7 @@ import { OrderConfirmationView } from '../components/checkout/OrderConfirmationV
 
 interface CheckoutPageProps {
   event: EventItem;
-  initialTiers?: { tier: TicketTier; quantity: number }[];
+  initialTiers?: SelectedTierItem[];
   onNavigateHome: () => void;
 }
 
@@ -48,7 +48,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     },
   ];
 
-  // Initialize quantities (default to Standard x2, VIP x1 as in the mockup, or from initialTiers)
+  // Initialize quantities
   const [quantities, setQuantities] = useState<Record<string, number>>(() => {
     if (initialTiers && initialTiers.length > 0) {
       const init: Record<string, number> = {};
@@ -101,10 +101,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   return (
     <div className="w-full bg-[#F4F5F7]/70 py-8 sm:py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
       <div className="max-w-6xl mx-auto">
-        
-        {/* Rounded Main Box Container as in Mockup */}
+        {/* Rounded Main Box Container */}
         <div className="bg-[#FAFBFD] rounded-[32px] sm:rounded-[44px] p-6 sm:p-10 lg:p-14 border border-gray-100/90 shadow-sm">
-          
           {/* Stepper Progress Indicator */}
           <CheckoutStepper
             currentStep={currentStep}
@@ -113,7 +111,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 
           {/* Two-Column Checkout Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start mt-2 sm:mt-4">
-            
             {/* Left Column: Active Step Form (7 of 12) */}
             <div className="lg:col-span-7 xl:col-span-8">
               {currentStep === 1 && (

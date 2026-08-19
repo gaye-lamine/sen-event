@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { EventItem, TicketTier } from '../types/event';
+import { EventItem, SelectedTierItem, EventTabType } from '../types';
 import { EventBreadcrumb } from '../components/event-detail/EventBreadcrumb';
 import { EventHeroBanner } from '../components/event-detail/EventHeroBanner';
-import { EventTabs, EventTabType } from '../components/event-detail/EventTabs';
+import { EventTabs } from '../components/event-detail/EventTabs';
 import { EventAboutSection } from '../components/event-detail/EventAboutSection';
 import { EventLocationMap } from '../components/event-detail/EventLocationMap';
 import { SimilarEventsSection } from '../components/event-detail/SimilarEventsSection';
@@ -14,7 +14,7 @@ interface EventDetailPageProps {
   similarEvents: EventItem[];
   onNavigateHome: () => void;
   onSelectEvent: (event: EventItem) => void;
-  onProceedToCheckout?: (selectedTiers: { tier: TicketTier; quantity: number }[]) => void;
+  onProceedToCheckout?: (selectedTiers: SelectedTierItem[]) => void;
 }
 
 export const EventDetailPage: React.FC<EventDetailPageProps> = ({
@@ -36,7 +36,6 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
   return (
     <div className="w-full bg-white pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         {/* 1. Breadcrumb navigation */}
         <EventBreadcrumb
           event={event}
@@ -57,8 +56,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
 
         {/* 4. Two-Column Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-          
-          {/* Left Main Content Column (Spans 7 of 12 on lg, 8 of 12 on xl) */}
+          {/* Left Main Content Column */}
           <div className="lg:col-span-7 xl:col-span-8 space-y-10">
             {activeTab === 'overview' && (
               <>
@@ -86,7 +84,7 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
             )}
           </div>
 
-          {/* Right Sticky Sidebar Column (Spans 5 of 12 on lg, 4 of 12 on xl) */}
+          {/* Right Sticky Sidebar Column */}
           <div className="lg:col-span-5 xl:col-span-4">
             <TicketSelectionCard
               event={event}

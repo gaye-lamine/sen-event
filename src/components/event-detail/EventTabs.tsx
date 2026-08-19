@@ -1,6 +1,5 @@
 import React from 'react';
-
-export type EventTabType = 'overview' | 'location' | 'faq';
+import { EventTabType } from '../../types';
 
 interface EventTabsProps {
   activeTab: EventTabType;

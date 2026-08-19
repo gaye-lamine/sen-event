@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldCheck, CheckCircle, QrCode, CreditCard, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { EventItem } from '../../types/event';
-
-export type PaymentMethodType = 'wave' | 'orange_money' | 'card';
+import { EventItem, PaymentMethodType } from '../../types';
 
 interface PaymentStepProps {
   event: EventItem;
@@ -57,9 +55,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
     }, 1200);
   };
 
-  // --------------------------------------------------------------------------
-  // VUE DE SUCCÈS : CONFIRMATION & BILLET DIGITAL QR CODE
-  // --------------------------------------------------------------------------
+  // Success Confirmation Screen
   if (isSuccess) {
     return (
       <div className="bg-white rounded-3xl sm:rounded-[32px] p-6 sm:p-8 lg:p-10 border border-gray-100 shadow-sm text-center animate-fadeIn">
@@ -116,10 +112,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
 
   return (
     <div className="bg-white rounded-3xl sm:rounded-[32px] p-6 sm:p-8 lg:p-10 border border-gray-100/90 shadow-sm text-left">
-      
-      {/* ------------------------------------------------------------- */}
-      {/* 1. EN-TÊTE : PAIEMENT                                         */}
-      {/* ------------------------------------------------------------- */}
+      {/* 1. Header */}
       <div className="mb-6 sm:mb-7">
         <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
           Paiement
@@ -130,12 +123,8 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
       </div>
 
       <form onSubmit={handlePaySubmit} className="space-y-5">
-        
-        {/* ------------------------------------------------------------- */}
-        {/* 2. SÉLECTION DU MODE DE PAIEMENT (3 CARTES : WAVE, OM, CARTE) */}
-        {/* ------------------------------------------------------------- */}
+        {/* 2. Payment Method Selector Cards */}
         <div className="grid grid-cols-3 gap-3 sm:gap-4">
-          
           {/* Option 1: Wave */}
           <button
             type="button"
@@ -193,9 +182,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
           </button>
         </div>
 
-        {/* ------------------------------------------------------------- */}
-        {/* 3. CHAMP DU NUMÉRO (WAVE OU ORANGE MONEY)                     */}
-        {/* ------------------------------------------------------------- */}
+        {/* 3. Phone or Card Inputs */}
         {selectedMethod !== 'card' ? (
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1.5">
@@ -216,7 +203,6 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
             </div>
           </div>
         ) : (
-          /* Champs Carte bancaire */
           <div className="space-y-3">
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
@@ -262,9 +248,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
           </div>
         )}
 
-        {/* ------------------------------------------------------------- */}
-        {/* 4. BANNIÈRE D'INFORMATION DE NOTIFICATION                      */}
-        {/* ------------------------------------------------------------- */}
+        {/* 4. Notification Alert Box */}
         <div className="p-3.5 sm:p-4 rounded-2xl bg-[#EAF7F1] border border-emerald-100 flex items-center gap-2.5 text-xs text-[#178558]">
           <ShieldCheck className="w-4 h-4 text-[#178558] flex-shrink-0" />
           <p className="leading-snug">
@@ -276,9 +260,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
           </p>
         </div>
 
-        {/* ------------------------------------------------------------- */}
-        {/* 5. CONDITIONS GÉNÉRALES & ERREUR DE VALIDATION                */}
-        {/* ------------------------------------------------------------- */}
+        {/* 5. Terms & Validation */}
         <div className="pt-1">
           <label className="flex items-start gap-2.5 cursor-pointer select-none">
             <input
@@ -296,7 +278,6 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
             </span>
           </label>
 
-          {/* Validation Notice */}
           {!acceptedTerms && hasAttemptedSubmit && (
             <p className="text-[11px] text-[#FF4747] font-medium mt-1.5">
               Tu dois accepter les conditions pour continuer
@@ -304,9 +285,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
           )}
         </div>
 
-        {/* ------------------------------------------------------------- */}
-        {/* 6. BOUTONS : RETOUR & PAYER MAINTENANT                         */}
-        {/* ------------------------------------------------------------- */}
+        {/* 6. Action Buttons */}
         <div className="flex items-center justify-between pt-6 border-t border-gray-100 mt-6">
           <button
             onClick={onBack}

@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { TicketTier } from '../../types/event';
-
-interface TicketHolder {
-  id: string;
-  tierName: string;
-  ticketIndex: number;
-  fullName: string;
-}
+import { TicketTier, TicketHolder } from '../../types';
 
 interface CustomerInfoStepProps {
   tiers: TicketTier[];
@@ -41,7 +34,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
   const [newsletterOptIn, setNewsletterOptIn] = useState(false);
   const [ticketHolders, setTicketHolders] = useState<TicketHolder[]>([]);
 
-  // Generate holder fields dynamically based on chosen quantities
+  // Dynamically generate holder fields based on selected ticket quantities
   useEffect(() => {
     const list: TicketHolder[] = [];
     tiers.forEach((tier) => {
@@ -51,9 +44,10 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
           id: `${tier.id}-${i}`,
           tierName: tier.name.toUpperCase(),
           ticketIndex: i,
-          fullName: i === 1 && list.length === 0 && customerFirstName && customerLastName
-            ? `${customerFirstName} ${customerLastName}`
-            : '',
+          fullName:
+            i === 1 && list.length === 0 && customerFirstName && customerLastName
+              ? `${customerFirstName} ${customerLastName}`
+              : '',
         });
       }
     });
@@ -88,10 +82,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
 
   return (
     <div className="bg-white rounded-3xl sm:rounded-[32px] p-6 sm:p-8 lg:p-10 border border-gray-100/90 shadow-sm text-left">
-      
-      {/* ------------------------------------------------------------- */}
-      {/* 1. EN-TÊTE : TES INFORMATIONS                                 */}
-      {/* ------------------------------------------------------------- */}
+      {/* 1. Header */}
       <div className="mb-6 sm:mb-7">
         <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
           Tes informations
@@ -102,8 +93,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        
-        {/* Prénom & Nom */}
+        {/* Buyer First and Last Name */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1.5">
@@ -134,7 +124,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
           </div>
         </div>
 
-        {/* Adresse email */}
+        {/* Buyer Email */}
         <div>
           <label className="block text-xs font-semibold text-gray-700 mb-1.5">
             Adresse email
@@ -149,7 +139,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
           />
         </div>
 
-        {/* Téléphone (+221 Addon) */}
+        {/* Buyer Phone with +221 Prefix */}
         <div>
           <label className="block text-xs font-semibold text-gray-700 mb-1.5">
             Téléphone
@@ -169,7 +159,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
           </div>
         </div>
 
-        {/* Newsletter Opt-in Checkbox */}
+        {/* Newsletter Opt-in */}
         <div className="pt-1">
           <label className="flex items-start gap-2.5 cursor-pointer select-none">
             <input
@@ -184,9 +174,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
           </label>
         </div>
 
-        {/* ------------------------------------------------------------- */}
-        {/* 2. SECTION : TITULAIRES DES BILLETS                           */}
-        {/* ------------------------------------------------------------- */}
+        {/* 2. Section Titulaires des billets */}
         <div className="pt-6">
           <h2 className="text-sm sm:text-base font-extrabold text-gray-900 tracking-tight">
             Titulaires des billets
@@ -229,9 +217,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
           </div>
         </div>
 
-        {/* ------------------------------------------------------------- */}
-        {/* 3. BOUTONS D'ACTIONS (RETOUR & CONTINUER)                      */}
-        {/* ------------------------------------------------------------- */}
+        {/* 3. Action Buttons */}
         <div className="flex items-center justify-between pt-6 border-t border-gray-100 mt-6">
           <button
             onClick={onBack}

@@ -5,8 +5,10 @@ import {
   EventCategory,
   DateFilterType,
   BookingConfirmation,
-  TicketTier,
-} from './types/event';
+  SelectedTierItem,
+  AppView,
+  CartItem,
+} from './types';
 import { eventService } from './services/api/eventService';
 import { Navbar } from './components/layout/Navbar';
 import { CategoryPills } from './components/hero/CategoryPills';
@@ -32,11 +34,9 @@ export const App: React.FC = () => {
   // --------------------------------------------------------------------------
   // VUE ACTIVE : 'home' | 'event-detail' | 'checkout'
   // --------------------------------------------------------------------------
-  const [currentView, setCurrentView] = useState<'home' | 'event-detail' | 'checkout'>('home');
+  const [currentView, setCurrentView] = useState<AppView>('home');
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
-  const [selectedCheckoutTiers, setSelectedCheckoutTiers] = useState<
-    { tier: TicketTier; quantity: number }[]
-  >([]);
+  const [selectedCheckoutTiers, setSelectedCheckoutTiers] = useState<SelectedTierItem[]>([]);
 
   // --------------------------------------------------------------------------
   // ÉTATS GLOBAUX : ÉVÉNEMENTS, CATÉGORIES ET FILTRES
@@ -61,9 +61,7 @@ export const App: React.FC = () => {
     mode: 'login' | 'signup';
   }>({ isOpen: false, mode: 'login' });
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<
-    { event: EventItem; quantity: number; tierName: string; price: number }[]
-  >([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
   // 1. Chargement initial des catégories et des événements vedettes
   useEffect(() => {
@@ -134,9 +132,7 @@ export const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleOpenCheckout = (
-    tiers?: { tier: TicketTier; quantity: number }[]
-  ) => {
+  const handleOpenCheckout = (tiers?: SelectedTierItem[]) => {
     if (tiers) {
       setSelectedCheckoutTiers(tiers);
     }
@@ -175,9 +171,7 @@ export const App: React.FC = () => {
   };
 
   /** Traite le checkout depuis la page de détail */
-  const handleProceedToCheckout = (
-    selectedTiers: { tier: TicketTier; quantity: number }[]
-  ) => {
+  const handleProceedToCheckout = (selectedTiers: SelectedTierItem[]) => {
     handleOpenCheckout(selectedTiers);
   };
 

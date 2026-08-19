@@ -13,11 +13,13 @@ import { X, Mail, Lock, Phone, User } from 'lucide-react';
  * L'état `mode` permet de basculer instantanément entre "login" et "signup".
  */
 
+import { AuthMode } from '../../types';
+
 interface AuthModalProps {
   /** Indique si la modale est visible à l'écran */
   isOpen: boolean;
   /** Mode initial à l'ouverture : 'login' (Connexion) ou 'signup' (Créer un compte) */
-  initialMode?: 'login' | 'signup';
+  initialMode?: AuthMode;
   /** Fonction de rappel pour fermer la modale */
   onClose: () => void;
 }
