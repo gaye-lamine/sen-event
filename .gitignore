@@ -19,6 +19,9 @@ dist-ssr
 # Netlify cache & build directory
 .netlify
 
+# Local documentation & scratch files
+docs/
+
 # Environment files
 .env
 .env.local
