@@ -4,7 +4,6 @@ import {
   CategoryItem,
   EventCategory,
   DateFilterType,
-  BookingConfirmation,
   SelectedTierItem,
   AppView,
   CartItem,
@@ -18,29 +17,21 @@ import { DateFilterSection } from './components/events/DateFilterSection';
 import { AllEventsSection } from './components/events/AllEventsSection';
 import { OrganizerBanner } from './components/cta/OrganizerBanner';
 import { Footer } from './components/layout/Footer';
-import { BookingModal } from './components/events/BookingModal';
-import { AuthModal } from './components/auth/AuthModal';
 import { CartDrawer } from './components/cart/CartDrawer';
 import { EventDetailPage } from './pages/EventDetailPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 
 /**
- * ============================================================================
- * COMPOSANT PRINCIPAL : SUNUEVENTS APPLICATION
- * ============================================================================
+ * @component App
+ * @description Composant racine et orchestrateur d'état de l'application Sunu Events.
+ * Gère le routage par état entre la page d'accueil, la fiche de détail et le tunnel de commande,
+ * ainsi que la synchronisation des filtres et du panier.
  */
-
 export const App: React.FC = () => {
-  // --------------------------------------------------------------------------
-  // VUE ACTIVE : 'home' | 'event-detail' | 'checkout'
-  // --------------------------------------------------------------------------
   const [currentView, setCurrentView] = useState<AppView>('home');
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [selectedCheckoutTiers, setSelectedCheckoutTiers] = useState<SelectedTierItem[]>([]);
 
-  // --------------------------------------------------------------------------
-  // ÉTATS GLOBAUX : ÉVÉNEMENTS, CATÉGORIES ET FILTRES
-  // --------------------------------------------------------------------------
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<EventCategory>('all');
   const [featuredEvents, setFeaturedEvents] = useState<EventItem[]>([]);
@@ -52,18 +43,9 @@ export const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // --------------------------------------------------------------------------
-  // ÉTATS DES MODALES (EN ATTENTE DE CONNEXION BACKEND)
-  // --------------------------------------------------------------------------
-  const [selectedEventForBooking, setSelectedEventForBooking] = useState<EventItem | null>(null);
-  const [authModalState, setAuthModalState] = useState<{
-    isOpen: boolean;
-    mode: 'login' | 'signup';
-  }>({ isOpen: false, mode: 'login' });
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  // 1. Chargement initial des catégories et des événements vedettes
   useEffect(() => {
     const loadInitialData = async () => {
       const cats = await eventService.getCategories();
@@ -80,7 +62,6 @@ export const App: React.FC = () => {
     loadInitialData();
   }, []);
 
-  // 2. Chargement des événements selon le filtre temporel ("C'est quand, la sortie ?")
   useEffect(() => {
     const loadDateEvents = async () => {
       const events = await eventService.getEventsByDateFilter(dateFilter);
@@ -90,7 +71,6 @@ export const App: React.FC = () => {
     loadDateEvents();
   }, [dateFilter]);
 
-  // 3. Chargement des événements avec recherche et pagination
   useEffect(() => {
     const loadAllEvents = async () => {
       const response = await eventService.getAllEvents(
@@ -118,9 +98,6 @@ export const App: React.FC = () => {
     loadAllEvents();
   }, [selectedCategory, searchQuery, currentPage]);
 
-  // --------------------------------------------------------------------------
-  // GESTIONNAIRES D'ACTIONS & NAVIGATION
-  // --------------------------------------------------------------------------
   const handleNavigateHome = () => {
     setCurrentView('home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -170,45 +147,25 @@ export const App: React.FC = () => {
     setCurrentPage((prev) => prev + 1);
   };
 
-  /** Traite le checkout depuis la page de détail */
   const handleProceedToCheckout = (selectedTiers: SelectedTierItem[]) => {
     handleOpenCheckout(selectedTiers);
   };
 
-  /** Traite le succès d'une réservation */
-  const handleBookingSuccess = (confirmation: BookingConfirmation) => {
-    setCartItems((prev) => [
-      ...prev,
-      {
-        event: confirmation.event,
-        quantity: confirmation.quantity,
-        tierName: confirmation.tierName,
-        price: confirmation.event.startingPrice,
-      },
-    ]);
-  };
-
-  // Récupération des événements similaires (excluant l'événement actuel)
   const similarEvents = allEvents.filter(
     (e) => !selectedEvent || e.id !== selectedEvent.id
   );
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans selection:bg-brand-300 selection:text-gray-900">
-      
-      {/* Header Fixe / Sticky (Navbar + Filtres de Catégories sur la page d'accueil) */}
       <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-xs transition-all">
-        {/* 1. Barre de navigation principale */}
         <Navbar
           searchQuery={searchQuery}
           onSearch={handleSearch}
           onNavigateHome={handleNavigateHome}
-          /* onOpenAuth={(mode) => setAuthModalState({ isOpen: true, mode })} // Décommenter pour activer les modales d'authentification */
           cartCount={cartItems.length}
           onOpenCart={() => setIsCartOpen(true)}
         />
 
-        {/* 2. Filtres par catégorie (Visibles uniquement sur la page d'accueil) */}
         {currentView === 'home' && (
           <CategoryPills
             categories={categories}
@@ -218,9 +175,6 @@ export const App: React.FC = () => {
         )}
       </header>
 
-      {/* =================================================================== */}
-      {/* VUE 1 : TUNNEL D'ACHAT & RÉSERVATION (CHECKOUT STEPPER)             */}
-      {/* =================================================================== */}
       {currentView === 'checkout' && selectedEvent ? (
         <main className="flex-1">
           <CheckoutPage
@@ -230,9 +184,6 @@ export const App: React.FC = () => {
           />
         </main>
       ) : currentView === 'event-detail' && selectedEvent ? (
-        /* ================================================================= */
-        /* VUE 2 : PAGE DE DÉTAIL D'UN ÉVÉNEMENT                             */
-        /* ================================================================= */
         <main className="flex-1">
           <EventDetailPage
             event={selectedEvent}
@@ -243,23 +194,17 @@ export const App: React.FC = () => {
           />
         </main>
       ) : (
-        /* ================================================================= */
-        /* VUE 3 : PAGE D'ACCUEIL PRINCIPALE                                 */
-        /* ================================================================= */
         <main className="flex-1">
-          {/* Section Hero principale avec recherche en direct */}
           <HeroSection
             searchQuery={searchQuery}
             onSearch={handleSearch}
           />
 
-          {/* Section 1 : "Évènements vedettes" */}
           <FeaturedEventsSection
             events={featuredEvents}
             onBook={handleOpenEventDetail}
           />
 
-          {/* Section 2 : "C'est quand, la sortie ?" */}
           <DateFilterSection
             activeFilter={dateFilter}
             onFilterChange={setDateFilter}
@@ -267,7 +212,6 @@ export const App: React.FC = () => {
             onBook={handleOpenEventDetail}
           />
 
-          {/* Section 3 : "Tous les évènements" avec résultats de recherche en direct */}
           <AllEventsSection
             events={allEvents}
             hasMore={hasMoreEvents}
@@ -278,42 +222,12 @@ export const App: React.FC = () => {
             onClearSearch={handleClearSearch}
           />
 
-          {/* Bannière CTA pour organisateurs */}
-          <OrganizerBanner
-            /* onBecomeOrganizer={() => setAuthModalState({ isOpen: true, mode: 'signup' })} // Décommenter pour activer */
-          />
+          <OrganizerBanner />
         </main>
       )}
 
-      {/* Pied de page (Footer) */}
-      <Footer />
+      <Footer onNavigateHome={handleNavigateHome} />
 
-      {/* =================================================================== */}
-      {/* MODALE : DÉTAILS DE L'ÉVÉNEMENT (COMMENTÉE / DÉSACTIVÉE ACTUELLEMENT)*/}
-      {/* =================================================================== */}
-      {/*
-      <BookingModal
-        event={selectedEventForBooking}
-        isOpen={!!selectedEventForBooking}
-        onClose={() => setSelectedEventForBooking(null)}
-        onBookingSuccess={handleBookingSuccess}
-      />
-      */}
-
-      {/* =================================================================== */}
-      {/* MODALE : AUTHENTIFICATION LOGIN / SIGNUP (COMMENTÉE ACTUELLEMENT)   */}
-      {/* =================================================================== */}
-      {/*
-      <AuthModal
-        isOpen={authModalState.isOpen}
-        initialMode={authModalState.mode}
-        onClose={() => setAuthModalState({ isOpen: false, mode: 'login' })}
-      />
-      */}
-
-      {/* =================================================================== */}
-      {/* TIROIR : PANIER D'ACHATS                                            */}
-      {/* =================================================================== */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}

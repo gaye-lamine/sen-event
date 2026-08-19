@@ -2,6 +2,12 @@ import React from 'react';
 import { X, ShoppingBag, ArrowRight, Trash2 } from 'lucide-react';
 import { CartDrawerProps } from '../../types';
 
+/**
+ * @component CartDrawer
+ * @description Tiroir latéral de gestion du panier avec liste des billets sélectionnés,
+ * calcul dynamique du montant total et redirection vers le tunnel d'achat.
+ * @param {CartDrawerProps} props - Contrat de propriétés du composant
+ */
 export const CartDrawer: React.FC<CartDrawerProps> = ({
   isOpen,
   onClose,
@@ -17,8 +23,6 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-black/50 backdrop-blur-xs flex justify-end">
       <div className="w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-slideInRight">
-        
-        {/* Drawer Header */}
         <div className="p-5 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-gray-900" />
@@ -30,51 +34,50 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           <button
             onClick={onClose}
             type="button"
-            className="p-1.5 text-gray-400 hover:text-gray-900 rounded-full hover:bg-gray-100"
+            className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+            aria-label="Fermer le panier"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Items List */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+        <div className="flex-1 overflow-y-auto p-5 space-y-4 text-left">
           {items.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center text-gray-400">
-              <ShoppingBag className="w-12 h-12 stroke-1 mb-2 text-gray-300" />
+            <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 py-12">
+              <ShoppingBag className="w-12 h-12 stroke-1 mb-3 text-gray-300" />
               <p className="text-sm font-medium">Votre panier est vide</p>
-              <p className="text-xs text-gray-400 mt-1 max-w-[200px]">
-                Choisissez un événement et réservez vos billets en 2 clics.
+              <p className="text-xs text-gray-400 mt-1">
+                Explorez nos événements pour ajouter des billets.
               </p>
             </div>
           ) : (
             items.map((item, idx) => (
               <div
-                key={idx}
-                className="flex items-center gap-3 p-3 bg-gray-50 rounded-2xl border border-gray-100"
+                key={`${item.event.id}-${item.tierName}-${idx}`}
+                className="flex gap-3 p-3 bg-gray-50 rounded-2xl border border-gray-100 relative group"
               >
                 <img
                   src={item.event.image}
                   alt={item.event.title}
-                  className="w-14 h-18 object-cover rounded-xl flex-shrink-0"
+                  className="w-16 h-16 rounded-xl object-cover"
                 />
                 <div className="flex-1 min-w-0">
                   <h4 className="font-bold text-xs text-gray-900 truncate">
                     {item.event.title}
                   </h4>
-                  <p className="text-[11px] text-gray-500 truncate">{item.event.location}</p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs font-extrabold text-gray-900">
-                      {new Intl.NumberFormat('fr-FR').format(item.price * item.quantity)} F
-                    </span>
-                    <span className="text-[10px] text-gray-500 bg-white px-2 py-0.5 rounded-full border border-gray-200">
-                      Qté: {item.quantity}
-                    </span>
-                  </div>
+                  <p className="text-[11px] text-gray-500 mt-0.5">
+                    {item.tierName} × {item.quantity}
+                  </p>
+                  <p className="text-xs font-black text-gray-900 mt-1">
+                    {new Intl.NumberFormat('fr-FR').format(item.price * item.quantity)}{' '}
+                    {item.event.currency || 'F'}
+                  </p>
                 </div>
                 <button
                   onClick={() => onRemoveItem(idx)}
                   type="button"
-                  className="p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-white"
+                  className="text-gray-400 hover:text-red-500 p-1 self-start transition-colors"
+                  aria-label="Supprimer du panier"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -83,19 +86,23 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           )}
         </div>
 
-        {/* Footer Checkout */}
         {items.length > 0 && (
-          <div className="p-5 border-t border-gray-100 bg-gray-50 space-y-3">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-500 font-medium">Total commande :</span>
-              <span className="text-lg font-extrabold text-gray-900">{formattedTotal} F</span>
+          <div className="p-5 border-t border-gray-100 bg-gray-50/50 space-y-3">
+            <div className="flex justify-between items-center text-sm font-semibold text-gray-700">
+              <span>Total estimé</span>
+              <span className="font-black text-base text-gray-900">
+                {formattedTotal} F
+              </span>
             </div>
             <button
-              onClick={onCheckout}
+              onClick={() => {
+                onClose();
+                onCheckout();
+              }}
               type="button"
-              className="w-full py-3 bg-[#0F141C] text-white text-xs font-bold rounded-full hover:bg-black flex items-center justify-center gap-2 shadow-md"
+              className="w-full py-3.5 bg-[#0F141C] text-white font-bold text-xs sm:text-sm rounded-full hover:bg-black active:scale-98 transition-all flex items-center justify-center gap-2 shadow-lg"
             >
-              <span>Valider et Payer avec Wave / OM</span>
+              <span>Passer la commande</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

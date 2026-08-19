@@ -1,20 +1,19 @@
 /**
- * Generic API Client with support for environment baseUrl and mock fallback.
- * When VITE_USE_REAL_BACKEND='true' and VITE_API_URL is configured,
- * requests are routed to the actual backend REST/GraphQL server.
+ * @file apiClient.ts
+ * @description Client HTTP centralisé pour la communication avec l'API REST de Sunu Events.
+ * Gère automatiquement le basculement entre le mode développement (mock) et l'API de production.
  */
 
 export interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
 }
 
-class ApiClient {
+export class ApiClient {
   private baseUrl: string;
   private isMockMode: boolean;
 
   constructor() {
     this.baseUrl = import.meta.env.VITE_API_URL || 'https://api.sunuevents.sn/v1';
-    // Defaults to mock mode until a real backend URL is enabled
     this.isMockMode = import.meta.env.VITE_USE_REAL_BACKEND !== 'true';
   }
 
@@ -26,9 +25,14 @@ class ApiClient {
     this.isMockMode = mock;
   }
 
+  /**
+   * Effectue une requête HTTP GET sécurisée.
+   * @param endpoint - Chemin relatif de la ressource API (ex: '/events')
+   * @param options - Paramètres de requête et options fetch
+   * @returns Données typées renvoyées par l'API
+   */
   public async get<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     if (this.isMockMode) {
-      // Simulate realistic network delay (50ms - 200ms)
       await new Promise((resolve) => setTimeout(resolve, 80));
       throw new Error(`MOCK_MODE_ACTIVE: Endpoint "${endpoint}" routed through local mock handler.`);
     }
@@ -59,6 +63,13 @@ class ApiClient {
     return response.json();
   }
 
+  /**
+   * Effectue une requête HTTP POST avec charge utile JSON.
+   * @param endpoint - Chemin relatif de la ressource API
+   * @param body - Objet payload envoyé dans le corps de la requête
+   * @param options - Options de configuration fetch supplémentaires
+   * @returns Réponse typée renvoyée par l'API
+   */
   public async post<T, B = unknown>(endpoint: string, body: B, options: RequestOptions = {}): Promise<T> {
     if (this.isMockMode) {
       await new Promise((resolve) => setTimeout(resolve, 200));

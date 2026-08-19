@@ -2,6 +2,12 @@ import React from 'react';
 import { Calendar, MapPin, ShieldCheck } from 'lucide-react';
 import { OrderSummaryCardProps } from '../../types';
 
+/**
+ * @component OrderSummaryCard
+ * @description Carte récapitulative taillée en forme de billet de concert avec encoches latérales,
+ * détail des tarifs par palier, calcul des frais de service et montant global.
+ * @param {OrderSummaryCardProps} props - Contrat de propriétés du composant
+ */
 export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
   event,
   tiers,
@@ -21,7 +27,6 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
 
   return (
     <div className="relative bg-white rounded-3xl sm:rounded-[32px] border border-gray-100/90 shadow-sm p-6 sm:p-7 text-left overflow-hidden">
-      {/* Event Header */}
       <div className="flex items-start gap-3.5 pb-5 border-b border-gray-100">
         <img
           src={event.image}
@@ -43,7 +48,6 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
         </div>
       </div>
 
-      {/* Selected Items Breakdown */}
       <div className="py-4 space-y-2.5">
         {selectedItems.length > 0 ? (
           selectedItems.map((tier) => {
@@ -70,14 +74,12 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
         )}
       </div>
 
-      {/* Dashed Ticket Separator with side notches */}
       <div className="relative my-3">
         <div className="absolute -left-9 -top-3 w-6 h-6 rounded-full bg-[#F9FAFB] border-r border-gray-100" />
         <div className="absolute -right-9 -top-3 w-6 h-6 rounded-full bg-[#F9FAFB] border-l border-gray-100" />
         <div className="w-full border-t border-dashed border-gray-200" />
       </div>
 
-      {/* Subtotal & Fees */}
       <div className="pt-2 pb-4 space-y-2 text-xs">
         <div className="flex justify-between items-center text-gray-500">
           <span>Sous-total</span>
@@ -92,7 +94,6 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
           </span>
         </div>
 
-        {/* Grand Total */}
         <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-sm font-extrabold text-gray-900">
           <span>Total</span>
           <span className="text-base font-black">
@@ -101,7 +102,6 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
         </div>
       </div>
 
-      {/* Modify Action */}
       <div className="pt-2 pb-3 flex items-center justify-between text-xs">
         <span className="text-gray-500">
           {totalTickets} {totalTickets > 1 ? 'billets sélectionnés' : 'billet sélectionné'}
@@ -117,7 +117,6 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
         )}
       </div>
 
-      {/* Security Badge */}
       <div className="mt-2 pt-3 border-t border-gray-100 text-center flex items-center justify-center gap-1.5 text-[10px] text-gray-400">
         <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
         <span>Paiement sécurisé • Wave • Orange Money • CB</span>

@@ -3,6 +3,12 @@ import { Search } from 'lucide-react';
 import { HeroSectionProps } from '../../types';
 import { FloatingTickets } from './FloatingTickets';
 
+/**
+ * @component HeroSection
+ * @description Section d'en-tête de la page d'accueil avec typographie soignée,
+ * halo lumineux pulsing `#FFC23C`, barre de recherche instantanée et billets VIP 3D flottants.
+ * @param {HeroSectionProps} props - Contrat de propriétés du composant
+ */
 export const HeroSection: React.FC<HeroSectionProps> = ({
   searchQuery = '',
   onSearch,
@@ -19,7 +25,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
   return (
     <section className="relative overflow-hidden pt-12 pb-24 sm:pt-16 sm:pb-28 lg:pt-20 lg:pb-32 bg-white">
-      {/* Exact Figma Specs for #FFC23C Glow with Breathing / Pulse Animation */}
       <div
         className="absolute pointer-events-none -z-0 animate-orb-pulse"
         style={{
@@ -37,7 +42,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-20">
-        {/* Main Headline */}
         <h1 className="font-extrabold text-3xl sm:text-4xl md:text-5xl lg:text-[52px] tracking-tight text-gray-900 leading-[1.18] max-w-3xl mx-auto">
           <span>Sunu moments, sunu</span>
           <br className="hidden sm:block" />{' '}
@@ -50,12 +54,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </span>
         </h1>
 
-        {/* Subtitle */}
         <p className="mt-4 sm:mt-5 text-xs sm:text-sm md:text-base text-gray-500 max-w-xl mx-auto leading-relaxed">
           Concerts, matchs, festivals, formations... trouve ton prochain sortie et paie en 2 clics avec Wave ou Orange Money. Ton billet arrive direct par mail, prêt à scanner.
         </p>
 
-        {/* Centered Pill Search Bar with Instant Filtering */}
         <div className="mt-7 sm:mt-9 max-w-xl mx-auto">
           <form
             onSubmit={handleSubmit}
@@ -79,7 +81,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         </div>
       </div>
 
-      {/* Floating 3D VIP Tickets in the bottom corners */}
       <FloatingTickets />
     </section>
   );

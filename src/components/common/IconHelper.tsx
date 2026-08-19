@@ -27,6 +27,11 @@ import {
 } from 'lucide-react';
 import { IconHelperProps } from '../../types';
 
+/**
+ * @component IconHelper
+ * @description Mappeur dynamique d'icônes vectorielles Lucide selon des identifiants textuels de catégories.
+ * @param {IconHelperProps} props - Contrat de propriétés du composant
+ */
 export const IconHelper: React.FC<IconHelperProps> = ({ name, className = 'w-4 h-4', size }) => {
   switch (name.toLowerCase()) {
     case 'grid':

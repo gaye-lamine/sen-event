@@ -1,6 +1,12 @@
 import React from 'react';
 import { EventTabType, EventTabsProps } from '../../types';
 
+/**
+ * @component EventTabs
+ * @description Barre d'onglets de navigation interne (Aperçu, Lieu & accès, FAQ)
+ * pour la page de détail d'un événement.
+ * @param {EventTabsProps} props - Contrat de propriétés du composant
+ */
 export const EventTabs: React.FC<EventTabsProps> = ({
   activeTab,
   onTabChange,

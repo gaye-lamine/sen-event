@@ -3,6 +3,12 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { FeaturedEventsSectionProps } from '../../types';
 import { EventCard } from './EventCard';
 
+/**
+ * @component FeaturedEventsSection
+ * @description Carrousel horizontal des événements à la une avec défilement fluide
+ * et contrôles de navigation gauche/droite auto-désactivables selon la position de scroll.
+ * @param {FeaturedEventsSectionProps} props - Contrat de propriétés du composant
+ */
 export const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
   events,
   onBook,
@@ -25,10 +31,9 @@ export const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
     return () => window.removeEventListener('resize', checkScrollability);
   }, [events]);
 
-  const scroll = (direction: 'left' | 'right') => {
+  const handleScroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const cardWidth = scrollContainerRef.current.clientWidth * 0.75;
-      const scrollAmount = direction === 'left' ? -cardWidth : cardWidth;
+      const scrollAmount = direction === 'left' ? -360 : 360;
       scrollContainerRef.current.scrollBy({
         left: scrollAmount,
         behavior: 'smooth',
@@ -37,71 +42,53 @@ export const FeaturedEventsSection: React.FC<FeaturedEventsSectionProps> = ({
     }
   };
 
-  return (
-    <section className="py-10 sm:py-14 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Header */}
-        <div className="flex items-center justify-between mb-6 sm:mb-8">
-          
-          {/* Section Title with Yellow Marker Highlight */}
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-            <span className="relative inline-block">
-              <span className="relative z-10">Évènements vedettes</span>
-              <span
-                className="absolute bottom-[2px] left-0 right-0 h-[8px] sm:h-[10px] bg-[#FFC23C]/75 rounded-xs -z-0"
-                aria-hidden="true"
-              />
-            </span>
-          </h2>
+  if (events.length === 0) return null;
 
-          {/* Carousel Arrows */}
+  return (
+    <section className="py-8 sm:py-12 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
+          <div className="text-left">
+            <h2 className="font-extrabold text-xl sm:text-2xl md:text-3xl text-gray-900 tracking-tight">
+              À la une cette semaine
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-400 mt-1">
+              Les sorties les plus attendues à Dakar et au Sénégal.
+            </p>
+          </div>
+
           <div className="flex items-center gap-2">
             <button
-              onClick={() => scroll('left')}
+              onClick={() => handleScroll('left')}
               disabled={!canScrollLeft}
               type="button"
-              className={`
-                w-8 h-8 rounded-full border bg-white flex items-center justify-center transition-all shadow-xs cursor-pointer
-                ${
-                  canScrollLeft
-                    ? 'border-gray-300 text-gray-800 hover:bg-gray-100 active:scale-95'
-                    : 'border-gray-200 text-gray-300 cursor-not-allowed opacity-60'
-                }
-              `}
-              aria-label="Événements précédents"
+              className="p-2.5 rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer shadow-xs"
+              aria-label="Défiler vers la gauche"
             >
               <ChevronLeft className="w-4 h-4 stroke-[2.2]" />
             </button>
+
             <button
-              onClick={() => scroll('right')}
+              onClick={() => handleScroll('right')}
               disabled={!canScrollRight}
               type="button"
-              className={`
-                w-8 h-8 rounded-full border bg-white flex items-center justify-center transition-all shadow-xs cursor-pointer
-                ${
-                  canScrollRight
-                    ? 'border-gray-300 text-gray-800 hover:bg-gray-100 active:scale-95'
-                    : 'border-gray-200 text-gray-300 cursor-not-allowed opacity-60'
-                }
-              `}
-              aria-label="Événements suivants"
+              className="p-2.5 rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer shadow-xs"
+              aria-label="Défiler vers la droite"
             >
               <ChevronRight className="w-4 h-4 stroke-[2.2]" />
             </button>
           </div>
         </div>
 
-        {/* Smooth Horizontal Carousel Track with Snap */}
         <div
           ref={scrollContainerRef}
           onScroll={checkScrollability}
-          className="flex items-stretch gap-5 sm:gap-6 overflow-x-auto no-scrollbar scroll-smooth pb-3 snap-x snap-mandatory"
+          className="flex gap-4 sm:gap-6 overflow-x-auto no-scrollbar pb-4 pt-1 snap-x snap-mandatory"
         >
           {events.map((event) => (
             <div
               key={event.id}
-              className="w-[280px] sm:w-[300px] lg:w-[calc(25%-18px)] flex-shrink-0 snap-start"
+              className="w-[270px] sm:w-[300px] flex-shrink-0 snap-start"
             >
               <EventCard
                 event={event}

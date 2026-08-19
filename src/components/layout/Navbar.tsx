@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import { Search, ShoppingCart, Menu, X } from 'lucide-react';
 import { NavbarProps } from '../../types';
 
+/**
+ * @component Navbar
+ * @description Barre de navigation supérieure responsive avec recherche instantanée,
+ * gestion du panier d'achat et déclencheurs d'authentification.
+ * @param {NavbarProps} props - Contrat de propriétés du composant
+ */
 export const Navbar: React.FC<NavbarProps> = ({
   searchQuery = '',
   onSearch,
@@ -26,7 +32,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     <div className="w-full border-b border-gray-100/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
-          {/* Logo officiel Sunu Events */}
           <button
             onClick={() => onNavigateHome?.()}
             type="button"
@@ -37,7 +42,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
           </button>
 
-          {/* Barre de recherche rapide (Desktop) */}
           <form
             onSubmit={handleSearchSubmit}
             className="hidden md:flex flex-1 max-w-md mx-4 items-center bg-[#F3F4F6] rounded-full px-4 py-2 focus-within:ring-2 focus-within:ring-gray-900/20 focus-within:bg-white border border-transparent focus-within:border-gray-200 transition-all"
@@ -52,9 +56,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             />
           </form>
 
-          {/* Boutons d'actions à droite */}
           <div className="flex items-center gap-2.5 sm:gap-3">
-            {/* Bouton Panier */}
             <button
               onClick={onOpenCart}
               type="button"
@@ -69,7 +71,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
 
-            {/* Bouton Se connecter */}
             <button
               onClick={() => onOpenAuth?.('login')}
               type="button"
@@ -78,7 +79,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               Se connecter
             </button>
 
-            {/* Bouton Créer un compte */}
             <button
               onClick={() => onOpenAuth?.('signup')}
               type="button"
@@ -87,7 +87,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               Créer un compte
             </button>
 
-            {/* Menu Mobile */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               type="button"
@@ -98,7 +97,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
 
-        {/* Barre de recherche sur Mobile */}
         <div className="md:hidden pb-3">
           <form
             onSubmit={handleSearchSubmit}
@@ -115,7 +113,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           </form>
         </div>
 
-        {/* Tiroir de navigation mobile */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-100 space-y-2">
             <button

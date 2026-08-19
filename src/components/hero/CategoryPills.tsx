@@ -2,6 +2,12 @@ import React from 'react';
 import { CategoryPillsProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
 
+/**
+ * @component CategoryPills
+ * @description Barre de sélection des catégories d'événements avec défilement horizontal fluide
+ * et indicateurs d'état actif foncés.
+ * @param {CategoryPillsProps} props - Contrat de propriétés du composant
+ */
 export const CategoryPills: React.FC<CategoryPillsProps> = ({
   categories,
   selectedCategory,

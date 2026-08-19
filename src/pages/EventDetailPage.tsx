@@ -9,6 +9,12 @@ import { SimilarEventsSection } from '../components/event-detail/SimilarEventsSe
 import { TicketSelectionCard } from '../components/event-detail/TicketSelectionCard';
 import { EventFaqSection } from '../components/event-detail/EventFaqSection';
 
+/**
+ * @page EventDetailPage
+ * @description Page de détail complète d'un événement orchestrant le fil d'Ariane,
+ * la bannière immersive dorée, les onglets de contenu et la réservation latérale.
+ * @param {EventDetailPageProps} props - Contrat de propriétés du composant
+ */
 export const EventDetailPage: React.FC<EventDetailPageProps> = ({
   event,
   similarEvents,
@@ -28,27 +34,22 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
   return (
     <div className="w-full bg-white pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* 1. Breadcrumb navigation */}
         <EventBreadcrumb
           event={event}
           onNavigateHome={onNavigateHome}
         />
 
-        {/* 2. Main Hero Banner Container */}
         <EventHeroBanner
           event={event}
           onScrollToTickets={scrollToTickets}
         />
 
-        {/* 3. Section Tabs */}
         <EventTabs
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
 
-        {/* 4. Two-Column Content Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-          {/* Left Main Content Column */}
           <div className="lg:col-span-7 xl:col-span-8 space-y-10">
             {activeTab === 'overview' && (
               <>
@@ -76,7 +77,6 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
             )}
           </div>
 
-          {/* Right Sticky Sidebar Column */}
           <div className="lg:col-span-5 xl:col-span-4">
             <TicketSelectionCard
               event={event}

@@ -48,10 +48,11 @@ export interface EventItem {
   city: string;
   date: string;
   time: string;
-  rawDate: string; // ISO date format for backend sorting/filtering
+  rawDate: string;
   startingPrice: number;
   currency: string;
   isFeatured?: boolean;
+  isSoldOut?: boolean;
   dateCategory?: DateFilterType[];
   attendeesCount?: number;
   rating?: number;
@@ -103,4 +104,7 @@ export interface BookingConfirmation {
   event: EventItem;
   tierName: string;
   quantity: number;
+  customerName?: string;
+  customerPhone?: string;
+  createdAt?: string;
 }

@@ -1,10 +1,15 @@
 import React from 'react';
 import { FooterProps } from '../../types';
 
+/**
+ * @component Footer
+ * @description Pied de page global de l'application avec atmosphère sombre `#12142B`,
+ * halos dorés décoratifs et liens de navigation contextuels.
+ * @param {FooterProps} props - Contrat de propriétés du composant
+ */
 export const Footer: React.FC<FooterProps> = ({ onNavigateHome }) => {
   return (
     <footer className="relative overflow-hidden bg-[#12142B] text-white pt-14 sm:pt-16 pb-12">
-      {/* Left #FFC23C9C Ambient Glow */}
       <div
         className="absolute top-0 left-[-80px] w-[360px] h-[360px] pointer-events-none -z-0"
         style={{
@@ -16,7 +21,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateHome }) => {
         aria-hidden="true"
       />
 
-      {/* Right #FFC23C9C Ambient Glow */}
       <div
         className="absolute bottom-0 right-[-80px] w-[360px] h-[360px] pointer-events-none -z-0"
         style={{
@@ -29,9 +33,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateHome }) => {
       />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-        {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-12 pb-10 text-left">
-          {/* Brand Column */}
           <div className="lg:col-span-5 pr-0 lg:pr-8">
             <button
               onClick={onNavigateHome}
@@ -45,7 +47,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateHome }) => {
             </p>
           </div>
 
-          {/* EXPLORER Column */}
           <div className="lg:col-span-2">
             <h4 className="font-bold text-xs uppercase tracking-wider text-white mb-4">
               EXPLORER
@@ -74,7 +75,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateHome }) => {
             </ul>
           </div>
 
-          {/* SUNU EVENTS Column */}
           <div className="lg:col-span-2">
             <h4 className="font-bold text-xs uppercase tracking-wider text-white mb-4">
               SUNU EVENTS
@@ -103,7 +103,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateHome }) => {
             </ul>
           </div>
 
-          {/* LÉGAL Column */}
           <div className="lg:col-span-3">
             <h4 className="font-bold text-xs uppercase tracking-wider text-white mb-4">
               LÉGAL
@@ -128,7 +127,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateHome }) => {
           </div>
         </div>
 
-        {/* Divider Line */}
         <div className="border-t border-[#23264A] pt-8 text-left">
           <p className="text-xs text-[#8E92BC]">
             © 2026 NIANE TECHNOLOGIES SUARL — Dakar, Sénégal

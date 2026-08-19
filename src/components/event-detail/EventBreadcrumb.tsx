@@ -2,6 +2,11 @@ import React from 'react';
 import { ChevronRight } from 'lucide-react';
 import { EventBreadcrumbProps } from '../../types';
 
+/**
+ * @component EventBreadcrumb
+ * @description Fil d'Ariane pour la navigation hiérarchique de la page de détail d'un événement.
+ * @param {EventBreadcrumbProps} props - Contrat de propriétés du composant
+ */
 export const EventBreadcrumb: React.FC<EventBreadcrumbProps> = ({
   event,
   onNavigateHome,

@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import { Minus, Plus, ShieldCheck, X } from 'lucide-react';
 import { TicketTier, TicketSelectionCardProps } from '../../types';
 
+/**
+ * @component TicketSelectionCard
+ * @description Carte latérale de sélection des paliers de billets avec compteur dynamique,
+ * calcul du montant global et déclencheur du passage vers le tunnel d'achat.
+ * @param {TicketSelectionCardProps} props - Contrat de propriétés du composant
+ */
 export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
   event,
   onProceedToCheckout,
@@ -18,22 +24,24 @@ export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
       id: 'vip',
       name: 'VIP',
       description: 'Zone VIP, boisson offerte + accès rapide',
-      price: (event.startingPrice || 10000) * 2.5,
+      price: 25000,
       available: true,
       remainingCount: 42,
     },
     {
-      id: 'carre-or',
-      name: 'Carré Or',
+      id: 'loge',
+      name: 'Place Réservée',
       description: 'Premières loges + rencontre backstage',
-      price: (event.startingPrice || 10000) * 5,
+      price: 50000,
       available: false,
       isSoldOut: true,
     },
   ];
 
-  // Quantities for each tier: { [tierId]: number }
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [quantities, setQuantities] = useState<Record<string, number>>({
+    standard: 2,
+    vip: 1,
+  });
 
   const handleUpdateQuantity = (tierId: string, delta: number) => {
     setQuantities((prev) => {
@@ -43,40 +51,44 @@ export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
     });
   };
 
-  // Calculate totals
-  const totalTicketsCount = Object.values(quantities).reduce((acc, q) => acc + q, 0);
-  const totalAmount = tiers.reduce((acc, tier) => {
-    const q = quantities[tier.id] || 0;
-    return acc + tier.price * q;
+  const totalTickets = Object.values(quantities).reduce((acc, q) => acc + q, 0);
+
+  const subtotal = tiers.reduce((acc, tier) => {
+    const qty = quantities[tier.id] || 0;
+    return acc + tier.price * qty;
   }, 0);
 
-  const formattedStartingPrice = new Intl.NumberFormat('fr-FR').format(event.startingPrice || 10000);
-  const formattedTotal = new Intl.NumberFormat('fr-FR').format(totalAmount);
+  const serviceFees = totalTickets > 0 ? 1500 : 0;
+  const grandTotal = subtotal + serviceFees;
 
   const handleCheckout = () => {
-    if (totalTicketsCount === 0) return;
     const selected = tiers
       .filter((t) => (quantities[t.id] || 0) > 0)
-      .map((t) => ({ tier: t, quantity: quantities[t.id] }));
-    onProceedToCheckout?.(selected);
+      .map((t) => ({
+        tier: t,
+        quantity: quantities[t.id],
+      }));
+
+    if (selected.length > 0 && onProceedToCheckout) {
+      onProceedToCheckout(selected);
+    }
   };
 
   return (
-    <div id="ticket-selection-card" className="sticky top-40 w-full bg-white rounded-3xl border border-gray-100/90 shadow-xl shadow-gray-200/50 p-6 text-left">
-      
-      {/* Price Header */}
-      <div className="mb-5">
-        <span className="text-xs text-gray-400 block font-medium">À partir de</span>
-        <div className="flex items-baseline gap-1 mt-0.5">
-          <span className="text-2xl sm:text-3xl font-extrabold text-gray-900">
-            {formattedStartingPrice} {event.currency || 'F'}
-          </span>
-          <span className="text-xs text-gray-400 font-medium">/ billet</span>
-        </div>
+    <div
+      id="ticket-selection-card"
+      className="sticky top-28 bg-[#FAFBFD] rounded-3xl sm:rounded-[32px] border border-gray-200/90 shadow-lg p-6 sm:p-7 text-left space-y-6"
+    >
+      <div>
+        <h3 className="text-xl font-extrabold text-gray-900 tracking-tight">
+          Billets disponibles
+        </h3>
+        <p className="text-xs text-gray-400 mt-0.5">
+          Sélectionnez vos places et réservez instantanément
+        </p>
       </div>
 
-      {/* Ticket Tiers List */}
-      <div className="space-y-3 mb-6">
+      <div className="space-y-3">
         {tiers.map((tier) => {
           const qty = quantities[tier.id] || 0;
           const isSoldOut = tier.isSoldOut || !tier.available;
@@ -84,113 +96,107 @@ export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
           return (
             <div
               key={tier.id}
-              className={`p-4 rounded-2xl border transition-all ${
+              className={`p-3.5 sm:p-4 rounded-2xl border transition-all ${
                 isSoldOut
-                  ? 'bg-gray-50/60 border-gray-100 opacity-60'
+                  ? 'bg-gray-50/50 border-gray-200/60 opacity-60'
                   : qty > 0
                   ? 'bg-white border-gray-900/40 ring-1 ring-gray-900/10 shadow-xs'
                   : 'bg-white border-gray-200/80 hover:border-gray-300'
               }`}
             >
-              <div className="flex items-start justify-between gap-2">
-                
-                {/* Tier Title & Badges */}
-                <div className="flex-1">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-xs sm:text-sm text-gray-900">
+                    <h4 className="font-bold text-xs sm:text-sm text-gray-900">
                       {tier.name}
-                    </span>
-                    {tier.remainingCount && !isSoldOut && (
-                      <span className="px-2 py-0.5 bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-wider rounded-md">
-                        {tier.remainingCount} RESTANTES
+                    </h4>
+                    {tier.remainingCount && tier.remainingCount <= 50 && (
+                      <span className="text-[10px] text-amber-700 bg-amber-100 font-bold px-2 py-0.5 rounded-full">
+                        Plus que {tier.remainingCount}
                       </span>
                     )}
                   </div>
                   {tier.description && (
-                    <p className="text-[11px] text-gray-500 mt-0.5 leading-snug">
+                    <p className="text-[11px] text-gray-400 mt-0.5 leading-snug">
                       {tier.description}
                     </p>
                   )}
-                </div>
-
-                {/* Status or Price */}
-                {isSoldOut && (
-                  <span className="text-[11px] font-medium text-gray-400 flex items-center gap-1">
-                    <X className="w-3 h-3 text-gray-400" /> Épuisé
-                  </span>
-                )}
-              </div>
-
-              {/* Price & Quantity Controls */}
-              <div className="mt-3 pt-2.5 border-t border-gray-100 flex items-center justify-between">
-                <div className="font-extrabold text-xs sm:text-sm text-gray-900">
-                  {new Intl.NumberFormat('fr-FR').format(tier.price)} {event.currency || 'F'}
-                </div>
-
-                {!isSoldOut && (
-                  <div className="flex items-center gap-2.5">
-                    <button
-                      onClick={() => handleUpdateQuantity(tier.id, -1)}
-                      disabled={qty === 0}
-                      type="button"
-                      className="w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
-                      aria-label="Diminuer"
-                    >
-                      <Minus className="w-3 h-3" />
-                    </button>
-                    <span className="text-xs font-bold text-gray-900 w-4 text-center">
-                      {qty}
-                    </span>
-                    <button
-                      onClick={() => handleUpdateQuantity(tier.id, 1)}
-                      type="button"
-                      className="w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-100 active:scale-95 transition-all cursor-pointer"
-                      aria-label="Augmenter"
-                    >
-                      <Plus className="w-3 h-3" />
-                    </button>
+                  <div className="font-extrabold text-xs sm:text-sm text-gray-900 mt-1.5">
+                    {new Intl.NumberFormat('fr-FR').format(tier.price)} {event.currency || 'F'}
                   </div>
-                )}
+                </div>
+
+                <div className="flex items-center self-center flex-shrink-0">
+                  {isSoldOut ? (
+                    <span className="text-[11px] font-medium text-gray-400 flex items-center gap-1">
+                      <X className="w-3.5 h-3.5 text-gray-400" /> Épuisé
+                    </span>
+                  ) : (
+                    <div className="flex items-center gap-2.5">
+                      <button
+                        onClick={() => handleUpdateQuantity(tier.id, -1)}
+                        disabled={qty === 0}
+                        type="button"
+                        className="w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+                        aria-label="Diminuer"
+                      >
+                        <Minus className="w-3 h-3" />
+                      </button>
+                      <span className="text-xs font-bold text-gray-900 w-4 text-center">
+                        {qty}
+                      </span>
+                      <button
+                        onClick={() => handleUpdateQuantity(tier.id, 1)}
+                        type="button"
+                        className="w-7 h-7 rounded-full border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:bg-gray-100 active:scale-95 transition-all cursor-pointer"
+                        aria-label="Augmenter"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Pricing Breakdown */}
-      <div className="space-y-2 py-4 border-t border-gray-100 text-xs text-gray-500">
-        <div className="flex justify-between items-center">
-          <span>{totalTicketsCount} {totalTicketsCount > 1 ? 'Billets' : 'Billet'}</span>
-          <span className="font-medium text-gray-900">{formattedTotal} {event.currency || 'F'}</span>
+      <div className="pt-2 border-t border-gray-200/80 space-y-2 text-xs">
+        <div className="flex justify-between items-center text-gray-500">
+          <span>Sous-total</span>
+          <span className="font-semibold text-gray-800">
+            {new Intl.NumberFormat('fr-FR').format(subtotal)} {event.currency || 'F'}
+          </span>
         </div>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center text-gray-500">
           <span>Frais de service</span>
-          <span className="font-medium text-gray-900">0 {event.currency || 'F'}</span>
+          <span className="font-semibold text-gray-800">
+            {new Intl.NumberFormat('fr-FR').format(serviceFees)} {event.currency || 'F'}
+          </span>
         </div>
-        <div className="flex justify-between items-center pt-2 border-t border-dashed border-gray-200 text-sm font-extrabold text-gray-900">
+        <div className="flex justify-between items-center pt-2 border-t border-gray-200 text-sm font-extrabold text-gray-900">
           <span>Total</span>
-          <span className="text-base">{formattedTotal} {event.currency || 'F'}</span>
+          <span className="text-base font-black">
+            {new Intl.NumberFormat('fr-FR').format(grandTotal)} {event.currency || 'F'}
+          </span>
         </div>
       </div>
 
-      {/* Submit Button */}
       <button
         onClick={handleCheckout}
-        disabled={totalTicketsCount === 0}
+        disabled={totalTickets === 0}
         type="button"
-        className={`w-full py-3.5 rounded-full font-bold text-xs sm:text-sm transition-all shadow-md active:scale-98 cursor-pointer ${
-          totalTicketsCount > 0
-            ? 'bg-[#0F141C] text-white hover:bg-black'
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-80'
-        }`}
+        className="w-full py-4 bg-[#0F141C] text-white text-xs sm:text-sm font-bold rounded-full hover:bg-black active:scale-98 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
       >
-        Continuer au paiement
+        <span>Continuer</span>
+        <span className="text-white/60">•</span>
+        <span>{new Intl.NumberFormat('fr-FR').format(grandTotal)} {event.currency || 'F'}</span>
       </button>
 
-      {/* Security Footer */}
-      <div className="mt-3 text-center flex items-center justify-center gap-1.5 text-[11px] text-gray-400">
-        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-        <span>Paiement sécurisé Wave • Orange Money • CB</span>
+      <div className="pt-1 text-center flex items-center justify-center gap-1.5 text-[11px] text-gray-400">
+        <ShieldCheck className="w-4 h-4 text-emerald-500" />
+        <span>Paiement sécurisé • Wave & Orange Money</span>
       </div>
     </div>
   );

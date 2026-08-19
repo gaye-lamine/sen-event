@@ -1,57 +1,38 @@
 import React from 'react';
 
+/**
+ * @component FloatingTickets
+ * @description Rendu des billets VIP 3D décoratifs dans les coins inférieurs gauche et droit
+ * de la section Hero (espacement 60px des bords, inclinaison subtile ±18° et base masquée).
+ */
 export const FloatingTickets: React.FC = () => {
   return (
     <>
-      {/* Left Purple Atmospheric Glow */}
       <div
-        className="absolute pointer-events-none -z-0"
+        className="hidden md:block absolute -bottom-16 left-[60px] z-10 pointer-events-none select-none transition-transform duration-700 ease-out hover:scale-105"
         style={{
-          width: '260px',
-          height: '260px',
-          bottom: '0px',
-          left: '120px',
-          borderRadius: '130px',
-          background: '#8B5CF6',
-          opacity: 0.28,
-          filter: 'blur(55px)',
+          transform: 'rotate(-18deg)',
         }}
         aria-hidden="true"
-      />
-
-      {/* Left card: gap from edge = 80px, cards lean -18deg, base hidden below */}
-      <div
-        className="absolute pointer-events-none select-none z-10 hidden sm:block animate-fluid-left"
-        style={{
-          width: '300px',
-          height: '380px',
-          bottom: '-140px',
-          left: '60px',
-          transformOrigin: 'bottom center',
-        }}
       >
         <img
           src="/images/ticket_stack_left.jpg"
-          alt="Tickets Dîner de Gala & Vogue Pass"
-          className="w-full h-full object-contain drop-shadow-2xl"
+          alt="Billet VIP gauche"
+          className="w-48 lg:w-56 xl:w-64 h-auto drop-shadow-2xl rounded-2xl opacity-95"
         />
       </div>
 
-      {/* Right card: gap from edge = 80px, cards lean +18deg, base hidden below */}
       <div
-        className="absolute pointer-events-none select-none z-10 hidden sm:block animate-fluid-right"
+        className="hidden md:block absolute -bottom-16 right-[60px] z-10 pointer-events-none select-none transition-transform duration-700 ease-out hover:scale-105"
         style={{
-          width: '300px',
-          height: '380px',
-          bottom: '-140px',
-          right: '60px',
-          transformOrigin: 'bottom center',
+          transform: 'rotate(18deg)',
         }}
+        aria-hidden="true"
       >
         <img
           src="/images/ticket_stack_right.jpg"
-          alt="Tickets Maggu VJ & Match Pass"
-          className="w-full h-full object-contain drop-shadow-2xl"
+          alt="Billet VIP droit"
+          className="w-48 lg:w-56 xl:w-64 h-auto drop-shadow-2xl rounded-2xl opacity-95"
         />
       </div>
     </>

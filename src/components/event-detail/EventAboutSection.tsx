@@ -1,6 +1,11 @@
 import React from 'react';
 import { EventAboutSectionProps } from '../../types';
 
+/**
+ * @component EventAboutSection
+ * @description Section narrative présentant le descriptif de l'événement et la carte organisateur.
+ * @param {EventAboutSectionProps} props - Contrat de propriétés du composant
+ */
 export const EventAboutSection: React.FC<EventAboutSectionProps> = ({ event }) => {
   const organizer = event.organizer || {
     name: 'Sunu Prod',
@@ -11,34 +16,41 @@ export const EventAboutSection: React.FC<EventAboutSectionProps> = ({ event }) =
 
   return (
     <div className="space-y-6 text-left">
-      {/* Section Title */}
       <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
         À propos de cet évènement
       </h2>
 
-      {/* Description Text */}
       <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
         {event.description ||
-          "Après une tournée sold-out en Europe, Wally B. Seck retrouve son public sénégalais pour une soirée exceptionnelle au Dakar Arena. Au programme : ses plus grands tubes, des featurings surprises et une scénographie pensée spécialement pour cette date unique. Une première partie assurée par de jeunes talents locaux ouvrira la soirée dès 18h00."}
+          "Retrouvez les plus grandes stars de la musique sénégalaise pour un show d'exception. Une soirée inoubliable avec des invités prestigieux, un son haute définition et une ambiance 100% festive dans la plus belle salle de Dakar."}
       </p>
 
-      {/* Organizer Card Box */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-[#F7F7F8] border border-gray-100/80 flex items-center gap-3.5">
-        
-        {/* Organizer Avatar / Initials */}
-        <div className="w-11 h-11 rounded-full bg-[#7C3AED] text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-xs">
-          {organizer.initials || 'SP'}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-xl bg-gray-900 text-white font-black text-sm flex items-center justify-center shadow-xs">
+            {organizer.initials}
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-xs sm:text-sm text-gray-900">
+                {organizer.name}
+              </span>
+              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                Vérifié
+              </span>
+            </div>
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              {organizer.eventsCount} évènements organisés • Membre depuis {organizer.memberSince}
+            </p>
+          </div>
         </div>
 
-        {/* Organizer Metadata */}
-        <div>
-          <h3 className="font-bold text-xs sm:text-sm text-gray-900 leading-snug">
-            Organisé par {organizer.name}
-          </h3>
-          <p className="text-[11px] sm:text-xs text-gray-500 mt-0.5">
-            {organizer.eventsCount || 24} événements organisés • Membre depuis {organizer.memberSince || '2021'}
-          </p>
-        </div>
+        <button
+          type="button"
+          className="px-3.5 py-1.5 border border-gray-300 rounded-full text-xs font-semibold text-gray-700 hover:bg-white hover:border-gray-400 transition-all cursor-pointer"
+        >
+          Profil
+        </button>
       </div>
     </div>
   );

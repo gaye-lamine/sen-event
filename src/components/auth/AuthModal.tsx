@@ -1,20 +1,13 @@
 import React, { useState } from 'react';
 import { X, Mail, Lock, Phone, User } from 'lucide-react';
+import { AuthModalProps, AuthMode } from '../../types';
 
 /**
- * ============================================================================
- * MODULE D'AUTHENTIFICATION : CONNEXION (LOGIN) & CRÉATION DE COMPTE (SIGNUP)
- * ============================================================================
- * 
- * Cette modale gère à la fois :
- * 1. La connexion d'un utilisateur existant (Email / Mot de passe)
- * 2. L'inscription / Création d'un nouveau compte (Nom, Téléphone, Email, Mot de passe)
- * 
- * L'état `mode` permet de basculer instantanément entre "login" et "signup".
+ * @component AuthModal
+ * @description Modale d'authentification à double mode (Connexion / Inscription)
+ * avec champs de saisie pour le marché sénégalais.
+ * @param {AuthModalProps} props - Contrat de propriétés du composant
  */
-
-import { AuthModalProps } from '../../types';
-
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   initialMode = 'login',
@@ -22,190 +15,148 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  // Mode actif : 'login' = Se connecter | 'signup' = Créer un compte
-  const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
-  
-  // Champs de formulaire
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  
-  // État de succès après soumission
   const [success, setSuccess] = useState(false);
 
-  /**
-   * Gestionnaire de soumission du formulaire (Connexion / Inscription)
-   * Prêt pour la liaison avec une API backend d'authentification (ex: Firebase, Supabase, API REST).
-   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess(true);
     setTimeout(() => {
       setSuccess(false);
       onClose();
-    }, 1200);
+    }, 1500);
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-8 border border-gray-100 animate-fadeIn">
-        
-        {/* Bouton de fermeture de la modale */}
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="relative w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl animate-scaleUp">
         <button
           onClick={onClose}
           type="button"
-          className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-900 rounded-full hover:bg-gray-100 transition-colors"
-          aria-label="Fermer la fenêtre"
+          className="absolute top-5 right-5 p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+          aria-label="Fermer la boîte de dialogue"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {/* ------------------------------------------------------------------ */}
-        {/* EN-TÊTE : TITRE ET SOUS-TITRE SELON LE MODE (LOGIN VS SIGNUP)      */}
-        {/* ------------------------------------------------------------------ */}
         <div className="text-center mb-6">
-          <h3 className="text-2xl font-extrabold text-gray-900">
-            {mode === 'login' ? 'Se connecter' : 'Créer un compte'}
-          </h3>
+          <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+            {mode === 'login' ? 'Bienvenue sur Sunu Events' : 'Créer un compte'}
+          </h2>
           <p className="text-xs text-gray-500 mt-1">
             {mode === 'login'
-              ? 'Accédez à vos billets et réservations en un clic'
-              : 'Rejoignez SunuEvents et réservez vos places partout au Sénégal'}
+              ? 'Connecte-toi pour accéder à tes billets et favoris'
+              : 'Rejoins la plus grande communauté événementielle du Sénégal'}
           </p>
         </div>
 
-        {/* Message de confirmation de succès */}
         {success ? (
-          <div className="p-6 text-center text-emerald-600 bg-emerald-50 rounded-2xl">
-            <p className="font-bold text-sm">
+          <div className="py-8 text-center">
+            <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
+              ✓
+            </div>
+            <h3 className="font-bold text-gray-900 text-base">
               {mode === 'login' ? 'Connexion réussie !' : 'Compte créé avec succès !'}
-            </p>
+            </h3>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            
-            {/* ============================================================= */}
-            {/* PARTIE CRÉER UN COMPTE : CHAMPS NOM & TÉLÉPHONE SÉNÉGALAIS   */}
-            {/* (Affichés uniquement en mode 'signup')                         */}
-            {/* ============================================================= */}
+          <form onSubmit={handleSubmit} className="space-y-4 text-left">
             {mode === 'signup' && (
               <>
-                {/* Champ Nom complet */}
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">
                     Nom complet
                   </label>
                   <div className="relative">
-                    <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <User className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400" />
                     <input
                       type="text"
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Ex: Awa Diop"
-                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
+                      placeholder="Moussa Ndiaye"
+                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
                     />
                   </div>
                 </div>
 
-                {/* Champ Téléphone (Format Sénégal +221) */}
                 <div>
                   <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    Numéro de téléphone (Wave / Orange Money)
+                    Numéro de téléphone
                   </label>
                   <div className="relative">
-                    <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <Phone className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400" />
                     <input
                       type="tel"
                       required
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="77 000 00 00"
-                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
                     />
                   </div>
                 </div>
               </>
             )}
 
-            {/* ============================================================= */}
-            {/* PARTIE COMMUNE (LOGIN & SIGNUP) : EMAIL ET MOT DE PASSE       */}
-            {/* ============================================================= */}
-            {/* Champ Adresse Email */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Adresse email
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="votre.email@exemple.sn"
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
+                  placeholder="exemple@domaine.sn"
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
                 />
               </div>
             </div>
 
-            {/* Champ Mot de passe */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1">
                 Mot de passe
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 focus:bg-white focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
                 />
               </div>
             </div>
 
-            {/* Bouton d'action principal (Se connecter ou Créer mon compte) */}
             <button
               type="submit"
-              className="w-full py-3 bg-[#111328] hover:bg-black text-white font-bold text-sm rounded-xl shadow-md transition-all active:scale-98 mt-2"
+              className="w-full py-3 bg-[#0F141C] text-white font-bold text-xs sm:text-sm rounded-xl hover:bg-black active:scale-98 transition-all shadow-md mt-2"
             >
               {mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
             </button>
+
+            <div className="text-center pt-2">
+              <button
+                type="button"
+                onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+                className="text-xs text-gray-600 hover:text-black font-semibold"
+              >
+                {mode === 'login'
+                  ? "Tu n'as pas de compte ? Inscris-toi"
+                  : 'Déjà un compte ? Connecte-toi'}
+              </button>
+            </div>
           </form>
         )}
-
-        {/* ------------------------------------------------------------------ */}
-        {/* BASSERELLE : BASCULER ENTRE LOGIN ET CRÉER UN COMPTE               */}
-        {/* ------------------------------------------------------------------ */}
-        <div className="mt-6 pt-4 border-t border-gray-100 text-center">
-          {mode === 'login' ? (
-            <p className="text-xs text-gray-500">
-              Pas encore de compte ?{' '}
-              <button
-                onClick={() => setMode('signup')}
-                type="button"
-                className="font-bold text-[#111328] hover:underline"
-              >
-                Créer un compte
-              </button>
-            </p>
-          ) : (
-            <p className="text-xs text-gray-500">
-              Vous avez déjà un compte ?{' '}
-              <button
-                onClick={() => setMode('login')}
-                type="button"
-                className="font-bold text-[#111328] hover:underline"
-              >
-                Se connecter
-              </button>
-            </p>
-          )}
-        </div>
       </div>
     </div>
   );

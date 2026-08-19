@@ -3,6 +3,12 @@ import { Calendar, MapPin, Heart, ArrowRight, Users, Star } from 'lucide-react';
 import { EventHeroBannerProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
 
+/**
+ * @component EventHeroBanner
+ * @description Grande bannière dorée de la page détail d'un événement avec affiche 3D inclinée,
+ * métadonnées d'audience, note moyenne et bouton d'action vers les billets.
+ * @param {EventHeroBannerProps} props - Contrat de propriétés du composant
+ */
 export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
   event,
   onScrollToTickets,
@@ -17,16 +23,12 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
 
   return (
     <div className="w-full">
-      {/* Golden Gradient Banner Container */}
       <div className="relative overflow-hidden rounded-3xl lg:rounded-[32px] bg-gradient-to-br from-[#BE8423] via-[#C68D2B] to-[#996515] p-6 sm:p-8 lg:p-10 text-white shadow-xl shadow-amber-900/10">
-        
-        {/* Subtle decorative background light effect */}
         <div
           className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none"
           aria-hidden="true"
         />
 
-        {/* Favorite Heart Button (Top-Right) */}
         <button
           onClick={() => setIsFavorite(!isFavorite)}
           type="button"
@@ -34,30 +36,25 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
           aria-label="Ajouter aux favoris"
         >
           <Heart
-            className={`w-5 h-5 transition-transform active:scale-125 ${
+            className={`w-5 h-5 ${
               isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-700'
             }`}
           />
         </button>
 
-        <div className="flex flex-col md:flex-row items-center gap-6 sm:gap-8 lg:gap-12">
-          
-          {/* Left Side: 3D Tilted Poster Image */}
-          <div className="w-48 sm:w-56 md:w-64 lg:w-72 flex-shrink-0">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl transform -rotate-3 hover:rotate-0 transition-transform duration-300 border-2 border-white/30">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-6 sm:gap-8 lg:gap-10">
+          <div className="w-40 sm:w-48 md:w-56 lg:w-60 flex-shrink-0 mx-auto md:mx-0">
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/20 transform -rotate-1 hover:rotate-0 transition-transform duration-300">
               <img
                 src={event.image}
                 alt={event.title}
-                className="w-full h-auto object-cover aspect-[3/4]"
+                className="w-full h-full object-cover object-center"
               />
             </div>
           </div>
 
-          {/* Right Side: Event Details & Action */}
           <div className="flex-1 text-left">
-            
-            {/* Category Pill */}
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold text-white mb-3 sm:mb-4 border border-white/20">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold text-white mb-3">
               <IconHelper
                 name={event.categoryIcon || event.category}
                 className="w-3.5 h-3.5 text-white"
@@ -65,54 +62,45 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
               <span>{event.categoryLabel}</span>
             </div>
 
-            {/* Event Title */}
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight mb-4">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
               {event.title}
             </h1>
 
-            {/* Date & Location Metadata */}
-            <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs sm:text-sm text-white/90 mb-6">
-              <span className="flex items-center gap-2">
+            <div className="mt-4 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs sm:text-sm text-white/90">
+              <div className="flex items-center gap-1.5">
                 <Calendar className="w-4 h-4 text-white/80" />
                 <span>{event.date}</span>
-              </span>
-              <span className="flex items-center gap-2">
+              </div>
+              <div className="flex items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-white/80" />
                 <span>{event.location}</span>
-              </span>
+              </div>
             </div>
 
-            {/* CTA Button: Acheter mon billet */}
-            <div>
+            <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-white/80">
+              <div className="flex items-center gap-1.5 bg-black/15 px-3 py-1.5 rounded-full">
+                <Users className="w-3.5 h-3.5 text-amber-300" />
+                <span>{formattedAttendees} participants</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 bg-black/15 px-3 py-1.5 rounded-full">
+                <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                <span className="font-bold text-white">{rating}</span>
+                <span className="text-white/60">({reviewsCount} avis)</span>
+              </div>
+            </div>
+
+            <div className="mt-6">
               <button
                 onClick={onScrollToTickets}
                 type="button"
-                className="group inline-flex items-center gap-2.5 px-6 sm:px-8 py-3 bg-[#0F141C] text-white text-xs sm:text-sm font-bold rounded-full hover:bg-black active:scale-95 transition-all shadow-lg hover:shadow-xl cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 bg-white text-gray-950 text-xs sm:text-sm font-bold rounded-full hover:bg-amber-50 active:scale-95 transition-all shadow-lg cursor-pointer"
               >
-                <span>Acheter mon billet</span>
-                <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-[#FFC23C] group-hover:text-gray-950 transition-colors">
-                  <ArrowRight className="w-3.5 h-3.5 stroke-[2.2]" />
-                </span>
+                <span>Voir les billets</span>
+                <ArrowRight className="w-4 h-4 stroke-[2.5]" />
               </button>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Social Proof & Rating Counters */}
-      <div className="flex items-center justify-center gap-6 sm:gap-8 py-5 text-xs sm:text-sm text-gray-600">
-        <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-gray-500" />
-          <span>
-            <strong className="font-bold text-gray-900">{formattedAttendees}</strong> intéressés
-          </span>
-        </div>
-        <div className="w-1 h-1 rounded-full bg-gray-300" />
-        <div className="flex items-center gap-1.5">
-          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-          <span>
-            <strong className="font-bold text-gray-900">{rating}</strong> ({reviewsCount} avis)
-          </span>
         </div>
       </div>
     </div>

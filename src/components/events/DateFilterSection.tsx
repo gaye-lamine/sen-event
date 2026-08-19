@@ -9,6 +9,12 @@ const DATE_TABS: { id: DateFilterType; label: string }[] = [
   { id: 'this_month', label: 'Ce mois' },
 ];
 
+/**
+ * @component DateFilterSection
+ * @description Section de filtrage chronologique rapide avec onglets temporels
+ * et grille de cartes d'événements associées.
+ * @param {DateFilterSectionProps} props - Contrat de propriétés du composant
+ */
 export const DateFilterSection: React.FC<DateFilterSectionProps> = ({
   activeFilter,
   onFilterChange,
@@ -16,63 +22,61 @@ export const DateFilterSection: React.FC<DateFilterSectionProps> = ({
   onBook,
 }) => {
   return (
-    <section className="py-12 sm:py-16 bg-[#FAF8F5] border-y border-stone-200/50">
+    <section className="py-8 sm:py-12 bg-[#FBFBFC]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Header */}
-        <div className="mb-6 sm:mb-8">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-            <span>C'est quand, la </span>
-            <span className="relative inline-block">
-              <span className="relative z-10">sortie ?</span>
-              {/* Yellow Marker Highlight under 'sortie ?' */}
-              <span
-                className="absolute bottom-[2px] left-[-2px] right-[-2px] h-[8px] sm:h-[10px] bg-[#FFC23C]/75 rounded-xs -z-0"
-                aria-hidden="true"
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+          <div className="text-left">
+            <h2 className="font-extrabold text-xl sm:text-2xl md:text-3xl text-gray-900 tracking-tight">
+              C'est quand, la sortie ?
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-400 mt-1">
+              Choisis ta disponibilité et trouve les meilleurs plans.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-1.5 p-1 bg-white rounded-full border border-gray-200/90 shadow-xs overflow-x-auto no-scrollbar">
+            {DATE_TABS.map((tab) => {
+              const isActive = activeFilter === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onFilterChange(tab.id)}
+                  type="button"
+                  className={`
+                    px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer
+                    ${
+                      isActive
+                        ? 'bg-[#0F141C] text-white shadow-xs'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    }
+                  `}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {events.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+            {events.map((event) => (
+              <EventCard
+                key={event.id}
+                event={event}
+                variant="date-section"
+                onBook={onBook}
               />
-            </span>
-          </h2>
-          <p className="mt-1.5 text-xs sm:text-sm text-gray-500">
-            Filtre selon ton emploi du temps même à la dernière minute.
-          </p>
-        </div>
-
-        {/* Date Filter Tabs */}
-        <div className="flex items-center gap-2.5 sm:gap-3 overflow-x-auto no-scrollbar pb-3 mb-6 sm:mb-8">
-          {DATE_TABS.map((tab) => {
-            const isActive = activeFilter === tab.id;
-
-            return (
-              <button
-                key={tab.id}
-                onClick={() => onFilterChange(tab.id)}
-                type="button"
-                className={`
-                  px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-xs sm:text-sm transition-all duration-200 cursor-pointer whitespace-nowrap
-                  ${
-                    isActive
-                      ? 'border-2 border-[#EF4444] text-gray-900 bg-white font-bold shadow-xs'
-                      : 'border border-gray-900/80 text-gray-800 bg-transparent font-medium hover:bg-black/5'
-                  }
-                `}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* 4 Event Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
-          {events.map((event) => (
-            <EventCard
-              key={event.id}
-              event={event}
-              variant="date-section"
-              onBook={onBook}
-            />
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-12 text-center bg-white rounded-3xl border border-gray-100 p-8">
+            <p className="text-sm text-gray-500 font-medium">
+              Aucun événement prévu pour cette période pour le moment.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -2,6 +2,12 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import { CheckoutStep, CheckoutStepperProps } from '../../types';
 
+/**
+ * @component CheckoutStepper
+ * @description Indicateur d'avancement horizontal à 3 étapes (Billets, Informations, Paiement)
+ * avec pastilles d'état (validé en vert, actif en corail, en attente en gris).
+ * @param {CheckoutStepperProps} props - Contrat de propriétés du composant
+ */
 export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
   currentStep,
   onStepClick,
@@ -21,7 +27,6 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
 
         return (
           <React.Fragment key={step.number}>
-            {/* Step Node */}
             <div className="flex flex-col items-center">
               <button
                 onClick={() => onStepClick?.(step.number)}
@@ -57,7 +62,6 @@ export const CheckoutStepper: React.FC<CheckoutStepperProps> = ({
               </span>
             </div>
 
-            {/* Connecting Line with mid-dot */}
             {!isLast && (
               <div className="flex-1 flex items-center justify-center px-3 sm:px-6 -mt-5">
                 <div className="w-full relative flex items-center justify-center">

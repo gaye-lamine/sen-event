@@ -2,6 +2,11 @@ import React from 'react';
 import { Minus, Plus, ArrowRight, X } from 'lucide-react';
 import { TicketSelectionStepProps } from '../../types';
 
+/**
+ * @component TicketSelectionStep
+ * @description Première étape du tunnel d'achat permettant d'ajuster les quantités par catégorie de billet.
+ * @param {TicketSelectionStepProps} props - Contrat de propriétés du composant
+ */
 export const TicketSelectionStep: React.FC<TicketSelectionStepProps> = ({
   event,
   tiers,
@@ -13,7 +18,6 @@ export const TicketSelectionStep: React.FC<TicketSelectionStepProps> = ({
 
   return (
     <div className="bg-white rounded-3xl sm:rounded-[32px] p-6 sm:p-8 lg:p-10 border border-gray-100/90 shadow-sm text-left">
-      {/* Header */}
       <div className="mb-6 sm:mb-8">
         <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
           Choisis tes billets
@@ -23,7 +27,6 @@ export const TicketSelectionStep: React.FC<TicketSelectionStepProps> = ({
         </p>
       </div>
 
-      {/* Ticket Tiers List */}
       <div className="space-y-3.5 sm:space-y-4 mb-8">
         {tiers.map((tier) => {
           const qty = quantities[tier.id] || 0;
@@ -57,7 +60,6 @@ export const TicketSelectionStep: React.FC<TicketSelectionStepProps> = ({
                   </div>
                 </div>
 
-                {/* Quantity Controls */}
                 <div className="flex items-center self-center flex-shrink-0">
                   {isSoldOut ? (
                     <span className="text-xs font-medium text-gray-400 flex items-center gap-1">
@@ -94,7 +96,6 @@ export const TicketSelectionStep: React.FC<TicketSelectionStepProps> = ({
         })}
       </div>
 
-      {/* Action Row */}
       <div className="flex justify-end pt-2">
         <button
           onClick={onContinue}

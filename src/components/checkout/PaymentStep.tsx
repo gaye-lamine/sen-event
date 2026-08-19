@@ -3,6 +3,12 @@ import { ShieldCheck, CheckCircle, QrCode, CreditCard, ArrowRight } from 'lucide
 import confetti from 'canvas-confetti';
 import { PaymentMethodType, PaymentStepProps } from '../../types';
 
+/**
+ * @component PaymentStep
+ * @description Troisième étape du tunnel d'achat : sélection du mode de paiement local (Wave, OM, CB),
+ * saisie du numéro avec préfixe +221, validation des CGV et confirmation avec confettis festifs.
+ * @param {PaymentStepProps} props - Contrat de propriétés du composant
+ */
 export const PaymentStep: React.FC<PaymentStepProps> = ({
   event,
   totalAmount,
@@ -45,7 +51,6 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
     }, 1200);
   };
 
-  // Success Confirmation Screen
   if (isSuccess) {
     return (
       <div className="bg-white rounded-3xl sm:rounded-[32px] p-6 sm:p-8 lg:p-10 border border-gray-100 shadow-sm text-center animate-fadeIn">
@@ -62,7 +67,6 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
           <strong className="text-gray-900">{customerEmail || 'aminata.diop@email.com'}</strong>.
         </p>
 
-        {/* Digital Ticket Card */}
         <div className="my-6 p-5 sm:p-6 bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-2xl text-left shadow-lg">
           <div className="flex justify-between items-start gap-4">
             <div>
@@ -102,7 +106,6 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
 
   return (
     <div className="bg-white rounded-3xl sm:rounded-[32px] p-6 sm:p-8 lg:p-10 border border-gray-100/90 shadow-sm text-left">
-      {/* 1. Header */}
       <div className="mb-6 sm:mb-7">
         <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
           Paiement
@@ -113,9 +116,7 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
       </div>
 
       <form onSubmit={handlePaySubmit} className="space-y-5">
-        {/* 2. Payment Method Selector Cards */}
         <div className="grid grid-cols-3 gap-3 sm:gap-4">
-          {/* Option 1: Wave */}
           <button
             type="button"
             onClick={() => setSelectedMethod('wave')}
@@ -135,7 +136,6 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
             <span className="text-xs sm:text-[13px] font-bold text-gray-900">Wave</span>
           </button>
 
-          {/* Option 2: Orange Money */}
           <button
             type="button"
             onClick={() => setSelectedMethod('orange_money')}
@@ -155,7 +155,6 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
             <span className="text-xs sm:text-[13px] font-bold text-gray-900">Orange Money</span>
           </button>
 
-          {/* Option 3: Carte bancaire */}
           <button
             type="button"
             onClick={() => setSelectedMethod('card')}
@@ -172,7 +171,6 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
           </button>
         </div>
 
-        {/* 3. Phone or Card Inputs */}
         {selectedMethod !== 'card' ? (
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1.5">
@@ -238,7 +236,6 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
           </div>
         )}
 
-        {/* 4. Notification Alert Box */}
         <div className="p-3.5 sm:p-4 rounded-2xl bg-[#EAF7F1] border border-emerald-100 flex items-center gap-2.5 text-xs text-[#178558]">
           <ShieldCheck className="w-4 h-4 text-[#178558] flex-shrink-0" />
           <p className="leading-snug">
@@ -250,7 +247,6 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
           </p>
         </div>
 
-        {/* 5. Terms & Validation */}
         <div className="pt-1">
           <label className="flex items-start gap-2.5 cursor-pointer select-none">
             <input
@@ -275,7 +271,6 @@ export const PaymentStep: React.FC<PaymentStepProps> = ({
           )}
         </div>
 
-        {/* 6. Action Buttons */}
         <div className="flex items-center justify-between pt-6 border-t border-gray-100 mt-6">
           <button
             onClick={onBack}
