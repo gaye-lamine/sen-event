@@ -26,6 +26,7 @@ import {
   Plus,
   ShieldCheck,
   Check,
+  Edit3,
 } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
@@ -198,8 +199,9 @@ const INITIAL_PAYMENT_METHODS: PaymentMethod[] = [
  * - Onglet "Vue d'ensemble" : KPI, billet prochain et activités
  * - Onglet "Mes billets" : Billets à venir (3) et Passés (9) avec téléchargement PDF
  * - Onglet "Mes favoris" : Grille des évènements mis de côté
- * - Onglet "Notifications" : Préférences des rappels, alertes, offres et canaux
- * - Onglet "Moyens de paiement" : Gestion Wave, OM et Cartes bancaires avec conformité PCI-DSS
+ * - Onglet "Notifications" : Préférences des alertes
+ * - Onglet "Moyens de paiement" : Gestion Wave, OM et Cartes
+ * - Onglet "Mes informations" : Édition du prénom, nom, email, téléphone et ville
  * @param {DashboardPageProps} props - Propriétés du composant
  */
 export const DashboardPage: React.FC<DashboardPageProps> = ({
@@ -212,11 +214,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onViewTicket,
   onBookEvent,
 }) => {
-  const [activeTab, setActiveTab] = useState<TabType>('payments');
+  const [activeTab, setActiveTab] = useState<TabType>('profile');
   const [ticketFilter, setTicketFilter] = useState<TicketFilterType>('upcoming');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<FavoriteEvent[]>(INITIAL_FAVORITES);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(INITIAL_PAYMENT_METHODS);
+
+  // État profil "Mes informations"
+  const [profileFirstName, setProfileFirstName] = useState('Aminata');
+  const [profileLastName, setProfileLastName] = useState('Diop');
+  const [profileEmail, setProfileEmail] = useState('aminata.diop@email.com');
+  const [profilePhone, setProfilePhone] = useState('77 123 45 67');
+  const [profileCity, setProfileCity] = useState('Dakar');
+  const [profileSavedToast, setProfileSavedToast] = useState(false);
 
   // Préférences notifications
   const [notifReminder, setNotifReminder] = useState(true);
@@ -249,6 +259,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         isDefault: pm.id === methodId,
       }))
     );
+  };
+
+  const handleSaveProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileSavedToast(true);
+    setTimeout(() => setProfileSavedToast(false), 3000);
+  };
+
+  const handleResetProfile = () => {
+    setProfileFirstName('Aminata');
+    setProfileLastName('Diop');
+    setProfileEmail('aminata.diop@email.com');
+    setProfilePhone('77 123 45 67');
+    setProfileCity('Dakar');
   };
 
   return (
@@ -285,7 +309,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-white/70 shadow-md bg-amber-100 flex items-center justify-center">
                 <img
                   src="/images/wally.png"
-                  alt="Aminata Diop"
+                  alt={profileFirstName}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     (e.target as HTMLElement).style.display = 'none';
@@ -304,11 +328,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
             <div>
               <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight leading-snug">
-                Aminata Diop
+                {profileFirstName} {profileLastName}
               </h1>
               <p className="text-xs sm:text-sm text-white/80 mt-1 flex items-center gap-1.5 font-medium">
                 <MapPin className="w-3.5 h-3.5 text-white/70" />
-                <span>Dakar</span>
+                <span>{profileCity}</span>
                 <span>•</span>
                 <span>Membre depuis janvier 2025</span>
               </p>
@@ -461,7 +485,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     : 'text-gray-600 hover:bg-white hover:text-gray-900'
                 }`}
               >
-                <User className="w-4 h-4 text-gray-500" />
+                <User
+                  className={`w-4 h-4 ${
+                    activeTab === 'profile' ? 'text-[#FF5722]' : 'text-gray-500'
+                  }`}
+                />
                 <span>Mes informations</span>
               </button>
 
@@ -510,11 +538,140 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           {/* B. SECTION CENTRALE DYNAMIQUE */}
           <section className="lg:col-span-9 space-y-6 text-left">
             {/* ========================================================= */}
+            {/* ONGLET : MES INFORMATIONS */}
+            {/* ========================================================= */}
+            {activeTab === 'profile' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                {/* En-tête */}
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight">
+                    Mes informations
+                  </h2>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                    Ces informations servent à personnaliser ton compte et tes billets.
+                  </p>
+                </div>
+
+                {/* Toast de succès */}
+                {profileSavedToast && (
+                  <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-300">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Tes informations ont été mises à jour avec succès !</span>
+                  </div>
+                )}
+
+                {/* Carte Formulaire */}
+                <form
+                  onSubmit={handleSaveProfile}
+                  className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200/80 shadow-2xs space-y-5"
+                >
+                  {/* Ligne 1 : Prénom & Nom */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-[#374151] mb-1.5">
+                        Prénom
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={profileFirstName}
+                        onChange={(e) => setProfileFirstName(e.target.value)}
+                        placeholder="Aminata"
+                        className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111827] focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-[#374151] mb-1.5">
+                        Nom
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={profileLastName}
+                        onChange={(e) => setProfileLastName(e.target.value)}
+                        placeholder="Diop"
+                        className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111827] focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Ligne 2 : Adresse email */}
+                  <div>
+                    <label className="block text-xs font-semibold text-[#374151] mb-1.5">
+                      Adresse email
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={profileEmail}
+                      onChange={(e) => setProfileEmail(e.target.value)}
+                      placeholder="aminata.diop@email.com"
+                      className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111827] focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Ligne 3 : Téléphone */}
+                  <div>
+                    <label className="block text-xs font-semibold text-[#374151] mb-1.5">
+                      Téléphone
+                    </label>
+                    <div className="flex rounded-xl overflow-hidden border border-gray-200 focus-within:ring-1 focus-within:ring-gray-900 transition-all">
+                      <span className="inline-flex items-center px-4 bg-[#F9FAFB] text-[#4B5563] text-xs sm:text-sm font-semibold border-r border-gray-200 select-none">
+                        +221
+                      </span>
+                      <input
+                        type="tel"
+                        required
+                        value={profilePhone}
+                        onChange={(e) => setProfilePhone(e.target.value)}
+                        placeholder="77 123 45 67"
+                        className="w-full px-4 py-2.5 bg-white text-xs sm:text-sm text-[#111827] focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Ligne 4 : Ville */}
+                  <div>
+                    <label className="block text-xs font-semibold text-[#374151] mb-1.5">
+                      Ville
+                    </label>
+                    <input
+                      type="text"
+                      value={profileCity}
+                      onChange={(e) => setProfileCity(e.target.value)}
+                      placeholder="Dakar"
+                      className="w-full px-4 py-3 bg-[#F3F4F6] border border-transparent rounded-xl text-xs sm:text-sm text-[#111827] focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Boutons d'action en bas à droite */}
+                  <div className="pt-3 flex items-center justify-end gap-3 border-t border-gray-100">
+                    <button
+                      type="button"
+                      onClick={handleResetProfile}
+                      className="px-5 py-2.5 rounded-full border border-gray-200 hover:bg-gray-50 text-xs font-semibold text-gray-800 transition-all cursor-pointer"
+                    >
+                      Annuler
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 rounded-full bg-[#121526] hover:bg-[#090B14] text-white font-bold text-xs flex items-center gap-2 transition-all active:scale-95 shadow-xs cursor-pointer"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      <span>Enregistrer</span>
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* ========================================================= */}
             {/* ONGLET : MOYENS DE PAIEMENT */}
             {/* ========================================================= */}
             {activeTab === 'payments' && (
               <div className="space-y-6 animate-in fade-in duration-200">
-                {/* En-tête */}
                 <div>
                   <h2 className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight">
                     Moyens de paiement
@@ -524,9 +681,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </p>
                 </div>
 
-                {/* Liste des Cartes de Moyens de Paiement */}
                 <div className="space-y-4">
-                  {/* Carte 1 : Wave */}
                   <div className="bg-white border border-gray-200/80 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-2xs hover:shadow-xs transition-shadow">
                     <div className="flex items-center gap-3.5 sm:gap-4">
                       <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#1DC4FF] flex items-center justify-center shrink-0 shadow-xs">
@@ -558,7 +713,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     </div>
                   </div>
 
-                  {/* Carte 2 : Orange Money */}
                   <div className="bg-white border border-gray-200/80 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-2xs hover:shadow-xs transition-shadow">
                     <div className="flex items-center gap-3.5 sm:gap-4">
                       <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-black flex items-center justify-center shrink-0 shadow-xs p-1">
@@ -587,7 +741,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     </div>
                   </div>
 
-                  {/* Carte 3 : Carte Visa */}
                   <div className="bg-white border border-gray-200/80 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-2xs hover:shadow-xs transition-shadow">
                     <div className="flex items-center gap-3.5 sm:gap-4">
                       <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#0F172A] text-white flex items-center justify-center shrink-0 shadow-xs">
@@ -614,7 +767,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     </div>
                   </div>
 
-                  {/* Bouton Ajouter un moyen de paiement */}
                   <button
                     type="button"
                     onClick={() => alert('Ajouter une méthode de paiement (Wave, OM ou Carte)')}
@@ -624,7 +776,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </button>
                 </div>
 
-                {/* Note de Sécurité Certifiée PCI-DSS */}
                 <div className="pt-2 flex items-center gap-3 text-left">
                   <div className="w-6 h-6 rounded-lg bg-[#ECFDF5] text-[#10B981] flex items-center justify-center shrink-0">
                     <ShieldCheck className="w-4 h-4" />
