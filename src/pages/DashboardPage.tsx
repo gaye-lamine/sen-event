@@ -16,6 +16,9 @@ import {
   FileText,
   QrCode,
   CheckCircle2,
+  Music,
+  Trophy,
+  ArrowRight,
 } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
@@ -28,6 +31,7 @@ export interface DashboardPageProps {
   cartCount?: number;
   onOpenCart?: () => void;
   onViewTicket?: (ticketId?: string) => void;
+  onBookEvent?: (eventId: string) => void;
 }
 
 type TabType =
@@ -50,6 +54,17 @@ interface UserTicket {
   quantity: number;
   tiers: string;
   status: 'upcoming' | 'past';
+}
+
+interface FavoriteEvent {
+  id: string;
+  title: string;
+  category: string;
+  categoryIcon: typeof Music;
+  location: string;
+  date: string;
+  image: string;
+  price: string;
 }
 
 const USER_TICKETS: UserTicket[] = [
@@ -105,11 +120,45 @@ const USER_TICKETS: UserTicket[] = [
   },
 ];
 
+const INITIAL_FAVORITES: FavoriteEvent[] = [
+  {
+    id: 'fav-1',
+    title: 'Jeeba en concert',
+    category: 'Concert',
+    categoryIcon: Music,
+    location: 'Jardin de la Mairie , Tambacounda',
+    date: 'Dim. 31 décembre, 20h00',
+    image: '/images/concert.png',
+    price: '10 000 F',
+  },
+  {
+    id: 'fav-2',
+    title: 'Match Sénégal vs Algérie',
+    category: 'Sport',
+    categoryIcon: Trophy,
+    location: 'Stade Abdoulaye Wade, Diamniadio',
+    date: 'Ven. 12 Sept, 19h00',
+    image: '/images/match.png',
+    price: '10 000 F',
+  },
+  {
+    id: 'fav-3',
+    title: 'Wally B. Seck en concert',
+    category: 'Concert',
+    categoryIcon: Music,
+    location: 'Gare TER de Dakar',
+    date: 'Sam. 05 Nov, 18h00',
+    image: '/images/wally.png',
+    price: '10 000 F',
+  },
+];
+
 /**
  * @page DashboardPage
  * @description Espace personnel / Tableau de bord d'Aminata Diop :
- * - Onglet "Vue d'ensemble" : KPI, billet prochain et activités
- * - Onglet "Mes billets" : Billets à venir (3) et Passés (9) avec téléchargement PDF et QR Code
+ * - Onglet "Vue d'ensemble" : KPI, billet prochain et activités récentes
+ * - Onglet "Mes billets" : Billets à venir (3) et Passés (9) avec téléchargement PDF
+ * - Onglet "Mes favoris" : Grille des évènements mis de côté avec actions de réservation
  * @param {DashboardPageProps} props - Propriétés du composant
  */
 export const DashboardPage: React.FC<DashboardPageProps> = ({
@@ -120,10 +169,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   cartCount = 0,
   onOpenCart,
   onViewTicket,
+  onBookEvent,
 }) => {
-  const [activeTab, setActiveTab] = useState<TabType>('tickets');
+  const [activeTab, setActiveTab] = useState<TabType>('favorites');
   const [ticketFilter, setTicketFilter] = useState<TicketFilterType>('upcoming');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<FavoriteEvent[]>(INITIAL_FAVORITES);
 
   const upcomingTickets = USER_TICKETS.filter((t) => t.status === 'upcoming');
   const pastTickets = USER_TICKETS.filter((t) => t.status === 'past');
@@ -135,6 +186,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       setDownloadingId(null);
       alert(`Téléchargement du billet PDF pour "${ticket.title}" terminé !`);
     }, 800);
+  };
+
+  const handleRemoveFavorite = (favId: string) => {
+    setFavorites(favorites.filter((f) => f.id !== favId));
   };
 
   return (
@@ -226,7 +281,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               className="cursor-pointer hover:opacity-90 transition-opacity"
             >
               <p className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                12
+                {favorites.length}
               </p>
               <p className="text-[11px] sm:text-xs text-white/75 font-normal mt-0.5 whitespace-nowrap">
                 Évènements suivis
@@ -296,7 +351,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     : 'text-gray-600 hover:bg-white hover:text-gray-900'
                 }`}
               >
-                <Heart className="w-4 h-4 text-gray-500" />
+                <Heart
+                  className={`w-4 h-4 ${
+                    activeTab === 'favorites' ? 'text-[#FF5722]' : 'text-gray-500'
+                  }`}
+                />
                 <span>Mes favoris</span>
               </button>
 
@@ -387,11 +446,120 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           {/* B. SECTION CENTRALE DYNAMIQUE */}
           <section className="lg:col-span-9 space-y-6 text-left">
             {/* ========================================================= */}
-            {/* ONGLET 1 : MES BILLETS */}
+            {/* ONGLET 1 : MES FAVORIS */}
+            {/* ========================================================= */}
+            {activeTab === 'favorites' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                {/* En-tête */}
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight">
+                    Mes favoris
+                  </h2>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                    Les évènements que tu as mis de côté pour plus tard.
+                  </p>
+                </div>
+
+                {/* Grille 3 colonnes des cartes d'évènements favoris */}
+                {favorites.length === 0 ? (
+                  <div className="bg-white rounded-3xl p-10 text-center border border-gray-100">
+                    <Heart className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                    <p className="text-sm font-bold text-gray-700">
+                      Aucun favori enregistré
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Explore les évènements et clique sur le cœur pour les retrouver ici.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={onNavigateHome}
+                      className="mt-4 px-5 py-2 rounded-full bg-[#121526] text-white text-xs font-bold"
+                    >
+                      Découvrir les évènements
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {favorites.map((event) => {
+                      const CategoryIcon = event.categoryIcon;
+                      return (
+                        <div
+                          key={event.id}
+                          className="bg-white rounded-3xl p-3 border border-gray-200/70 shadow-2xs hover:shadow-md transition-all group flex flex-col justify-between"
+                        >
+                          {/* Image avec Badges flottants */}
+                          <div className="relative rounded-2xl overflow-hidden aspect-[4/4.8] bg-gray-100">
+                            <img
+                              src={event.image}
+                              alt={event.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+
+                            {/* Badge Catégorie Top-Left */}
+                            <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-[11px] font-bold text-gray-900 flex items-center gap-1 shadow-2xs">
+                              <CategoryIcon className="w-3 h-3 text-gray-800" />
+                              <span>{event.category}</span>
+                            </div>
+
+                            {/* Badge Cœur Top-Right (Actif en rouge) */}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveFavorite(event.id)}
+                              title="Retirer des favoris"
+                              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white text-[#EF4444] flex items-center justify-center shadow-xs hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                            >
+                              <Heart className="w-4 h-4 fill-[#EF4444]" />
+                            </button>
+                          </div>
+
+                          {/* Détails de l'évènement */}
+                          <div className="px-1.5 pt-3 pb-1">
+                            <h3 className="font-bold text-sm sm:text-base text-[#111827] leading-snug line-clamp-1">
+                              {event.title}
+                            </h3>
+                            <p className="text-xs text-gray-500 mt-1 flex items-center gap-1 line-clamp-1">
+                              <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                              <span>{event.location}</span>
+                            </p>
+                            <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                              <Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                              <span>{event.date}</span>
+                            </p>
+                          </div>
+
+                          {/* Prix et Bouton Réserver */}
+                          <div className="px-1.5 pt-3 border-t border-gray-100 flex items-center justify-between mt-2">
+                            <div>
+                              <p className="text-sm font-black text-[#111827] leading-none">
+                                {event.price}
+                              </p>
+                              <span className="text-[10px] text-gray-400 font-medium">
+                                à partir de
+                              </span>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => onBookEvent?.(event.id)}
+                              className="px-4 py-2 rounded-full bg-[#121526] hover:bg-[#090B14] text-white font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-xs cursor-pointer"
+                            >
+                              <span>Réserver</span>
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ========================================================= */}
+            {/* ONGLET 2 : MES BILLETS */}
             {/* ========================================================= */}
             {activeTab === 'tickets' && (
               <div className="space-y-6 animate-in fade-in duration-200">
-                {/* En-tête */}
                 <div>
                   <h2 className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight">
                     Mes billets
@@ -401,7 +569,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </p>
                 </div>
 
-                {/* Filtres Sous-onglets (À venir vs Passés) */}
                 <div className="flex items-center gap-6 border-b border-gray-200 text-xs sm:text-sm select-none">
                   <button
                     type="button"
@@ -428,14 +595,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </button>
                 </div>
 
-                {/* Liste des Cartes de Billets */}
                 <div className="space-y-4">
                   {displayedTickets.map((ticket) => (
                     <div
                       key={ticket.id}
                       className="bg-white border border-gray-200/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs hover:shadow-xs transition-shadow"
                     >
-                      {/* Image et Détails de l'évènement */}
                       <div className="flex items-center gap-4">
                         <img
                           src={ticket.image}
@@ -457,7 +622,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                         </div>
                       </div>
 
-                      {/* Nombre de Billets & Bouton Télécharger PDF */}
                       <div className="flex items-center justify-between sm:justify-end gap-6 border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-100">
                         <div className="text-left sm:text-right">
                           <p className="text-xl sm:text-2xl font-black text-[#111827] leading-tight">
@@ -487,7 +651,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             )}
 
             {/* ========================================================= */}
-            {/* ONGLET 2 : VUE D'ENSEMBLE */}
+            {/* ONGLET 3 : VUE D'ENSEMBLE */}
             {/* ========================================================= */}
             {activeTab === 'overview' && (
               <div className="space-y-6 animate-in fade-in duration-200">
@@ -546,7 +710,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                       <Heart className="w-4 h-4" />
                     </div>
                     <p className="text-2xl sm:text-3xl font-extrabold text-[#111827] mt-3 tracking-tight">
-                      12
+                      {favorites.length}
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5 font-medium">
                       Favoris enregistrés

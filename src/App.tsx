@@ -174,6 +174,12 @@ export const App: React.FC = () => {
             handleOpenEventDetail(featuredEvents[0]);
           }
         }}
+        onBookEvent={(eventId) => {
+          const ev = allEvents.find((e) => e.id === eventId) || featuredEvents[0];
+          if (ev) {
+            handleOpenEventDetail(ev);
+          }
+        }}
       />
     );
   }
