@@ -41,6 +41,34 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
+  // Étape 5 : Rendu plein écran avec bandeau sombre supérieur
+  if (currentStep === 5) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col justify-between font-sans selection:bg-brand-300 selection:text-gray-900">
+        <div className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-2xs">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 sm:h-20 gap-4">
+            <Navbar
+              onNavigateHome={onNavigateHome}
+              onOpenDashboard={onOpenDashboard}
+              isAuthenticated={true}
+            />
+          </div>
+        </div>
+
+        <main className="flex-1 w-full flex flex-col items-center">
+          <StepWelcomeSuccess
+            formData={formData}
+            onNavigateHome={onNavigateHome}
+            onOpenDashboard={onOpenDashboard}
+          />
+        </main>
+
+        <Footer onNavigateHome={onNavigateHome} />
+      </div>
+    );
+  }
+
+  // Étapes 1 à 4 : Tunnel avec Stepper et formulaire centré
   return (
     <div className="min-h-screen bg-[#F8F9FB] flex flex-col justify-between font-sans selection:bg-brand-300 selection:text-gray-900">
       {/* 1. EN-TÊTE / NAVBAR */}
@@ -54,14 +82,16 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
       </div>
 
       {/* 2. CORPS DU TUNNEL D'ONBOARDING */}
-      <main className="flex-1 max-w-2xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 flex flex-col justify-center">
+      <main
+        className={`flex-1 mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 flex flex-col justify-center transition-all ${
+          currentStep === 3 ? 'max-w-md' : 'max-w-xl'
+        }`}
+      >
         {/* Stepper horizontal */}
-        {currentStep <= 4 && (
-          <OnboardingStepper currentStep={currentStep} />
-        )}
+        <OnboardingStepper currentStep={currentStep} />
 
         {/* Carte formulaire principale */}
-        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/80 shadow-sm">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-100 shadow-sm">
           {currentStep === 1 && (
             <StepRoleSelection
               formData={formData}
@@ -95,14 +125,6 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
               setFormData={setFormData}
               onNext={handleNext}
               onPrev={handlePrev}
-            />
-          )}
-
-          {currentStep === 5 && (
-            <StepWelcomeSuccess
-              formData={formData}
-              onNavigateHome={onNavigateHome}
-              onOpenDashboard={onOpenDashboard}
             />
           )}
         </div>

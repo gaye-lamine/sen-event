@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { OnboardingFormData } from '../../../types/onboarding';
+import { authService } from '../../../services/api/authService';
 
 export interface StepAccountInfoProps {
   formData: OnboardingFormData;
@@ -18,6 +19,7 @@ export const StepAccountInfo: React.FC<StepAccountInfoProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Password rules validation
   const hasMinLength = formData.password.length >= 8;
@@ -27,7 +29,7 @@ export const StepAccountInfo: React.FC<StepAccountInfoProps> = ({
   const strengthScore =
     [hasMinLength, hasUppercase, hasNumber, hasSpecial].filter(Boolean).length;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
       setErrorMsg('Veuillez renseigner votre prénom et nom.');
@@ -54,7 +56,37 @@ export const StepAccountInfo: React.FC<StepAccountInfoProps> = ({
       return;
     }
     setErrorMsg('');
-    onNext();
+    setIsSubmitting(true);
+
+    try {
+      // Nettoyage et formatage du numéro au format international +221
+      const rawPhone = formData.phone.replace(/\s+/g, '');
+      const formattedPhone = rawPhone.startsWith('+221')
+        ? rawPhone
+        : rawPhone.startsWith('221')
+        ? `+${rawPhone}`
+        : `+221${rawPhone}`;
+
+      await authService.register({
+        role: formData.role,
+        first_name: formData.firstName.trim(),
+        last_name: formData.lastName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formattedPhone,
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
+        accept_terms: formData.acceptTerms,
+      });
+
+      onNext();
+    } catch (err: unknown) {
+      const message =
+        (err as Error)?.message ||
+        "Une erreur est survenue lors de l'inscription. Veuillez réessayer.";
+      setErrorMsg(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -279,10 +311,20 @@ export const StepAccountInfo: React.FC<StepAccountInfoProps> = ({
         </button>
         <button
           type="submit"
-          className="flex-1 py-3.5 px-6 rounded-full bg-[#121526] hover:bg-[#090B14] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-98 cursor-pointer"
+          disabled={isSubmitting}
+          className="flex-1 py-3.5 px-6 rounded-full bg-[#12142B] hover:bg-[#0A0C1B] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-98 cursor-pointer disabled:opacity-75"
         >
-          <span>Continuer</span>
-          <ArrowRight className="w-4 h-4" />
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Création du compte...</span>
+            </>
+          ) : (
+            <>
+              <span>Continuer</span>
+              <ArrowRight className="w-4 h-4" />
+            </>
+          )}
         </button>
       </div>
     </form>

@@ -120,10 +120,30 @@ export interface PaymentStatusResponse {
   data: PaymentStatusResponseData;
 }
 
+export interface OrderDetailsEventData {
+  id?: number | string;
+  title: string;
+  venueName?: string;
+  city?: string;
+  startDate?: string;
+  startTime?: string;
+  posterUrl?: string;
+}
+
+export interface OrderDetailsCustomerData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+}
+
 export interface OrderDetailsResponseData {
   orderNumber: string;
   status: string;
   amount: number;
+  currency?: string;
+  event?: OrderDetailsEventData;
+  customer?: OrderDetailsCustomerData;
   tickets: TicketResponseItem[];
 }
 

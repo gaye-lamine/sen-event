@@ -37,6 +37,7 @@ export interface FaqItem {
 
 export interface EventItem {
   id: string;
+  slug?: string;
   title: string;
   subtitle?: string;
   category: EventCategory;

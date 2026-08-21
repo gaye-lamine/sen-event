@@ -3,6 +3,7 @@ import { Calendar, MapPin, Heart, ArrowRight, Users, Star } from 'lucide-react';
 import { EventHeroBannerProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
 import { formatNumber, formatRating } from '../../utils';
+import { dashboardService } from '../../services/api/dashboardService';
 
 /**
  * @component EventHeroBanner
@@ -15,6 +16,16 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
   onScrollToTickets,
 }) => {
   const [isFavorite, setIsFavorite] = useState(false);
+
+  const handleFavoriteClick = async () => {
+    setIsFavorite(!isFavorite);
+    try {
+      const targetId = event.slug || event.id;
+      await dashboardService.toggleFavorite(targetId);
+    } catch (err) {
+      console.error('Erreur toggle favori:', err);
+    }
+  };
 
   const formattedAttendees = event.attendeesCount
     ? formatNumber(event.attendeesCount)
@@ -31,14 +42,14 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
         />
 
         <button
-          onClick={() => setIsFavorite(!isFavorite)}
+          onClick={handleFavoriteClick}
           type="button"
           className="absolute top-5 right-5 sm:top-6 sm:right-6 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-gray-700 hover:text-red-500 transition-all shadow-md active:scale-95 cursor-pointer"
           aria-label="Ajouter aux favoris"
         >
           <Heart
             className={`w-5 h-5 ${
-              isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-700'
+              isFavorite ? 'fill-[#EF4444] text-[#EF4444]' : 'text-gray-700'
             }`}
           />
         </button>

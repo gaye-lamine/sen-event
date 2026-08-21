@@ -1,14 +1,39 @@
-import React from 'react';
-import { ArrowRight, Calendar, Heart, MapPin } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  ArrowRight,
+  Calendar,
+  Heart,
+  MapPin,
+  Music,
+  Trophy,
+  Theater,
+  Film,
+  Sparkles,
+  Mic,
+  Loader2,
+  LucideIcon,
+} from 'lucide-react';
 import { FavoriteEvent } from '../../../types/dashboard';
 import { DashboardSectionHeader } from '../ui/DashboardSectionHeader';
 
 export interface FavoritesTabProps {
   favorites: FavoriteEvent[];
-  onRemoveFavorite: (id: string) => void;
-  onBookEvent?: (eventId: string) => void;
+  onRemoveFavorite: (id: string | number) => void;
+  onBookEvent?: (eventId: string | number) => void;
   onNavigateHome: () => void;
 }
+
+const getCategoryIcon = (category: string, CustomIcon?: LucideIcon): LucideIcon => {
+  if (CustomIcon) return CustomIcon;
+  const normalized = (category || '').toLowerCase();
+  if (normalized.includes('musique') || normalized.includes('concert')) return Music;
+  if (normalized.includes('sport') || normalized.includes('foot') || normalized.includes('match')) return Trophy;
+  if (normalized.includes('theatre') || normalized.includes('humour') || normalized.includes('comedie')) return Theater;
+  if (normalized.includes('cinema') || normalized.includes('film')) return Film;
+  if (normalized.includes('festival')) return Sparkles;
+  if (normalized.includes('conference') || normalized.includes('formation')) return Mic;
+  return Sparkles;
+};
 
 export const FavoritesTab: React.FC<FavoritesTabProps> = ({
   favorites,
@@ -16,6 +41,17 @@ export const FavoritesTab: React.FC<FavoritesTabProps> = ({
   onBookEvent,
   onNavigateHome,
 }) => {
+  const [removingId, setRemovingId] = useState<string | number | null>(null);
+
+  const handleRemove = async (eventId: string | number) => {
+    setRemovingId(eventId);
+    try {
+      await onRemoveFavorite(eventId);
+    } finally {
+      setRemovingId(null);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-200 text-left">
       <DashboardSectionHeader
@@ -24,18 +60,20 @@ export const FavoritesTab: React.FC<FavoritesTabProps> = ({
       />
 
       {favorites.length === 0 ? (
-        <div className="bg-white rounded-3xl p-10 text-center border border-gray-100">
-          <Heart className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-sm font-bold text-gray-700">
+        <div className="bg-white rounded-3xl p-10 text-center border border-gray-100 shadow-2xs">
+          <div className="w-14 h-14 rounded-full bg-red-50 text-red-400 flex items-center justify-center mx-auto mb-3">
+            <Heart className="w-7 h-7" />
+          </div>
+          <h4 className="text-base font-bold text-gray-800">
             Aucun favori enregistré
-          </p>
-          <p className="text-xs text-gray-400 mt-1">
-            Explore les évènements et clique sur le cœur pour les retrouver ici.
+          </h4>
+          <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto">
+            Explore le catalogue d’évènements et clique sur le cœur pour les retrouver instantanément ici.
           </p>
           <button
             type="button"
             onClick={onNavigateHome}
-            className="mt-4 px-5 py-2 rounded-full bg-[#121526] text-white text-xs font-bold"
+            className="mt-5 px-6 py-2.5 rounded-full bg-[#12142B] hover:bg-[#0A0C1B] text-white text-xs font-bold transition-all shadow-xs active:scale-95 cursor-pointer"
           >
             Découvrir les évènements
           </button>
@@ -43,7 +81,10 @@ export const FavoritesTab: React.FC<FavoritesTabProps> = ({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {favorites.map((event) => {
-            const CategoryIcon = event.categoryIcon;
+            const targetId = event.event_id || event.id;
+            const CategoryIcon = getCategoryIcon(event.category, event.categoryIcon);
+            const isRemoving = removingId === targetId;
+
             return (
               <div
                 key={event.id}
@@ -54,20 +95,28 @@ export const FavoritesTab: React.FC<FavoritesTabProps> = ({
                     src={event.image}
                     alt={event.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/images/wally.png';
+                    }}
                   />
 
                   <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-[11px] font-bold text-gray-900 flex items-center gap-1 shadow-2xs">
                     <CategoryIcon className="w-3 h-3 text-gray-800" />
-                    <span>{event.category}</span>
+                    <span>{event.category || 'Évènement'}</span>
                   </div>
 
                   <button
                     type="button"
-                    onClick={() => onRemoveFavorite(event.id)}
+                    onClick={() => handleRemove(targetId)}
+                    disabled={isRemoving}
                     title="Retirer des favoris"
-                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white text-[#EF4444] flex items-center justify-center shadow-xs hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white text-[#EF4444] flex items-center justify-center shadow-xs hover:scale-110 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
                   >
-                    <Heart className="w-4 h-4 fill-[#EF4444]" />
+                    {isRemoving ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-red-500" />
+                    ) : (
+                      <Heart className="w-4 h-4 fill-[#EF4444]" />
+                    )}
                   </button>
                 </div>
 
@@ -97,8 +146,8 @@ export const FavoritesTab: React.FC<FavoritesTabProps> = ({
 
                   <button
                     type="button"
-                    onClick={() => onBookEvent?.(event.id)}
-                    className="px-4 py-2 rounded-full bg-[#121526] hover:bg-[#090B14] text-white font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-xs cursor-pointer"
+                    onClick={() => onBookEvent?.(targetId)}
+                    className="px-4 py-2 rounded-full bg-[#12142B] hover:bg-[#0A0C1B] text-white font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 shadow-xs cursor-pointer"
                   >
                     <span>Réserver</span>
                     <ArrowRight className="w-3.5 h-3.5" />

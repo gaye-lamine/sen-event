@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { AuthMode, AuthMethodType, LoginPageProps } from '../types';
 import { CHECKOUT_CONSTANTS } from '../constants';
-
-// Identifiants autorisés pour le verrouillage de pré-production
-const VALID_EMAIL = 'nt@gmail.com';
-const VALID_PASSWORD = 'password123';
+import { authService } from '../services/api/authService';
 
 /**
  * @page LoginPage
- * @description Page de connexion sécurisée pour Sunu Events avec message d'erreur générique standard
- * respectant les bonnes pratiques de sécurité (aucune fuite d'identifiants).
+ * @description Page de connexion sécurisée pour Sunu Events avec intégration API Laravel (Email ou Téléphone).
  * @param {LoginPageProps} props - Contrat de propriétés du composant
  */
 export const LoginPage: React.FC<LoginPageProps> = ({
@@ -30,27 +26,49 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      const normalizedEmail = email.trim().toLowerCase();
+    const loginIdentifier = authMethod === 'email' ? email.trim() : phone.trim();
 
-      if (normalizedEmail === VALID_EMAIL && password === VALID_PASSWORD) {
-        setIsSubmitting(false);
-        onLoginSuccess?.({
-          email: VALID_EMAIL,
-          name: 'Niane Technologies',
-          phone: '+221 77 000 00 00',
-        });
-      } else {
-        setIsSubmitting(false);
-        // Message d'erreur générique standard et sécurisé (aucune fuite d'informations)
-        setErrorMessage('Adresse email ou mot de passe incorrect.');
-      }
-    }, 400);
+    if (!loginIdentifier) {
+      setIsSubmitting(false);
+      setErrorMessage(
+        authMethod === 'email'
+          ? 'Veuillez saisir votre adresse email.'
+          : 'Veuillez saisir votre numéro de téléphone.'
+      );
+      return;
+    }
+
+    if (!password) {
+      setIsSubmitting(false);
+      setErrorMessage('Veuillez saisir votre mot de passe.');
+      return;
+    }
+
+    try {
+      const response = await authService.login({
+        login: loginIdentifier,
+        password,
+      });
+
+      const user = response.data.user;
+      onLoginSuccess?.({
+        email: user.email,
+        name: `${user.first_name} ${user.last_name}`.trim() || 'Utilisateur Sunu Events',
+        phone: user.phone,
+      });
+    } catch (err: unknown) {
+      const message =
+        (err as Error)?.message ||
+        'Identifiant ou mot de passe incorrect.';
+      setErrorMessage(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -436,13 +454,18 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 px-6 bg-[#121526] hover:bg-[#090B14] text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition-all active:scale-98 cursor-pointer disabled:opacity-75"
+              className="w-full py-3 px-6 bg-[#12142B] hover:bg-[#0A0C1B] text-white font-bold text-xs sm:text-sm rounded-full shadow-xs transition-all active:scale-98 cursor-pointer disabled:opacity-75 flex items-center justify-center gap-2"
             >
-              {isSubmitting
-                ? 'Vérification...'
-                : mode === 'login'
-                ? 'Se connecter'
-                : 'Créer mon compte'}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Connexion en cours...</span>
+                </>
+              ) : mode === 'login' ? (
+                'Se connecter'
+              ) : (
+                'Créer mon compte'
+              )}
             </button>
 
             {/* Bouton Social Google */}

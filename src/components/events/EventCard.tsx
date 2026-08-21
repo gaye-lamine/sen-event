@@ -3,6 +3,7 @@ import { MapPin, Calendar, Heart, ArrowRight } from 'lucide-react';
 import { EventCardProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
 import { formatPrice } from '../../utils';
+import { dashboardService } from '../../services/api/dashboardService';
 
 /**
  * @component EventCard
@@ -18,10 +19,18 @@ export const EventCard: React.FC<EventCardProps> = ({
 }) => {
   const [isFavorite, setIsFavorite] = useState(false);
 
-  const handleFavoriteClick = (e: React.MouseEvent) => {
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsFavorite(!isFavorite);
+    const newStatus = !isFavorite;
+    setIsFavorite(newStatus);
     onToggleFavorite?.(event);
+
+    try {
+      const targetId = event.slug || event.id;
+      await dashboardService.toggleFavorite(targetId);
+    } catch (err) {
+      console.error('Erreur lors du toggle favori:', err);
+    }
   };
 
   const handleCardClick = () => {
@@ -53,20 +62,18 @@ export const EventCard: React.FC<EventCardProps> = ({
           </span>
         </div>
 
-        {variant === 'featured' && (
-          <button
-            onClick={handleFavoriteClick}
-            type="button"
-            className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur-md text-gray-700 hover:text-red-500 transition-colors shadow-sm"
-            aria-label="Ajouter aux favoris"
-          >
-            <Heart
-              className={`w-4 h-4 ${
-                isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-700'
-              }`}
-            />
-          </button>
-        )}
+        <button
+          onClick={handleFavoriteClick}
+          type="button"
+          className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/85 backdrop-blur-md text-gray-700 hover:text-red-500 transition-all shadow-sm hover:scale-110 active:scale-95 cursor-pointer"
+          aria-label="Ajouter aux favoris"
+        >
+          <Heart
+            className={`w-4 h-4 transition-colors ${
+              isFavorite ? 'fill-[#EF4444] text-[#EF4444]' : 'text-gray-700'
+            }`}
+          />
+        </button>
 
         {event.isSoldOut && (
           <div className="absolute bottom-3 left-3 z-10">

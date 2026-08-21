@@ -105,3 +105,23 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Impression optimisée pour le Billet Numérique */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .digital-ticket-container,
+  .digital-ticket-container * {
+    visibility: visible;
+  }
+  .digital-ticket-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: none !important;
+    border: 2px solid #12142B !important;
+    page-break-inside: avoid;
+  }
+}

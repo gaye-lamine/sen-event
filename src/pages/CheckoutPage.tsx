@@ -14,6 +14,8 @@ import { CHECKOUT_CONSTANTS } from '../constants';
  * 2 (Informations) et 3 (Paiement InTouch) ainsi que l'écran final de confirmation.
  * @param {CheckoutPageProps} props - Contrat de propriétés du composant
  */
+import { authService } from '../services/api/authService';
+
 export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   event,
   initialTiers,
@@ -24,6 +26,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   const [confirmedOrderNumber, setConfirmedOrderNumber] = useState<string>(
     CHECKOUT_CONSTANTS.DEFAULT_ORDER_NUMBER
   );
+
+  const currentUser = authService.getCurrentUser();
 
   const tiers: TicketTier[] = event.ticketTiers || [
     {
@@ -66,16 +70,16 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   });
 
   const [customerFirstName, setCustomerFirstName] = useState<string>(
-    CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.FIRST_NAME
+    currentUser?.first_name || CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.FIRST_NAME
   );
   const [customerLastName, setCustomerLastName] = useState<string>(
-    CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.LAST_NAME
+    currentUser?.last_name || CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.LAST_NAME
   );
   const [customerPhone, setCustomerPhone] = useState<string>(
-    CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.PHONE
+    currentUser?.phone?.replace(/^\+221/, '').trim() || CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.PHONE
   );
   const [customerEmail, setCustomerEmail] = useState<string>(
-    CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.EMAIL
+    currentUser?.email || CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.EMAIL
   );
   const [holders, setHolders] = useState<TicketHolder[]>([]);
 

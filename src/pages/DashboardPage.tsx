@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
 import {
   DashboardTabType,
   DashboardPageProps,
   UserProfileData,
+  UserTicket,
   FavoriteEvent,
   PaymentMethod,
 } from '../types/dashboard';
@@ -23,6 +24,8 @@ import { NotificationsTab } from '../components/dashboard/tabs/NotificationsTab'
 import { PaymentMethodsTab } from '../components/dashboard/tabs/PaymentMethodsTab';
 import { ProfileInfoTab } from '../components/dashboard/tabs/ProfileInfoTab';
 import { SecurityTab } from '../components/dashboard/tabs/SecurityTab';
+import { authService } from '../services/api/authService';
+import { dashboardService } from '../services/api/dashboardService';
 
 /**
  * @page DashboardPage
@@ -52,14 +55,72 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   // État de navigation des onglets
   const [activeTab, setActiveTab] = useState<DashboardTabType>('overview');
 
-  // Données locales avec état pour persistance d'interaction dans la session
-  const [profile, setProfile] = useState<UserProfileData>(MOCK_USER_PROFILE);
-  const [favorites, setFavorites] = useState<FavoriteEvent[]>(MOCK_FAVORITE_EVENTS);
+  // Données locales avec état initialisé depuis l'utilisateur connecté réel
+  const [profile, setProfile] = useState<UserProfileData>(() => {
+    const currentUser = authService.getCurrentUser();
+    if (currentUser) {
+      return {
+        firstName: currentUser.first_name || 'Lamine',
+        lastName: currentUser.last_name || 'Gaye',
+        email: currentUser.email || 'lamineg049@gmail.com',
+        phone: currentUser.phone || '+221 77 223 80 13',
+        city: currentUser.city || 'Dakar',
+        memberSince: 'août 2026',
+        avatarUrl: '/images/wally.png',
+      };
+    }
+    return MOCK_USER_PROFILE;
+  });
+  const [tickets, setTickets] = useState<UserTicket[]>([]);
+  const [ticketCounts, setTicketCounts] = useState<{ upcoming: number; past: number; total: number }>({
+    upcoming: 0,
+    past: 0,
+    total: 0,
+  });
+  const [favorites, setFavorites] = useState<FavoriteEvent[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(MOCK_PAYMENT_METHODS);
 
-  // Gestion des favoris
-  const handleRemoveFavorite = (favId: string) => {
-    setFavorites((prev) => prev.filter((f) => f.id !== favId));
+  // Chargement des vrais billets et favoris depuis l'API Laravel
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const [ticketsRes, favsRes] = await Promise.allSettled([
+          dashboardService.getUserTickets(),
+          dashboardService.getUserFavorites(),
+        ]);
+
+        if (ticketsRes.status === 'fulfilled' && ticketsRes.value?.data?.tickets) {
+          setTickets(ticketsRes.value.data.tickets);
+        } else {
+          setTickets([]);
+        }
+
+        if (ticketsRes.status === 'fulfilled' && ticketsRes.value?.data?.counts) {
+          setTicketCounts(ticketsRes.value.data.counts);
+        }
+
+        if (favsRes.status === 'fulfilled' && favsRes.value?.data?.favorites) {
+          setFavorites(favsRes.value.data.favorites);
+        } else {
+          setFavorites([]);
+        }
+      } catch (err) {
+        console.error('Erreur de chargement des données dashboard:', err);
+      }
+    };
+
+    loadDashboardData();
+  }, []);
+
+  // Gestion des favoris avec bascule API
+  const handleRemoveFavorite = async (favId: string | number) => {
+    // Mise à jour optimiste immédiate de l'interface
+    setFavorites((prev) => prev.filter((f) => f.id !== String(favId) && f.event_id !== favId));
+    try {
+      await dashboardService.toggleFavorite(favId);
+    } catch (err) {
+      console.error('Erreur lors du retrait du favori:', err);
+    }
   };
 
   // Gestion des moyens de paiement
@@ -72,16 +133,31 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     );
   };
 
-  // Mise à jour du profil
-  const handleUpdateProfile = (updatedData: Partial<UserProfileData>) => {
+  // Mise à jour du profil vers l'API Laravel
+  const handleUpdateProfile = async (updatedData: Partial<UserProfileData>) => {
+    const payload = {
+      first_name: updatedData.firstName || profile.firstName,
+      last_name: updatedData.lastName || profile.lastName,
+      phone: updatedData.phone || profile.phone,
+      city: updatedData.city ?? profile.city,
+    };
+
+    const response = await dashboardService.updateUserProfile(payload);
+    const updatedUser = response?.data?.user;
+
     setProfile((prev) => ({
       ...prev,
-      ...updatedData,
+      firstName: updatedUser?.first_name || payload.first_name,
+      lastName: updatedUser?.last_name || payload.last_name,
+      phone: updatedUser?.phone || payload.phone,
+      city: updatedUser?.city || payload.city || 'Dakar',
     }));
   };
 
-  const upcomingTickets = MOCK_USER_TICKETS.filter((t) => t.status === 'upcoming');
-  const pastTickets = MOCK_USER_TICKETS.filter((t) => t.status === 'past');
+  const upcomingTickets = tickets.filter((t) => t.status === 'upcoming');
+  const pastTickets = tickets.filter((t) => t.status === 'past');
+  const totalSpentAmount = tickets.reduce((sum, t) => sum + (t.total_amount || 0), 0);
+  const totalSpentFormatted = `${totalSpentAmount.toLocaleString('fr-FR')} F`;
 
   return (
     <div className="min-h-screen bg-[#F8F9FB] flex flex-col justify-between font-sans selection:bg-brand-300 selection:text-gray-900">
@@ -103,9 +179,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       {/* 2. BANDEAU SUPÉRIEUR DÉGRADÉ VIOLET & KPI */}
       <DashboardHeaderBanner
         profile={profile}
-        upcomingTicketsCount={upcomingTickets.length}
+        upcomingTicketsCount={ticketCounts.upcoming}
         followedEventsCount={favorites.length}
-        totalSpent="76 500 F"
+        totalSpent={totalSpentFormatted}
         onSelectTicketsTab={() => setActiveTab('tickets')}
         onSelectFavoritesTab={() => setActiveTab('favorites')}
       />
@@ -125,8 +201,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           <section className="lg:col-span-9 space-y-6 text-left">
             {activeTab === 'overview' && (
               <OverviewTab
-                upcomingCount={upcomingTickets.length}
-                pastCount={pastTickets.length + 7}
+                upcomingCount={ticketCounts.upcoming || upcomingTickets.length}
+                pastCount={ticketCounts.past || pastTickets.length}
                 favoritesCount={favorites.length}
                 onSelectUpcomingTickets={() => setActiveTab('tickets')}
                 onSelectPastTickets={() => setActiveTab('tickets')}
@@ -136,14 +212,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             )}
 
             {activeTab === 'tickets' && (
-              <TicketsTab tickets={MOCK_USER_TICKETS} />
+              <TicketsTab tickets={tickets} />
             )}
 
             {activeTab === 'favorites' && (
               <FavoritesTab
                 favorites={favorites}
                 onRemoveFavorite={handleRemoveFavorite}
-                onBookEvent={onBookEvent}
+                onBookEvent={(id) => onBookEvent?.(String(id))}
                 onNavigateHome={onNavigateHome}
               />
             )}

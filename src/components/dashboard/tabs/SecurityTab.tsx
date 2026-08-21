@@ -1,23 +1,62 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Lock, LogOut, Trash2 } from 'lucide-react';
+import { CheckCircle2, Lock, LogOut, Trash2, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { DashboardSectionHeader } from '../ui/DashboardSectionHeader';
+import { dashboardService } from '../../../services/api/dashboardService';
 
 export interface SecurityTabProps {
   onLogout: () => void;
 }
 
 export const SecurityTab: React.FC<SecurityTabProps> = ({ onLogout }) => {
-  const [currentPassword, setCurrentPassword] = useState('••••••••');
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordToast, setPasswordToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleUpdatePassword = (e: React.FormEvent) => {
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setPasswordToast(true);
-    setNewPassword('');
-    setConfirmNewPassword('');
-    setTimeout(() => setPasswordToast(false), 3000);
+    setErrorMessage(null);
+
+    if (newPassword.length < 8) {
+      setErrorMessage('Le nouveau mot de passe doit comporter au moins 8 caractères.');
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      setErrorMessage('Les deux nouveaux mots de passe ne correspondent pas.');
+      return;
+    }
+
+    if (currentPassword === newPassword) {
+      setErrorMessage('Le nouveau mot de passe doit être différent du mot de passe actuel.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await dashboardService.updateUserPassword({
+        current_password: currentPassword,
+        password: newPassword,
+        password_confirmation: confirmNewPassword,
+      });
+
+      setPasswordToast(true);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+      setTimeout(() => setPasswordToast(false), 3500);
+    } catch (err: unknown) {
+      const message = (err as Error)?.message || 'Erreur lors de la mise à jour du mot de passe.';
+      setErrorMessage(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleLogoutAllDevices = () => {
@@ -54,6 +93,13 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ onLogout }) => {
         </div>
       )}
 
+      {errorMessage && (
+        <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2 animate-in fade-in duration-300">
+          <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+
       {/* CARTE 1 : CHANGER DE MOT DE PASSE */}
       <form
         onSubmit={handleUpdatePassword}
@@ -68,13 +114,23 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ onLogout }) => {
           <label className="block text-xs font-semibold text-[#374151] mb-1.5">
             Mot de passe actuel
           </label>
-          <input
-            type="password"
-            required
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111827] focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
-          />
+          <div className="relative">
+            <input
+              type={showCurrent ? 'text' : 'password'}
+              required
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111827] focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowCurrent(!showCurrent)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer p-1"
+            >
+              {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          </div>
         </div>
 
         {/* Nouveau mot de passe & Confirmation (Grille 2 Colonnes) */}
@@ -83,28 +139,46 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ onLogout }) => {
             <label className="block text-xs font-semibold text-[#374151] mb-1.5">
               Nouveau mot de passe
             </label>
-            <input
-              type="password"
-              required
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="8 caractères minimum"
-              className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111827] focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all placeholder:text-gray-400"
-            />
+            <div className="relative">
+              <input
+                type={showNew ? 'text' : 'password'}
+                required
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="8 caractères minimum"
+                className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111827] focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all placeholder:text-gray-400 pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNew(!showNew)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer p-1"
+              >
+                {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-[#374151] mb-1.5">
               Confirmer
             </label>
-            <input
-              type="password"
-              required
-              value={confirmNewPassword}
-              onChange={(e) => setConfirmNewPassword(e.target.value)}
-              placeholder="Retape le nouveau mot de passe"
-              className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111827] focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all placeholder:text-gray-400"
-            />
+            <div className="relative">
+              <input
+                type={showConfirm ? 'text' : 'password'}
+                required
+                value={confirmNewPassword}
+                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                placeholder="Retape le nouveau mot de passe"
+                className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-[#111827] focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all placeholder:text-gray-400 pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer p-1"
+              >
+                {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -112,10 +186,20 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ onLogout }) => {
         <div className="pt-2 flex justify-end">
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-full bg-[#121526] hover:bg-[#090B14] text-white font-bold text-xs flex items-center gap-2 transition-all active:scale-95 shadow-xs cursor-pointer"
+            disabled={isSubmitting}
+            className="px-6 py-2.5 rounded-full bg-[#12142B] hover:bg-[#0A0C1B] text-white font-bold text-xs flex items-center gap-2 transition-all active:scale-95 shadow-xs cursor-pointer disabled:opacity-75"
           >
-            <Lock className="w-3.5 h-3.5" />
-            <span>Mettre à jour</span>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Mise à jour en cours...</span>
+              </>
+            ) : (
+              <>
+                <Lock className="w-3.5 h-3.5" />
+                <span>Mettre à jour</span>
+              </>
+            )}
           </button>
         </div>
       </form>

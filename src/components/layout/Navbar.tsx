@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, ShoppingCart, Menu, X, LogOut, User, Bell } from 'lucide-react';
 import { NavbarProps } from '../../types';
+import { authService } from '../../services/api/authService';
 
 /**
  * @component Navbar
@@ -20,6 +21,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCart,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const currentUser = authService.getCurrentUser();
+  const displayName = currentUser?.first_name || 'Mon Profil';
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,7 +98,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <div className="w-6 h-6 rounded-full overflow-hidden border border-amber-300 bg-amber-100 flex items-center justify-center shrink-0">
                     <img
                       src="/images/wally.png"
-                      alt="Aminata"
+                      alt={displayName}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLElement).style.display = 'none';
@@ -103,7 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     />
                     <User className="w-3.5 h-3.5 text-amber-800" />
                   </div>
-                  <span>Aminata</span>
+                  <span>{displayName}</span>
                 </button>
 
                 {/* Déconnexion */}

@@ -1,32 +1,25 @@
-import React, { useEffect } from 'react';
-import { Download } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Download, QrCode, Ticket as TicketIcon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { OrderConfirmationViewProps } from '../../types';
 import { CHECKOUT_CONSTANTS } from '../../constants';
+import { DigitalTicketModal } from '../tickets/DigitalTicketModal';
 
-/**
- * @component OrderConfirmationView
- * @description Écran final de confirmation de paiement (« Paiement confirmé ! »)
- * avec GIF animé officiel, numéro de commande certifié et éventail de 3 billets 3D.
- * @param {OrderConfirmationViewProps} props - Contrat de propriétés du composant
- */
 export const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({
   orderNumber = CHECKOUT_CONSTANTS.DEFAULT_ORDER_NUMBER,
   customerEmail = CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.EMAIL,
   onNavigateHome,
 }) => {
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+
   useEffect(() => {
     confetti({
-      particleCount: 100,
-      spread: 70,
+      particleCount: 120,
+      spread: 80,
       origin: { y: 0.5 },
       colors: ['#FFC23C', '#10B981', '#1DC6F6', '#FF4747'],
     });
   }, []);
-
-  const handleDownloadTickets = () => {
-    window.print();
-  };
 
   return (
     <div className="relative min-h-[75vh] flex flex-col items-center justify-center py-12 sm:py-16 px-4 text-center overflow-hidden">
@@ -60,11 +53,16 @@ export const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({
           Les billets ont été envoyés à <span className="text-gray-600 font-medium">{customerEmail}</span> — retrouve-les aussi dans "Mes billets"
         </p>
 
-        <div className="relative w-full max-w-md h-36 sm:h-40 my-8 flex items-end justify-center">
+        {/* Éventail de billets interactif */}
+        <div
+          onClick={() => setIsTicketModalOpen(true)}
+          title="Cliquer pour afficher votre billet avec QR Code"
+          className="relative w-full max-w-md h-36 sm:h-40 my-8 flex items-end justify-center cursor-pointer group"
+        >
           <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#0F141C] z-0" />
 
           <div
-            className="absolute bottom-0 left-12 sm:left-16 w-28 sm:w-32 h-20 sm:h-22 bg-[#0F141C] text-white/30 rounded-t-xl z-10 origin-bottom-right shadow-lg transform -rotate-15 hover:-rotate-12 transition-transform select-none flex flex-col items-center justify-center border-t border-l border-r border-gray-700/50"
+            className="absolute bottom-0 left-12 sm:left-16 w-28 sm:w-32 h-20 sm:h-22 bg-[#0F141C] text-white/30 rounded-t-xl z-10 origin-bottom-right shadow-lg transform -rotate-15 group-hover:-rotate-18 transition-transform select-none flex flex-col items-center justify-center border-t border-l border-r border-gray-700/50"
             style={{
               clipPath:
                 'polygon(0% 0%, 100% 0%, 100% 35%, 90% 50%, 100% 65%, 100% 100%, 0% 100%, 0% 65%, 10% 50%, 0% 35%)',
@@ -76,7 +74,7 @@ export const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({
           </div>
 
           <div
-            className="absolute bottom-0 right-12 sm:right-16 w-28 sm:w-32 h-20 sm:h-22 bg-[#0F141C] text-white/30 rounded-t-xl z-10 origin-bottom-left shadow-lg transform rotate-15 hover:rotate-12 transition-transform select-none flex flex-col items-center justify-center border-t border-l border-r border-gray-700/50"
+            className="absolute bottom-0 right-12 sm:right-16 w-28 sm:w-32 h-20 sm:h-22 bg-[#0F141C] text-white/30 rounded-t-xl z-10 origin-bottom-left shadow-lg transform rotate-15 group-hover:rotate-18 transition-transform select-none flex flex-col items-center justify-center border-t border-l border-r border-gray-700/50"
             style={{
               clipPath:
                 'polygon(0% 0%, 100% 0%, 100% 35%, 90% 50%, 100% 65%, 100% 100%, 0% 100%, 0% 65%, 10% 50%, 0% 35%)',
@@ -88,7 +86,7 @@ export const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({
           </div>
 
           <div
-            className="relative bottom-0 w-32 sm:w-36 h-24 sm:h-28 bg-[#FFC23C] text-gray-950 rounded-t-2xl z-20 shadow-xl flex flex-col items-center justify-center select-none border-t-2 border-l border-r border-amber-300 transform hover:-translate-y-1 transition-transform"
+            className="relative bottom-0 w-32 sm:w-36 h-24 sm:h-28 bg-[#FFC23C] text-gray-950 rounded-t-2xl z-20 shadow-xl flex flex-col items-center justify-center select-none border-t-2 border-l border-r border-amber-300 transform group-hover:-translate-y-2 transition-transform"
             style={{
               clipPath:
                 'polygon(0% 0%, 100% 0%, 100% 35%, 90% 50%, 100% 65%, 100% 100%, 0% 100%, 0% 65%, 10% 50%, 0% 35%)',
@@ -110,15 +108,22 @@ export const OrderConfirmationView: React.FC<OrderConfirmationViewProps> = ({
           </button>
 
           <button
-            onClick={handleDownloadTickets}
+            onClick={() => setIsTicketModalOpen(true)}
             type="button"
-            className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 rounded-full bg-[#0F141C] text-white text-xs sm:text-sm font-bold hover:bg-black active:scale-95 transition-all shadow-md cursor-pointer"
+            className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 rounded-full bg-[#0F141C] hover:bg-black text-white text-xs sm:text-sm font-bold active:scale-95 transition-all shadow-md cursor-pointer"
           >
-            <span>Télécharger mes billets</span>
-            <Download className="w-4 h-4 stroke-[2.2]" />
+            <QrCode className="w-4 h-4 text-[#FFC23C]" />
+            <span>Voir mon billet numérique</span>
           </button>
         </div>
       </div>
+
+      {/* Modale d'inspection et d'impression du billet numérique */}
+      <DigitalTicketModal
+        isOpen={isTicketModalOpen}
+        onClose={() => setIsTicketModalOpen(false)}
+        orderNumber={orderNumber}
+      />
     </div>
   );
 };

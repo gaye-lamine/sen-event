@@ -161,7 +161,12 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       </nav>
 
       {/* ENCART CTA ORGANISATEUR */}
-      <div className="bg-gradient-to-br from-[#E64A19] to-[#FF5722] text-white p-5 rounded-2xl shadow-xs text-left">
+      <div
+        className="text-white p-5 rounded-2xl shadow-xs text-left"
+        style={{
+          background: 'linear-gradient(123.97deg, #FF5A36 0%, #B23412 100%)',
+        }}
+      >
         <h4 className="font-bold text-sm text-white">
           Envie d'organiser ?
         </h4>
@@ -171,7 +176,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         <button
           type="button"
           onClick={onBecomeOrganizer}
-          className="w-full py-2.5 bg-white text-[#E64A19] font-bold text-xs rounded-xl mt-3 text-center shadow-xs hover:bg-gray-50 transition-all active:scale-98 cursor-pointer"
+          className="w-full py-2.5 bg-white text-[#B23412] font-bold text-xs rounded-xl mt-3 text-center shadow-xs hover:bg-gray-50 transition-all active:scale-98 cursor-pointer"
         >
           Devenir organisateur
         </button>

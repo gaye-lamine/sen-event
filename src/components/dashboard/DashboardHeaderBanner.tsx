@@ -21,12 +21,16 @@ export const DashboardHeaderBanner: React.FC<DashboardHeaderBannerProps> = ({
 }) => {
   return (
     <div
-      className="w-full text-white py-8 sm:py-10 px-4 sm:px-6 lg:px-8 shadow-sm relative overflow-hidden"
+      className="w-full text-white shadow-sm relative overflow-hidden flex items-center min-h-[152px]"
       style={{
-        background: 'linear-gradient(90deg, #6347EA 0%, #5439DD 50%, #462DC9 100%)',
+        background: 'linear-gradient(92.91deg, #7C5CFC 0%, #3E2F9E 100%)',
+        paddingTop: '36px',
+        paddingBottom: '40px',
+        paddingLeft: 'clamp(16px, 10vw, 264px)',
+        paddingRight: 'clamp(16px, 10vw, 264px)',
       }}
     >
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+      <div className="w-full mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
         {/* Profil Utilisateur */}
         <div className="flex items-center gap-4 sm:gap-5">
           <div className="relative">

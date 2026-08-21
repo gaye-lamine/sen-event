@@ -102,7 +102,7 @@ export const StepRoleSelection: React.FC<StepRoleSelectionProps> = ({
         <button
           type="button"
           onClick={onNext}
-          className="w-full py-3.5 px-6 rounded-full bg-[#121526] hover:bg-[#090B14] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-98 cursor-pointer"
+          className="w-full py-3.5 px-6 rounded-full bg-[#12142B] hover:bg-[#0A0C1B] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-98 cursor-pointer"
         >
           <span>Continuer</span>
           <ArrowRight className="w-4 h-4" />
