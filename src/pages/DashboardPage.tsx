@@ -19,6 +19,10 @@ import {
   Music,
   Trophy,
   ArrowRight,
+  Tag,
+  Newspaper,
+  Mail,
+  Smartphone,
 } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
@@ -156,9 +160,10 @@ const INITIAL_FAVORITES: FavoriteEvent[] = [
 /**
  * @page DashboardPage
  * @description Espace personnel / Tableau de bord d'Aminata Diop :
- * - Onglet "Vue d'ensemble" : KPI, billet prochain et activités récentes
+ * - Onglet "Vue d'ensemble" : KPI, billet prochain et activités
  * - Onglet "Mes billets" : Billets à venir (3) et Passés (9) avec téléchargement PDF
- * - Onglet "Mes favoris" : Grille des évènements mis de côté avec actions de réservation
+ * - Onglet "Mes favoris" : Grille des évènements mis de côté
+ * - Onglet "Notifications" : Préférences des rappels, alertes, offres et canaux SMS/Email
  * @param {DashboardPageProps} props - Propriétés du composant
  */
 export const DashboardPage: React.FC<DashboardPageProps> = ({
@@ -171,10 +176,18 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onViewTicket,
   onBookEvent,
 }) => {
-  const [activeTab, setActiveTab] = useState<TabType>('favorites');
+  const [activeTab, setActiveTab] = useState<TabType>('notifications');
   const [ticketFilter, setTicketFilter] = useState<TicketFilterType>('upcoming');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<FavoriteEvent[]>(INITIAL_FAVORITES);
+
+  // États des préférences de notifications (Toggles)
+  const [notifReminder, setNotifReminder] = useState(true);
+  const [notifNewDates, setNotifNewDates] = useState(true);
+  const [notifPromos, setNotifPromos] = useState(true);
+  const [notifNewsletter, setNotifNewsletter] = useState(true);
+  const [notifEmail, setNotifEmail] = useState(true);
+  const [notifSms, setNotifSms] = useState(true);
 
   const upcomingTickets = USER_TICKETS.filter((t) => t.status === 'upcoming');
   const pastTickets = USER_TICKETS.filter((t) => t.status === 'past');
@@ -368,7 +381,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     : 'text-gray-600 hover:bg-white hover:text-gray-900'
                 }`}
               >
-                <Bell className="w-4 h-4 text-gray-500" />
+                <Bell
+                  className={`w-4 h-4 ${
+                    activeTab === 'notifications' ? 'text-[#FF5722]' : 'text-gray-500'
+                  }`}
+                />
                 <span>Notifications</span>
               </button>
 
@@ -446,11 +463,243 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           {/* B. SECTION CENTRALE DYNAMIQUE */}
           <section className="lg:col-span-9 space-y-6 text-left">
             {/* ========================================================= */}
-            {/* ONGLET 1 : MES FAVORIS */}
+            {/* ONGLET : NOTIFICATIONS */}
+            {/* ========================================================= */}
+            {activeTab === 'notifications' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                {/* En-tête */}
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight">
+                    Notifications
+                  </h2>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                    Choisis comment et quand Sunu Events peut te contacter.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  {/* GROUPE 1 : ÉVÈNEMENTS */}
+                  <div>
+                    <h3 className="font-bold text-xs sm:text-sm text-[#111827] mb-2">
+                      Évènements
+                    </h3>
+
+                    <div className="divide-y divide-gray-100">
+                      {/* Paramètre 1 : Rappel */}
+                      <div className="py-3.5 flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-8 h-8 rounded-xl bg-[#F0FDFA] text-[#0D9488] flex items-center justify-center shrink-0">
+                            <Bell className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-xs sm:text-sm text-[#111827]">
+                              Rappel avant un évènement
+                            </h4>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              24h avant chaque évènement pour lequel tu as un billet
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Toggle Switch */}
+                        <button
+                          type="button"
+                          onClick={() => setNotifReminder(!notifReminder)}
+                          className={`w-11 h-6 rounded-full p-0.5 flex items-center transition-colors cursor-pointer shrink-0 ${
+                            notifReminder ? 'bg-[#FF5722]' : 'bg-gray-200'
+                          }`}
+                        >
+                          <div
+                            className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform transform ${
+                              notifReminder ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Paramètre 2 : Nouvelles dates */}
+                      <div className="py-3.5 flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-8 h-8 rounded-xl bg-[#F0FDFA] text-[#0D9488] flex items-center justify-center shrink-0">
+                            <Heart className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-xs sm:text-sm text-[#111827]">
+                              Nouvelles dates de tes artistes suivis
+                            </h4>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              Alerte dès qu'un favori programme un nouvel évènement
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setNotifNewDates(!notifNewDates)}
+                          className={`w-11 h-6 rounded-full p-0.5 flex items-center transition-colors cursor-pointer shrink-0 ${
+                            notifNewDates ? 'bg-[#FF5722]' : 'bg-gray-200'
+                          }`}
+                        >
+                          <div
+                            className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform transform ${
+                              notifNewDates ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* GROUPE 2 : OFFRES & ACTUALITÉS */}
+                  <div>
+                    <h3 className="font-bold text-xs sm:text-sm text-[#111827] mb-2">
+                      Offres & actualités
+                    </h3>
+
+                    <div className="divide-y divide-gray-100">
+                      {/* Paramètre 3 : Offres promos */}
+                      <div className="py-3.5 flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-8 h-8 rounded-xl bg-[#F0FDFA] text-[#0D9488] flex items-center justify-center shrink-0">
+                            <Tag className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-xs sm:text-sm text-[#111827]">
+                              Offres promotionnelles
+                            </h4>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              Réductions et ventes flash sur des évènements sélectionnés
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setNotifPromos(!notifPromos)}
+                          className={`w-11 h-6 rounded-full p-0.5 flex items-center transition-colors cursor-pointer shrink-0 ${
+                            notifPromos ? 'bg-[#FF5722]' : 'bg-gray-200'
+                          }`}
+                        >
+                          <div
+                            className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform transform ${
+                              notifPromos ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Paramètre 4 : Newsletter */}
+                      <div className="py-3.5 flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-8 h-8 rounded-xl bg-[#F0FDFA] text-[#0D9488] flex items-center justify-center shrink-0">
+                            <Newspaper className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-xs sm:text-sm text-[#111827]">
+                              Newsletter mensuelle
+                            </h4>
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              Le meilleur des sorties au Sénégal, une fois par mois
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setNotifNewsletter(!notifNewsletter)}
+                          className={`w-11 h-6 rounded-full p-0.5 flex items-center transition-colors cursor-pointer shrink-0 ${
+                            notifNewsletter ? 'bg-[#FF5722]' : 'bg-gray-200'
+                          }`}
+                        >
+                          <div
+                            className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform transform ${
+                              notifNewsletter ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* GROUPE 3 : CANAUX */}
+                  <div>
+                    <h3 className="font-bold text-xs sm:text-sm text-[#111827] mb-2">
+                      Canaux
+                    </h3>
+
+                    <div className="divide-y divide-gray-100">
+                      {/* Paramètre 5 : Email */}
+                      <div className="py-3.5 flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-8 h-8 rounded-xl bg-[#F0FDFA] text-[#0D9488] flex items-center justify-center shrink-0">
+                            <Mail className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-xs sm:text-sm text-[#111827]">
+                              Notifications par email
+                            </h4>
+                            <p className="text-xs text-gray-500 mt-0.5 font-normal">
+                              aminata.diop@email.com
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setNotifEmail(!notifEmail)}
+                          className={`w-11 h-6 rounded-full p-0.5 flex items-center transition-colors cursor-pointer shrink-0 ${
+                            notifEmail ? 'bg-[#FF5722]' : 'bg-gray-200'
+                          }`}
+                        >
+                          <div
+                            className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform transform ${
+                              notifEmail ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+
+                      {/* Paramètre 6 : SMS */}
+                      <div className="py-3.5 flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3.5">
+                          <div className="w-8 h-8 rounded-xl bg-[#F0FDFA] text-[#0D9488] flex items-center justify-center shrink-0">
+                            <Smartphone className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-xs sm:text-sm text-[#111827]">
+                              Notifications par SMS
+                            </h4>
+                            <p className="text-xs text-gray-500 mt-0.5 font-normal">
+                              +221 77 123 45 67
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setNotifSms(!notifSms)}
+                          className={`w-11 h-6 rounded-full p-0.5 flex items-center transition-colors cursor-pointer shrink-0 ${
+                            notifSms ? 'bg-[#FF5722]' : 'bg-gray-200'
+                          }`}
+                        >
+                          <div
+                            className={`w-5 h-5 rounded-full bg-white shadow-xs transition-transform transform ${
+                              notifSms ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ========================================================= */}
+            {/* ONGLET : MES FAVORIS */}
             {/* ========================================================= */}
             {activeTab === 'favorites' && (
               <div className="space-y-6 animate-in fade-in duration-200">
-                {/* En-tête */}
                 <div>
                   <h2 className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight">
                     Mes favoris
@@ -460,7 +709,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </p>
                 </div>
 
-                {/* Grille 3 colonnes des cartes d'évènements favoris */}
                 {favorites.length === 0 ? (
                   <div className="bg-white rounded-3xl p-10 text-center border border-gray-100">
                     <Heart className="w-10 h-10 text-gray-300 mx-auto mb-3" />
@@ -487,7 +735,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                           key={event.id}
                           className="bg-white rounded-3xl p-3 border border-gray-200/70 shadow-2xs hover:shadow-md transition-all group flex flex-col justify-between"
                         >
-                          {/* Image avec Badges flottants */}
                           <div className="relative rounded-2xl overflow-hidden aspect-[4/4.8] bg-gray-100">
                             <img
                               src={event.image}
@@ -495,13 +742,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
 
-                            {/* Badge Catégorie Top-Left */}
                             <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-[11px] font-bold text-gray-900 flex items-center gap-1 shadow-2xs">
                               <CategoryIcon className="w-3 h-3 text-gray-800" />
                               <span>{event.category}</span>
                             </div>
 
-                            {/* Badge Cœur Top-Right (Actif en rouge) */}
                             <button
                               type="button"
                               onClick={() => handleRemoveFavorite(event.id)}
@@ -512,7 +757,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                             </button>
                           </div>
 
-                          {/* Détails de l'évènement */}
                           <div className="px-1.5 pt-3 pb-1">
                             <h3 className="font-bold text-sm sm:text-base text-[#111827] leading-snug line-clamp-1">
                               {event.title}
@@ -527,7 +771,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                             </p>
                           </div>
 
-                          {/* Prix et Bouton Réserver */}
                           <div className="px-1.5 pt-3 border-t border-gray-100 flex items-center justify-between mt-2">
                             <div>
                               <p className="text-sm font-black text-[#111827] leading-none">
@@ -556,7 +799,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             )}
 
             {/* ========================================================= */}
-            {/* ONGLET 2 : MES BILLETS */}
+            {/* ONGLET : MES BILLETS */}
             {/* ========================================================= */}
             {activeTab === 'tickets' && (
               <div className="space-y-6 animate-in fade-in duration-200">
@@ -651,7 +894,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             )}
 
             {/* ========================================================= */}
-            {/* ONGLET 3 : VUE D'ENSEMBLE */}
+            {/* ONGLET : VUE D'ENSEMBLE */}
             {/* ========================================================= */}
             {activeTab === 'overview' && (
               <div className="space-y-6 animate-in fade-in duration-200">
@@ -664,7 +907,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </p>
                 </div>
 
-                {/* 3 Cartes KPI */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div
                     onClick={() => {
@@ -718,7 +960,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </div>
                 </div>
 
-                {/* Billet en Vedette */}
                 <div className="bg-white border border-gray-200/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
                   <div className="flex items-center gap-3.5 sm:gap-4">
                     <img
@@ -757,7 +998,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   </div>
                 </div>
 
-                {/* Activité récente */}
                 <div className="pt-2">
                   <h3 className="font-bold text-sm sm:text-base text-[#111827] mb-3">
                     Activité récente
