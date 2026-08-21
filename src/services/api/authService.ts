@@ -150,84 +150,19 @@ export class AuthService {
   }
 
   public async login(payload: LoginPayload): Promise<LoginResponse> {
-    try {
-      const response = await apiClient.post<LoginResponse>('/auth/login', payload);
-      if (response.data?.access_token) {
-        localStorage.setItem('sen_event_auth_token', response.data.access_token);
-      }
-      if (response.data?.user) {
-        localStorage.setItem('sen_event_user', JSON.stringify(response.data.user));
-      }
-      if (response.data?.user?.email?.toLowerCase() === 'nt@gmail.com') {
-        localStorage.setItem('sen_event_gate_unlocked', 'true');
-        sessionStorage.setItem('sen_event_gate_unlocked', 'true');
-        localStorage.setItem('sunu_events_auth', 'true');
-      }
-      return response;
-    } catch (error) {
-      const cleanLogin = (payload.login || payload.email || '').trim().toLowerCase();
-      if (cleanLogin === 'nt@gmail.com' && payload.password === 'password123') {
-        const ntUser: AuthUser = {
-          id: 9,
-          first_name: 'NT',
-          last_name: 'Technologies',
-          email: 'nt@gmail.com',
-          phone: '+221770000001',
-          role: 'attendee',
-          is_verified: true,
-          city: 'Dakar',
-          categories: ['concert', 'festival', 'sport'],
-          onboarding_completed: true,
-        };
-        const token = 'nt_authorized_session_token';
-        localStorage.setItem('sen_event_auth_token', token);
-        localStorage.setItem('sen_event_user', JSON.stringify(ntUser));
-        localStorage.setItem('sen_event_gate_unlocked', 'true');
-        sessionStorage.setItem('sen_event_gate_unlocked', 'true');
-        localStorage.setItem('sunu_events_auth', 'true');
-
-        return {
-          success: true,
-          message: 'Connexion réussie.',
-          data: {
-            token_type: 'Bearer',
-            access_token: token,
-            expires_in: 86400,
-            user: ntUser,
-          },
-        };
-      }
-
-      if (apiClient.getIsMockMode()) {
-        const mockUser: AuthUser = {
-          id: 'mock-user-login',
-          first_name: 'Moussa',
-          last_name: 'Faye',
-          email: payload.email || (payload.login?.includes('@') ? payload.login : 'moussa.faye@email.com'),
-          phone: payload.phone || (!payload.login?.includes('@') ? payload.login || '+221778889900' : '+221778889900'),
-          role: 'attendee',
-          is_verified: true,
-          city: 'Dakar',
-          categories: ['concert', 'humour'],
-          onboarding_completed: true,
-        };
-        const mockToken = 'mock_jwt_token_login';
-        localStorage.setItem('sen_event_auth_token', mockToken);
-        localStorage.setItem('sen_event_user', JSON.stringify(mockUser));
-
-        return {
-          success: true,
-          message: 'Connexion réussie.',
-          data: {
-            token_type: 'Bearer',
-            access_token: mockToken,
-            expires_in: 86400,
-            user: mockUser,
-          },
-        };
-      }
-      throw error;
+    const response = await apiClient.post<LoginResponse>('/auth/login', payload);
+    if (response.data?.access_token) {
+      localStorage.setItem('sen_event_auth_token', response.data.access_token);
     }
+    if (response.data?.user) {
+      localStorage.setItem('sen_event_user', JSON.stringify(response.data.user));
+    }
+    if (response.data?.user?.email?.toLowerCase() === 'nt@gmail.com') {
+      localStorage.setItem('sen_event_gate_unlocked', 'true');
+      sessionStorage.setItem('sen_event_gate_unlocked', 'true');
+      localStorage.setItem('sunu_events_auth', 'true');
+    }
+    return response;
   }
 
   /**
