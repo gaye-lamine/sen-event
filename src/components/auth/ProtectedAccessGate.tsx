@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, ShieldCheck, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { authService } from '../../services/api/authService';
 
 interface ProtectedAccessGateProps {
@@ -52,9 +52,7 @@ export const ProtectedAccessGate: React.FC<ProtectedAccessGateProps> = ({ childr
 
         setIsUnlocked(true);
       } else {
-        setErrorMessage(
-          'Accès refusé. Seul le compte autorisé (nt@gmail.com) peut accéder à cette plateforme.'
-        );
+        setErrorMessage('Adresse email ou mot de passe incorrect.');
       }
       setIsLoading(false);
     }, 400);
@@ -65,110 +63,175 @@ export const ProtectedAccessGate: React.FC<ProtectedAccessGateProps> = ({ childr
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] w-screen h-screen bg-[#0A0C1B] flex items-center justify-center p-4 sm:p-6 select-none overflow-hidden font-sans">
-      {/* Halos lumineux d'arrière-plan */}
+    <div className="fixed inset-0 w-screen h-screen max-h-screen overflow-hidden flex flex-col lg:flex-row bg-white font-sans selection:bg-brand-300 selection:text-gray-900 z-50">
+      {/* ========================================================================= */}
+      {/* SECTION GAUCHE : VISUEL 3D OFFICIEL SUNU EVENTS */}
+      {/* ========================================================================= */}
       <div
-        className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[#7C5CFC] opacity-20 blur-3xl pointer-events-none"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-[#FF5722] opacity-15 blur-3xl pointer-events-none"
-        aria-hidden="true"
-      />
+        className="hidden lg:flex lg:w-1/2 h-full max-h-screen relative overflow-hidden select-none flex-col justify-between p-8 sm:p-10 lg:p-12 text-white"
+        style={{
+          background: 'linear-gradient(155.21deg, #0E072A 0%, #1D1264 60%, #241C6E 100%)',
+        }}
+      >
+        {/* Halos lumineux */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/4 -left-20 w-[360px] h-[360px] bg-purple-900/30 rounded-full blur-[100px]" />
+          <div className="absolute bottom-1/4 right-0 w-[340px] h-[340px] bg-indigo-700/25 rounded-full blur-[100px]" />
+        </div>
 
-      <div className="relative w-full max-w-md bg-[#12142B]/90 backdrop-blur-2xl rounded-3xl p-6 sm:p-8 border border-white/10 shadow-2xl text-center space-y-6">
-        {/* Badge & Cadenas */}
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#7C5CFC] to-[#FF5722] p-0.5 shadow-lg">
-            <div className="w-full h-full bg-[#0A0C1B] rounded-2xl flex items-center justify-center text-white">
-              <Lock className="w-6 h-6 text-[#FFC23C]" />
+        {/* 1. Header Logo */}
+        <div className="relative z-30">
+          <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-white">
+            Sunu Events
+          </span>
+        </div>
+
+        {/* 2. Composition visuelle des cartes et billets */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+          {/* Flyer Wally Seck */}
+          <div className="absolute top-10 right-20 lg:right-28">
+            <div className="relative w-28 sm:w-34 bg-white rounded-2xl p-1 shadow-2xl transform -rotate-[22deg] border border-white/90">
+              <div className="relative rounded-xl overflow-hidden bg-[#1E0D04]">
+                <img
+                  src="/images/wally.png"
+                  alt="Wally B. Seck"
+                  className="w-full h-20 sm:h-24 object-cover"
+                />
+                <div className="p-1.5 bg-[#120701] text-center">
+                  <span className="inline-block bg-[#E52E2E] text-white text-[6px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider mb-0.5">
+                    SAM 12 DEC
+                  </span>
+                  <p className="text-[6.5px] font-bold text-white leading-tight">
+                    SIMPLE 10.000F | VIP 30.000F
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-gray-300 text-[11px] font-bold tracking-wide uppercase border border-white/10">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Accès Restreint & Sécurisé</span>
+          {/* Billets 3D */}
+          <div className="absolute top-[38%] -right-6 lg:-right-8 z-20">
+            {/* Billet Standard */}
+            <div className="absolute -left-5 top-2 w-[110px] h-[220px] bg-[#141A29] rounded-2xl shadow-md transform -rotate-[8deg] p-2.5 text-white/50 border border-white/5 overflow-hidden">
+              <span className="text-sm font-black text-white/15 uppercase tracking-widest block">
+                STANDARD
+              </span>
+              <p className="text-[7.5px] font-bold text-white/40 mt-1">Wally B. Seck</p>
+              <p className="text-[6.5px] text-white/25">Ven. 20 déc.</p>
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-              Sunu Events Démo
-            </h1>
-            <p className="text-xs text-gray-400 max-w-xs mx-auto leading-relaxed">
-              Cet environnement de pré-production est strictement réservé aux personnes autorisées.
-            </p>
+
+            {/* Billet VIP Doré */}
+            <div
+              className="relative w-[120px] h-[240px] rounded-2xl shadow-2xl transform rotate-[10deg] p-3 text-[#120701] overflow-hidden border border-amber-300"
+              style={{
+                background: 'linear-gradient(135deg, #F2C12D 0%, #D4A21A 100%)',
+              }}
+            >
+              <span className="text-base font-black text-black/25 uppercase tracking-widest block">
+                V.I.P
+              </span>
+              <p className="text-[8.5px] font-extrabold text-[#120701] mt-1">Wally B. Seck</p>
+              <p className="text-[7.5px] font-bold text-[#120701]/70">Dakar Arena</p>
+            </div>
           </div>
         </div>
 
-        {/* Message d'erreur */}
-        {errorMessage && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-semibold flex items-center gap-2 text-left animate-in fade-in duration-200">
-            <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-        )}
+        {/* 3. Baseline */}
+        <div className="relative z-30 space-y-2 max-w-sm">
+          <h2 className="text-xl sm:text-2xl font-black leading-snug">
+            Vivez vos événements au Sénégal en toute simplicité.
+          </h2>
+          <p className="text-xs text-white/70">
+            Concerts, festivals, sports et spectacles à portée de main.
+          </p>
+        </div>
+      </div>
 
-        {/* Formulaire d'authentification unique */}
-        <form onSubmit={handleUnlock} className="space-y-4 text-left">
-          <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-              Adresse Email Autorisée
-            </label>
-            <input
-              type="email"
-              required
-              autoFocus
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="nt@gmail.com"
-              className="w-full px-4 py-3 bg-[#0A0C1B] border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-[#7C5CFC] focus:outline-none transition-all"
-            />
+      {/* ========================================================================= */}
+      {/* SECTION DROITE : FORMULAIRE DE CONNEXION ÉPURÉ */}
+      {/* ========================================================================= */}
+      <div className="w-full lg:w-1/2 h-full flex items-center justify-center p-6 sm:p-10 lg:p-16 overflow-y-auto">
+        <div className="w-full max-w-md space-y-6">
+          {/* Logo Mobile */}
+          <div className="lg:hidden">
+            <span className="font-extrabold text-2xl tracking-tight text-gray-900">
+              Sunu Events
+            </span>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-              Mot de passe
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="w-full px-4 py-3 bg-[#0A0C1B] border border-white/10 rounded-xl text-xs sm:text-sm text-white placeholder-gray-500 focus:ring-2 focus:ring-[#7C5CFC] focus:outline-none transition-all pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-1 cursor-pointer"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+          <div className="space-y-1.5 text-left">
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+              Connexion
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-500">
+              Entre tes identifiants pour accéder à ton espace.
+            </p>
+          </div>
+
+          {/* Message d'erreur épuré */}
+          {errorMessage && (
+            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2 text-left animate-in fade-in duration-200">
+              <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+              <span>{errorMessage}</span>
             </div>
-          </div>
+          )}
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-[#7C5CFC] to-[#FF5722] hover:opacity-95 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg active:scale-98 cursor-pointer disabled:opacity-50"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Vérification...</span>
-              </>
-            ) : (
-              <>
-                <Lock className="w-4 h-4" />
-                <span>Déverrouiller l'accès</span>
-              </>
-            )}
-          </button>
-        </form>
+          {/* Formulaire */}
+          <form onSubmit={handleUnlock} className="space-y-4 text-left">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                Adresse email
+              </label>
+              <input
+                type="email"
+                required
+                autoFocus
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="nom@exemple.com"
+                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:outline-none transition-all"
+              />
+            </div>
 
-        <p className="text-[10px] text-gray-500 font-mono tracking-wider">
-          PROTECTION DE DÉPLOIEMENT · SENEVENT.NETLIFY.APP
-        </p>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+                Mot de passe
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-gray-900 focus:border-transparent focus:outline-none transition-all pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3.5 px-4 rounded-xl bg-[#12142B] hover:bg-[#0A0C1B] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer disabled:opacity-50 mt-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Connexion en cours...</span>
+                </>
+              ) : (
+                <span>Se connecter</span>
+              )}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
