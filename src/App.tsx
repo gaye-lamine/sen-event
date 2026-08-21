@@ -15,13 +15,13 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { LoginPage } from './pages/LoginPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { ProtectedAccessGate } from './components/auth/ProtectedAccessGate';
 
 /**
- * @component App
- * @description Composant racine et orchestrateur d'état de l'application Sunu Events.
- * Intègre la navigation entre Accueil, Détail Évènement, Checkout, Connexion, Onboarding et Tableau de bord (Mon Espace).
+ * @component AppContent
+ * @description Contenu principal et orchestrateur d'état de l'application Sunu Events.
  */
-export const App: React.FC = () => {
+export const AppContent: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem('sunu_events_auth') === 'true';
   });
@@ -273,6 +273,14 @@ export const App: React.FC = () => {
         }}
       />
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <ProtectedAccessGate>
+      <AppContent />
+    </ProtectedAccessGate>
   );
 };
 
