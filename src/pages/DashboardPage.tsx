@@ -23,6 +23,9 @@ import {
   Newspaper,
   Mail,
   Smartphone,
+  Plus,
+  ShieldCheck,
+  Check,
 } from 'lucide-react';
 import { Navbar } from '../components/layout/Navbar';
 import { Footer } from '../components/layout/Footer';
@@ -69,6 +72,14 @@ interface FavoriteEvent {
   date: string;
   image: string;
   price: string;
+}
+
+interface PaymentMethod {
+  id: string;
+  type: 'wave' | 'om' | 'card';
+  title: string;
+  detail: string;
+  isDefault: boolean;
 }
 
 const USER_TICKETS: UserTicket[] = [
@@ -157,13 +168,38 @@ const INITIAL_FAVORITES: FavoriteEvent[] = [
   },
 ];
 
+const INITIAL_PAYMENT_METHODS: PaymentMethod[] = [
+  {
+    id: 'pm-1',
+    type: 'wave',
+    title: 'Wave',
+    detail: '+221 77 •• •• 67',
+    isDefault: true,
+  },
+  {
+    id: 'pm-2',
+    type: 'om',
+    title: 'Orange Money',
+    detail: '+221 78 •• •• 12',
+    isDefault: false,
+  },
+  {
+    id: 'pm-3',
+    type: 'card',
+    title: 'Carte Visa',
+    detail: '•••• •••• •••• 4821 — Exp. 08/28',
+    isDefault: false,
+  },
+];
+
 /**
  * @page DashboardPage
  * @description Espace personnel / Tableau de bord d'Aminata Diop :
  * - Onglet "Vue d'ensemble" : KPI, billet prochain et activités
  * - Onglet "Mes billets" : Billets à venir (3) et Passés (9) avec téléchargement PDF
  * - Onglet "Mes favoris" : Grille des évènements mis de côté
- * - Onglet "Notifications" : Préférences des rappels, alertes, offres et canaux SMS/Email
+ * - Onglet "Notifications" : Préférences des rappels, alertes, offres et canaux
+ * - Onglet "Moyens de paiement" : Gestion Wave, OM et Cartes bancaires avec conformité PCI-DSS
  * @param {DashboardPageProps} props - Propriétés du composant
  */
 export const DashboardPage: React.FC<DashboardPageProps> = ({
@@ -176,12 +212,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onViewTicket,
   onBookEvent,
 }) => {
-  const [activeTab, setActiveTab] = useState<TabType>('notifications');
+  const [activeTab, setActiveTab] = useState<TabType>('payments');
   const [ticketFilter, setTicketFilter] = useState<TicketFilterType>('upcoming');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<FavoriteEvent[]>(INITIAL_FAVORITES);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>(INITIAL_PAYMENT_METHODS);
 
-  // États des préférences de notifications (Toggles)
+  // Préférences notifications
   const [notifReminder, setNotifReminder] = useState(true);
   const [notifNewDates, setNotifNewDates] = useState(true);
   const [notifPromos, setNotifPromos] = useState(true);
@@ -203,6 +240,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
   const handleRemoveFavorite = (favId: string) => {
     setFavorites(favorites.filter((f) => f.id !== favId));
+  };
+
+  const handleSetDefaultPayment = (methodId: string) => {
+    setPaymentMethods(
+      paymentMethods.map((pm) => ({
+        ...pm,
+        isDefault: pm.id === methodId,
+      }))
+    );
   };
 
   return (
@@ -234,7 +280,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         }}
       >
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-          {/* Profil Utilisateur */}
           <div className="flex items-center gap-4 sm:gap-5">
             <div className="relative">
               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-white/70 shadow-md bg-amber-100 flex items-center justify-center">
@@ -270,7 +315,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             </div>
           </div>
 
-          {/* 3 Statistiques Principales */}
           <div className="flex items-center gap-8 sm:gap-12 md:gap-14 border-t md:border-t-0 pt-4 md:pt-0 border-white/15">
             <div
               onClick={() => {
@@ -398,7 +442,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     : 'text-gray-600 hover:bg-white hover:text-gray-900'
                 }`}
               >
-                <CreditCard className="w-4 h-4 text-gray-500" />
+                <CreditCard
+                  className={`w-4 h-4 ${
+                    activeTab === 'payments' ? 'text-[#FF5722]' : 'text-gray-500'
+                  }`}
+                />
                 <span>Moyens de paiement</span>
               </button>
 
@@ -442,7 +490,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               </button>
             </nav>
 
-            {/* ENCART CTA ORGANISATEUR */}
             <div className="bg-gradient-to-br from-[#E64A19] to-[#FF5722] text-white p-5 rounded-2xl shadow-xs text-left">
               <h4 className="font-bold text-sm text-white">
                 Envie d'organiser ?
@@ -463,11 +510,137 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           {/* B. SECTION CENTRALE DYNAMIQUE */}
           <section className="lg:col-span-9 space-y-6 text-left">
             {/* ========================================================= */}
+            {/* ONGLET : MOYENS DE PAIEMENT */}
+            {/* ========================================================= */}
+            {activeTab === 'payments' && (
+              <div className="space-y-6 animate-in fade-in duration-200">
+                {/* En-tête */}
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight">
+                    Moyens de paiement
+                  </h2>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                    Gère tes méthodes de paiement enregistrées pour des achats plus rapides.
+                  </p>
+                </div>
+
+                {/* Liste des Cartes de Moyens de Paiement */}
+                <div className="space-y-4">
+                  {/* Carte 1 : Wave */}
+                  <div className="bg-white border border-gray-200/80 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-2xs hover:shadow-xs transition-shadow">
+                    <div className="flex items-center gap-3.5 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#1DC4FF] flex items-center justify-center shrink-0 shadow-xs">
+                        <span className="text-white text-lg font-black select-none">
+                          🐧
+                        </span>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm sm:text-base text-[#111827]">
+                          Wave
+                        </h4>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          +221 77 •• •• 67
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="bg-[#ECFDF5] text-[#10B981] font-bold text-[11px] px-2.5 py-1 rounded-full whitespace-nowrap">
+                        Par défaut
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => alert('Modification du compte Wave')}
+                        className="px-4 py-1.5 rounded-full border border-gray-200 hover:bg-gray-50 text-xs font-semibold text-gray-800 transition-all cursor-pointer"
+                      >
+                        Modifier
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Carte 2 : Orange Money */}
+                  <div className="bg-white border border-gray-200/80 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-2xs hover:shadow-xs transition-shadow">
+                    <div className="flex items-center gap-3.5 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-black flex items-center justify-center shrink-0 shadow-xs p-1">
+                        <span className="text-[#FF7900] font-black text-xs">
+                          OM
+                        </span>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm sm:text-base text-[#111827]">
+                          Orange Money
+                        </h4>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          +221 78 •• •• 12
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleSetDefaultPayment('pm-2')}
+                        className="px-4 py-1.5 rounded-full border border-gray-200 hover:bg-gray-50 text-xs font-semibold text-gray-800 transition-all cursor-pointer whitespace-nowrap"
+                      >
+                        Définir par défaut
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Carte 3 : Carte Visa */}
+                  <div className="bg-white border border-gray-200/80 rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-2xs hover:shadow-xs transition-shadow">
+                    <div className="flex items-center gap-3.5 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#0F172A] text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <CreditCard className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm sm:text-base text-[#111827]">
+                          Carte Visa
+                        </h4>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          •••• •••• •••• 4821 — Exp. 08/28
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => alert('Modification de la carte bancaire')}
+                        className="px-4 py-1.5 rounded-full border border-gray-200 hover:bg-gray-50 text-xs font-semibold text-gray-800 transition-all cursor-pointer"
+                      >
+                        Modifier
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Bouton Ajouter un moyen de paiement */}
+                  <button
+                    type="button"
+                    onClick={() => alert('Ajouter une méthode de paiement (Wave, OM ou Carte)')}
+                    className="w-full py-3.5 rounded-2xl border border-dashed border-gray-300 hover:border-gray-400 bg-white/60 hover:bg-white text-center text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-900 transition-all cursor-pointer shadow-2xs flex items-center justify-center gap-1.5"
+                  >
+                    <span>+ Ajouter un moyen de paiement</span>
+                  </button>
+                </div>
+
+                {/* Note de Sécurité Certifiée PCI-DSS */}
+                <div className="pt-2 flex items-center gap-3 text-left">
+                  <div className="w-6 h-6 rounded-lg bg-[#ECFDF5] text-[#10B981] flex items-center justify-center shrink-0">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <p className="text-xs text-gray-500 leading-relaxed">
+                    Sunu Events ne stocke aucune donnée bancaire — tout est géré par nos partenaires certifiés PCI-DSS.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* ========================================================= */}
             {/* ONGLET : NOTIFICATIONS */}
             {/* ========================================================= */}
             {activeTab === 'notifications' && (
               <div className="space-y-6 animate-in fade-in duration-200">
-                {/* En-tête */}
                 <div>
                   <h2 className="text-xl sm:text-2xl font-black text-[#111827] tracking-tight">
                     Notifications
@@ -478,14 +651,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 </div>
 
                 <div className="space-y-6">
-                  {/* GROUPE 1 : ÉVÈNEMENTS */}
                   <div>
                     <h3 className="font-bold text-xs sm:text-sm text-[#111827] mb-2">
                       Évènements
                     </h3>
 
                     <div className="divide-y divide-gray-100">
-                      {/* Paramètre 1 : Rappel */}
                       <div className="py-3.5 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3.5">
                           <div className="w-8 h-8 rounded-xl bg-[#F0FDFA] text-[#0D9488] flex items-center justify-center shrink-0">
@@ -501,7 +672,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                           </div>
                         </div>
 
-                        {/* Toggle Switch */}
                         <button
                           type="button"
                           onClick={() => setNotifReminder(!notifReminder)}
@@ -517,7 +687,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                         </button>
                       </div>
 
-                      {/* Paramètre 2 : Nouvelles dates */}
                       <div className="py-3.5 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3.5">
                           <div className="w-8 h-8 rounded-xl bg-[#F0FDFA] text-[#0D9488] flex items-center justify-center shrink-0">
@@ -550,14 +719,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     </div>
                   </div>
 
-                  {/* GROUPE 2 : OFFRES & ACTUALITÉS */}
                   <div>
                     <h3 className="font-bold text-xs sm:text-sm text-[#111827] mb-2">
                       Offres & actualités
                     </h3>
 
                     <div className="divide-y divide-gray-100">
-                      {/* Paramètre 3 : Offres promos */}
                       <div className="py-3.5 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3.5">
                           <div className="w-8 h-8 rounded-xl bg-[#F0FDFA] text-[#0D9488] flex items-center justify-center shrink-0">
@@ -588,7 +755,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                         </button>
                       </div>
 
-                      {/* Paramètre 4 : Newsletter */}
                       <div className="py-3.5 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3.5">
                           <div className="w-8 h-8 rounded-xl bg-[#F0FDFA] text-[#0D9488] flex items-center justify-center shrink-0">
@@ -621,14 +787,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     </div>
                   </div>
 
-                  {/* GROUPE 3 : CANAUX */}
                   <div>
                     <h3 className="font-bold text-xs sm:text-sm text-[#111827] mb-2">
                       Canaux
                     </h3>
 
                     <div className="divide-y divide-gray-100">
-                      {/* Paramètre 5 : Email */}
                       <div className="py-3.5 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3.5">
                           <div className="w-8 h-8 rounded-xl bg-[#F0FDFA] text-[#0D9488] flex items-center justify-center shrink-0">
@@ -659,7 +823,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                         </button>
                       </div>
 
-                      {/* Paramètre 6 : SMS */}
                       <div className="py-3.5 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-3.5">
                           <div className="w-8 h-8 rounded-xl bg-[#F0FDFA] text-[#0D9488] flex items-center justify-center shrink-0">
