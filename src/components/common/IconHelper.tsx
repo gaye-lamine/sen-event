@@ -74,6 +74,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
  * @param {IconHelperProps} props - Contrat de propriétés du composant
  */
 export const IconHelper: React.FC<IconHelperProps> = ({ name, className = 'w-4 h-4', size }) => {
-  const IconComponent = ICON_MAP[name.toLowerCase()] || Music;
+  const normalizedKey = (name || '').toLowerCase().trim();
+  const IconComponent = ICON_MAP[normalizedKey] || Music;
   return <IconComponent className={className} size={size} />;
 };

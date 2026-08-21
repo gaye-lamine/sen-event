@@ -5,6 +5,9 @@ export interface NavbarProps {
   onSearch?: (query: string) => void;
   onNavigateHome?: () => void;
   onOpenAuth?: (mode: AuthMode) => void;
+  onOpenDashboard?: () => void;
+  onLogout?: () => void;
+  isAuthenticated?: boolean;
   cartCount?: number;
   onOpenCart?: () => void;
 }

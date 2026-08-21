@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EventItem, SelectedTierItem, AppView } from './types';
+import { EventItem, SelectedTierItem, AppView, AuthMode, OnboardingRole } from './types';
 import { useEvents, useCart } from './hooks';
 import { Navbar } from './components/layout/Navbar';
 import { CategoryPills } from './components/hero/CategoryPills';
@@ -12,16 +12,24 @@ import { Footer } from './components/layout/Footer';
 import { CartDrawer } from './components/cart/CartDrawer';
 import { EventDetailPage } from './pages/EventDetailPage';
 import { CheckoutPage } from './pages/CheckoutPage';
+import { LoginPage } from './pages/LoginPage';
+import { OnboardingPage } from './pages/OnboardingPage';
+import { DashboardPage } from './pages/DashboardPage';
 
 /**
  * @component App
  * @description Composant racine et orchestrateur d'état de l'application Sunu Events.
- * Gère le routage par état entre la page d'accueil, la fiche de détail et le tunnel de commande.
+ * Intègre la navigation entre Accueil, Détail Évènement, Checkout, Connexion, Onboarding et Tableau de bord (Mon Espace).
  */
 export const App: React.FC = () => {
-  const [currentView, setCurrentView] = useState<AppView>('home');
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('sunu_events_auth') === 'true';
+  });
+
+  const [currentView, setCurrentView] = useState<AppView>('dashboard');
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [selectedCheckoutTiers, setSelectedCheckoutTiers] = useState<SelectedTierItem[]>([]);
+  const [authMode, setAuthMode] = useState<AuthMode>('login');
 
   const {
     categories,
@@ -52,6 +60,44 @@ export const App: React.FC = () => {
   const handleNavigateHome = () => {
     setCurrentView('home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenDashboard = () => {
+    setCurrentView('dashboard');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenAuth = (mode: AuthMode = 'login') => {
+    setAuthMode(mode);
+    setCurrentView('login');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOpenOnboarding = () => {
+    setCurrentView('onboarding');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+    localStorage.setItem('sunu_events_auth', 'true');
+    setCurrentView('dashboard');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOnboardingComplete = (role: OnboardingRole) => {
+    setIsAuthenticated(true);
+    localStorage.setItem('sunu_events_auth', 'true');
+    localStorage.setItem('sunu_events_user_role', role);
+    setCurrentView('dashboard');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('sunu_events_auth');
+    setAuthMode('login');
+    setCurrentView('login');
   };
 
   const handleOpenEventDetail = (event: EventItem) => {
@@ -86,6 +132,53 @@ export const App: React.FC = () => {
     (e) => !selectedEvent || e.id !== selectedEvent.id
   );
 
+  // 1. Vue Onboarding (Étape 1 à 5)
+  if (currentView === 'onboarding') {
+    return (
+      <OnboardingPage
+        onNavigateHome={handleNavigateHome}
+        onOpenLogin={() => handleOpenAuth('login')}
+        onComplete={handleOnboardingComplete}
+        searchQuery={searchQuery}
+        onSearch={handleSearchAndNavigate}
+        cartCount={cartCount}
+        onOpenCart={openCart}
+      />
+    );
+  }
+
+  // 2. Vue Connexion
+  if (!isAuthenticated || currentView === 'login') {
+    return (
+      <LoginPage
+        initialMode={authMode}
+        onNavigateHome={handleNavigateHome}
+        onLoginSuccess={handleLoginSuccess}
+        onOpenOnboarding={handleOpenOnboarding}
+      />
+    );
+  }
+
+  // 3. Vue Espace Personnel / Dashboard ("Vue d'ensemble")
+  if (currentView === 'dashboard') {
+    return (
+      <DashboardPage
+        onNavigateHome={handleNavigateHome}
+        onLogout={handleLogout}
+        searchQuery={searchQuery}
+        onSearch={handleSearchAndNavigate}
+        cartCount={cartCount}
+        onOpenCart={openCart}
+        onViewTicket={() => {
+          if (featuredEvents[0]) {
+            handleOpenEventDetail(featuredEvents[0]);
+          }
+        }}
+      />
+    );
+  }
+
+  // 4. Application Complète (Accueil, Détail Évènement, Checkout)
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans selection:bg-brand-300 selection:text-gray-900">
       <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-xs transition-all">
@@ -93,6 +186,10 @@ export const App: React.FC = () => {
           searchQuery={searchQuery}
           onSearch={handleSearchAndNavigate}
           onNavigateHome={handleNavigateHome}
+          onOpenAuth={handleOpenAuth}
+          onOpenDashboard={handleOpenDashboard}
+          onLogout={handleLogout}
+          isAuthenticated={isAuthenticated}
           cartCount={cartCount}
           onOpenCart={openCart}
         />
@@ -146,8 +243,8 @@ export const App: React.FC = () => {
           <AllEventsSection
             events={allEvents}
             hasMore={hasMoreEvents}
-            onLoadMore={handleLoadMore}
             isLoadingMore={isLoadingMore}
+            onLoadMore={handleLoadMore}
             onBook={handleOpenEventDetail}
             searchQuery={searchQuery}
             onClearSearch={handleClearSearch}

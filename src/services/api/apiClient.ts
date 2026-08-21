@@ -1,6 +1,6 @@
 /**
  * @file apiClient.ts
- * @description Client HTTP centralisé pour la communication avec l'API REST de Sunu Events.
+ * @description Client HTTP centralisé pour la communication avec l'API REST Laravel / InTouch.
  * Gère automatiquement le basculement entre le mode développement (mock) et l'API de production.
  */
 
@@ -13,7 +13,7 @@ export class ApiClient {
   private isMockMode: boolean;
 
   constructor() {
-    this.baseUrl = import.meta.env.VITE_API_URL || 'https://api.sunuevents.sn/v1';
+    this.baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api/v1';
     this.isMockMode = import.meta.env.VITE_USE_REAL_BACKEND !== 'true';
   }
 
@@ -57,7 +57,24 @@ export class ApiClient {
     });
 
     if (!response.ok) {
-      throw new Error(`API Error [${response.status}]: ${response.statusText}`);
+      let errorData: unknown = null;
+      try {
+        errorData = await response.json();
+      } catch {
+        // Ignored
+      }
+      let errorMsg =
+        (errorData as { message?: string })?.message ||
+        `API Error [${response.status}]: ${response.statusText}`;
+      const validationErrors = (errorData as { errors?: Record<string, string[]> })?.errors;
+      if (validationErrors) {
+        const details = Object.values(validationErrors).flat().join(' • ');
+        if (details) errorMsg = details;
+      }
+      const err = new Error(errorMsg);
+      (err as unknown as { data?: unknown; status?: number }).data = errorData;
+      (err as unknown as { status?: number }).status = response.status;
+      throw err;
     }
 
     return response.json();
@@ -88,7 +105,24 @@ export class ApiClient {
     });
 
     if (!response.ok) {
-      throw new Error(`API Error [${response.status}]: ${response.statusText}`);
+      let errorData: unknown = null;
+      try {
+        errorData = await response.json();
+      } catch {
+        // Ignored
+      }
+      let errorMsg =
+        (errorData as { message?: string })?.message ||
+        `API Error [${response.status}]: ${response.statusText}`;
+      const validationErrors = (errorData as { errors?: Record<string, string[]> })?.errors;
+      if (validationErrors) {
+        const details = Object.values(validationErrors).flat().join(' • ');
+        if (details) errorMsg = details;
+      }
+      const err = new Error(errorMsg);
+      (err as unknown as { data?: unknown; status?: number }).data = errorData;
+      (err as unknown as { status?: number }).status = response.status;
+      throw err;
     }
 
     return response.json();

@@ -2,7 +2,7 @@ import { EventItem, TicketTier } from './event';
 
 export type CheckoutStep = 1 | 2 | 3;
 
-export type PaymentMethodType = 'wave' | 'orange_money' | 'card';
+export type PaymentMethodType = 'wave' | 'orange_money' | 'card' | 'free_money';
 
 export interface TicketHolder {
   id: string;
@@ -51,6 +51,8 @@ export interface CustomerInfoStepProps {
   customerLastName: string;
   customerPhone: string;
   customerEmail: string;
+  holders: TicketHolder[];
+  onHoldersChange: (holders: TicketHolder[]) => void;
   onChangeFirstName: (value: string) => void;
   onChangeLastName: (value: string) => void;
   onChangePhone: (value: string) => void;
@@ -61,12 +63,16 @@ export interface CustomerInfoStepProps {
 
 export interface PaymentStepProps {
   event: EventItem;
+  tiers: TicketTier[];
+  quantities: Record<string, number>;
+  holders: TicketHolder[];
   totalAmount: number;
-  customerName: string;
+  customerFirstName: string;
+  customerLastName: string;
   customerPhone: string;
   customerEmail: string;
   onBack: () => void;
-  onPaymentComplete?: () => void;
+  onPaymentComplete?: (orderNumber: string) => void;
 }
 
 export interface OrderSummaryCardProps {

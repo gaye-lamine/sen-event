@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { TicketHolder, CustomerInfoStepProps } from '../../types';
+import { CustomerInfoStepProps, TicketHolder } from '../../types';
 import { CHECKOUT_CONSTANTS } from '../../constants';
 
 /**
@@ -16,6 +16,8 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
   customerLastName,
   customerPhone,
   customerEmail,
+  holders,
+  onHoldersChange,
   onChangeFirstName,
   onChangeLastName,
   onChangePhone,
@@ -24,31 +26,32 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
   onContinue,
 }) => {
   const [newsletterOptIn, setNewsletterOptIn] = useState(false);
-  const [ticketHolders, setTicketHolders] = useState<TicketHolder[]>([]);
 
   useEffect(() => {
     const list: TicketHolder[] = [];
     tiers.forEach((tier) => {
       const qty = quantities[tier.id] || 0;
       for (let i = 1; i <= qty; i++) {
+        const existing = holders.find((h) => h.id === `${tier.id}-${i}`);
         list.push({
           id: `${tier.id}-${i}`,
           tierName: tier.name.toUpperCase(),
           ticketIndex: i,
           fullName:
-            i === 1 && list.length === 0 && customerFirstName && customerLastName
+            existing?.fullName ||
+            (i === 1 && list.length === 0 && customerFirstName && customerLastName
               ? `${customerFirstName} ${customerLastName}`
-              : '',
+              : ''),
         });
       }
     });
 
-    setTicketHolders(list);
+    onHoldersChange(list);
   }, [tiers, quantities]);
 
   const handleHolderNameChange = (id: string, name: string) => {
-    setTicketHolders((prev) =>
-      prev.map((h) => (h.id === id ? { ...h, fullName: name } : h))
+    onHoldersChange(
+      holders.map((h) => (h.id === id ? { ...h, fullName: name } : h))
     );
   };
 
@@ -169,7 +172,7 @@ export const CustomerInfoStep: React.FC<CustomerInfoStepProps> = ({
           </p>
 
           <div className="space-y-3">
-            {ticketHolders.map((holder, index) => (
+            {holders.map((holder, index) => (
               <div
                 key={holder.id}
                 className="p-3.5 sm:p-4 rounded-2xl bg-[#F9F9FB] border border-gray-100/90"

@@ -9,15 +9,17 @@ import { IconHelper } from '../common/IconHelper';
  * @param {CategoryPillsProps} props - Contrat de propriétés du composant
  */
 export const CategoryPills: React.FC<CategoryPillsProps> = ({
-  categories,
+  categories = [],
   selectedCategory,
   onSelectCategory,
 }) => {
+  const categoryList = Array.isArray(categories) ? categories : [];
+
   return (
     <div className="w-full py-2.5 sm:py-3">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-start sm:justify-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar py-0.5">
-          {categories.map((cat) => {
+          {categoryList.map((cat) => {
             const isActive = selectedCategory === cat.id;
 
             return (

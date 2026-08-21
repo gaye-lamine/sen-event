@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TicketTier, CheckoutStep, CheckoutPageProps } from '../types';
+import { TicketTier, CheckoutStep, CheckoutPageProps, TicketHolder } from '../types';
 import { CheckoutStepper } from '../components/checkout/CheckoutStepper';
 import { TicketSelectionStep } from '../components/checkout/TicketSelectionStep';
 import { OrderSummaryCard } from '../components/checkout/OrderSummaryCard';
@@ -11,7 +11,7 @@ import { CHECKOUT_CONSTANTS } from '../constants';
 /**
  * @page CheckoutPage
  * @description Page principale du tunnel d'achat orchestrant les étapes 1 (Billets),
- * 2 (Informations) et 3 (Paiement) ainsi que l'écran final de confirmation.
+ * 2 (Informations) et 3 (Paiement InTouch) ainsi que l'écran final de confirmation.
  * @param {CheckoutPageProps} props - Contrat de propriétés du composant
  */
 export const CheckoutPage: React.FC<CheckoutPageProps> = ({
@@ -21,20 +21,23 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
 }) => {
   const [currentStep, setCurrentStep] = useState<CheckoutStep>(1);
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState(false);
+  const [confirmedOrderNumber, setConfirmedOrderNumber] = useState<string>(
+    CHECKOUT_CONSTANTS.DEFAULT_ORDER_NUMBER
+  );
 
   const tiers: TicketTier[] = event.ticketTiers || [
     {
       id: 'standard',
       name: 'Standard',
       description: 'Accès général, places debout',
-      price: 10000,
+      price: 10,
       available: true,
     },
     {
       id: 'vip',
       name: 'VIP',
       description: 'Zone VIP, boisson offerte + accès rapide',
-      price: 25000,
+      price: 20,
       available: true,
       remainingCount: 42,
     },
@@ -42,7 +45,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
       id: 'place-reservee',
       name: 'Place Réservée',
       description: 'Premières loges + rencontre backstage',
-      price: 50000,
+      price: 30,
       available: false,
       isSoldOut: true,
     },
@@ -57,8 +60,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
       return init;
     }
     return {
-      standard: 2,
-      vip: 1,
+      standard: 1,
+      vip: 0,
     };
   });
 
@@ -74,6 +77,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
   const [customerEmail, setCustomerEmail] = useState<string>(
     CHECKOUT_CONSTANTS.DEFAULT_DEMO_BUYER.EMAIL
   );
+  const [holders, setHolders] = useState<TicketHolder[]>([]);
 
   const handleUpdateQuantity = (tierId: string, delta: number) => {
     setQuantities((prev) => {
@@ -89,13 +93,18 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
     return subtotal + serviceFees;
   };
 
-  const customerFullName = `${customerFirstName} ${customerLastName}`.trim();
+  const handlePaymentComplete = (orderNumber: string) => {
+    if (orderNumber) {
+      setConfirmedOrderNumber(orderNumber);
+    }
+    setIsPaymentConfirmed(true);
+  };
 
   if (isPaymentConfirmed) {
     return (
       <div className="w-full bg-white">
         <OrderConfirmationView
-          orderNumber={CHECKOUT_CONSTANTS.DEFAULT_ORDER_NUMBER}
+          orderNumber={confirmedOrderNumber}
           customerEmail={customerEmail}
           onNavigateHome={onNavigateHome}
         />
@@ -132,6 +141,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
                   customerLastName={customerLastName}
                   customerPhone={customerPhone}
                   customerEmail={customerEmail}
+                  holders={holders}
+                  onHoldersChange={setHolders}
                   onChangeFirstName={setCustomerFirstName}
                   onChangeLastName={setCustomerLastName}
                   onChangePhone={setCustomerPhone}
@@ -144,12 +155,16 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({
               {currentStep === 3 && (
                 <PaymentStep
                   event={event}
+                  tiers={tiers}
+                  quantities={quantities}
+                  holders={holders}
                   totalAmount={calculateTotal()}
-                  customerName={customerFullName}
+                  customerFirstName={customerFirstName}
+                  customerLastName={customerLastName}
                   customerPhone={customerPhone}
                   customerEmail={customerEmail}
                   onBack={() => setCurrentStep(2)}
-                  onPaymentComplete={() => setIsPaymentConfirmed(true)}
+                  onPaymentComplete={handlePaymentComplete}
                 />
               )}
             </div>

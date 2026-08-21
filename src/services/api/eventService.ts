@@ -13,8 +13,8 @@ import { MOCK_EVENTS, CATEGORIES } from '../../data/mockEvents';
 /**
  * @class EventService
  * @description Couche de service métier pour la gestion des événements, catégories, filtres et réservations.
- * Implémente le pattern Fallback résilient : consomme l'API backend si active, ou bascule de façon transparente
- * sur les données locales typées.
+ * Implémente le pattern Fallback résilient : extrait automatiquement le champ data des réponses standard Laravel
+ * ou bascule de façon transparente sur les données locales typées.
  */
 export class EventService {
   /**
@@ -26,7 +26,14 @@ export class EventService {
       if (apiClient.getIsMockMode()) {
         return CATEGORIES;
       }
-      return await apiClient.get<CategoryItem[]>('/categories');
+      const res = await apiClient.get<CategoryItem[] | { success?: boolean; data?: CategoryItem[] }>(
+        '/categories'
+      );
+      if (Array.isArray(res)) return res;
+      if (res && Array.isArray((res as { data?: CategoryItem[] }).data)) {
+        return (res as { data: CategoryItem[] }).data;
+      }
+      return CATEGORIES;
     } catch {
       return CATEGORIES;
     }
@@ -41,7 +48,14 @@ export class EventService {
       if (apiClient.getIsMockMode()) {
         return MOCK_EVENTS.filter((e) => e.isFeatured);
       }
-      return await apiClient.get<EventItem[]>('/events/featured');
+      const res = await apiClient.get<EventItem[] | { success?: boolean; data?: EventItem[] }>(
+        '/events/featured'
+      );
+      if (Array.isArray(res)) return res;
+      if (res && Array.isArray((res as { data?: EventItem[] }).data)) {
+        return (res as { data: EventItem[] }).data;
+      }
+      return MOCK_EVENTS.filter((e) => e.isFeatured);
     } catch {
       return MOCK_EVENTS.filter((e) => e.isFeatured);
     }
@@ -62,9 +76,22 @@ export class EventService {
           ? matches.slice(0, 4)
           : MOCK_EVENTS.filter((e) => !e.isFeatured).slice(0, 4);
       }
-      return await apiClient.get<EventItem[]>('/events/by-date', {
-        params: { filter },
-      });
+      const res = await apiClient.get<EventItem[] | { success?: boolean; data?: EventItem[] }>(
+        '/events/by-date',
+        {
+          params: { filter },
+        }
+      );
+      if (Array.isArray(res)) return res;
+      if (res && Array.isArray((res as { data?: EventItem[] }).data)) {
+        return (res as { data: EventItem[] }).data;
+      }
+      const matches = MOCK_EVENTS.filter(
+        (e) => !e.isFeatured && e.dateCategory?.includes(filter)
+      );
+      return matches.length > 0
+        ? matches.slice(0, 4)
+        : MOCK_EVENTS.filter((e) => !e.isFeatured).slice(0, 4);
     } catch {
       const matches = MOCK_EVENTS.filter(
         (e) => !e.isFeatured && e.dateCategory?.includes(filter)
@@ -124,7 +151,9 @@ export class EventService {
         };
       }
 
-      return await apiClient.get<PaginatedResponse<EventItem>>('/events', {
+      const res = await apiClient.get<
+        PaginatedResponse<EventItem> | { success?: boolean; data?: PaginatedResponse<EventItem> | EventItem[] }
+      >('/events', {
         params: {
           category: params.category,
           dateFilter: params.dateFilter,
@@ -133,6 +162,26 @@ export class EventService {
           limit,
         },
       });
+
+      if (res && 'data' in res && Array.isArray((res as PaginatedResponse<EventItem>).data)) {
+        return res as PaginatedResponse<EventItem>;
+      }
+
+      if (res && 'data' in res && (res as { data?: { data?: EventItem[] } }).data?.data) {
+        return (res as { data: PaginatedResponse<EventItem> }).data;
+      }
+
+      let results = [...MOCK_EVENTS];
+      if (params.category && params.category !== 'all') {
+        results = results.filter((e) => e.category === params.category);
+      }
+      return {
+        data: results.slice(0, limit),
+        total: results.length,
+        page,
+        limit,
+        hasMore: false,
+      };
     } catch {
       let results = [...MOCK_EVENTS];
       if (params.category && params.category !== 'all') {
@@ -233,7 +282,13 @@ export class EventService {
         const found = MOCK_EVENTS.find((e) => e.id === id);
         return found || null;
       }
-      return await apiClient.get<EventItem>(`/events/${id}`);
+      const res = await apiClient.get<EventItem | { success?: boolean; data?: EventItem }>(
+        `/events/${id}`
+      );
+      if (res && 'data' in res && (res as { data?: EventItem }).data) {
+        return (res as { data: EventItem }).data;
+      }
+      return (res as EventItem) || null;
     } catch {
       return MOCK_EVENTS.find((e) => e.id === id) || null;
     }
@@ -256,9 +311,19 @@ export class EventService {
         ).slice(0, limit);
       }
 
-      return await apiClient.get<EventItem[]>(`/events/${eventId}/similar`, {
-        params: { limit },
-      });
+      const res = await apiClient.get<EventItem[] | { success?: boolean; data?: EventItem[] }>(
+        `/events/${eventId}/similar`,
+        {
+          params: { limit },
+        }
+      );
+      if (Array.isArray(res)) return res;
+      if (res && Array.isArray((res as { data?: EventItem[] }).data)) {
+        return (res as { data: EventItem[] }).data;
+      }
+      return MOCK_EVENTS.filter(
+        (e) => e.id !== eventId && e.category === current.category
+      ).slice(0, limit);
     } catch {
       const current = MOCK_EVENTS.find((e) => e.id === eventId);
       if (!current) return [];
