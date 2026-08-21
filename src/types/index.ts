@@ -9,3 +9,5 @@ export * from './cart';
 export * from './common';
 export * from './navigation';
 export * from './intouch-order';
+export * from './dashboard';
+export * from './onboarding';

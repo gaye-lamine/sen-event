@@ -22,7 +22,9 @@ export interface LoginPageProps {
 
 export interface OnboardingPageProps {
   onNavigateHome: () => void;
-  onOpenLogin: () => void;
+  onOpenLogin?: () => void;
+  onNavigateLogin?: () => void;
+  onOpenDashboard?: () => void;
   onComplete?: (role: OnboardingRole) => void;
   searchQuery?: string;
   onSearch?: (q: string) => void;
