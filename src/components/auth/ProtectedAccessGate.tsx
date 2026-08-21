@@ -22,7 +22,7 @@ export const ProtectedAccessGate: React.FC<ProtectedAccessGateProps> = ({ childr
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleUnlock = (e: React.FormEvent) => {
+  const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
     setIsLoading(true);
@@ -30,32 +30,28 @@ export const ProtectedAccessGate: React.FC<ProtectedAccessGateProps> = ({ childr
     const cleanEmail = email.trim().toLowerCase();
     const cleanPassword = password.trim();
 
-    setTimeout(() => {
-      if (cleanEmail === 'nt@gmail.com' && cleanPassword === 'password123') {
-        localStorage.setItem('sen_event_gate_unlocked', 'true');
-        sessionStorage.setItem('sen_event_gate_unlocked', 'true');
-        localStorage.setItem('sunu_events_auth', 'true');
-
-        const authorizedUser = {
-          id: 999,
-          first_name: 'NT',
-          last_name: 'Technologies',
-          email: 'nt@gmail.com',
-          phone: '+221772238013',
-          role: 'attendee' as const,
-          is_verified: true,
-          onboarding_completed: true,
-        };
-
-        localStorage.setItem('sen_event_user', JSON.stringify(authorizedUser));
-        localStorage.setItem('sen_event_auth_token', 'nt_authorized_session_token');
-
-        setIsUnlocked(true);
-      } else {
-        setErrorMessage('Adresse email ou mot de passe incorrect.');
-      }
+    if (cleanEmail !== 'nt@gmail.com') {
+      setErrorMessage('Adresse email ou mot de passe incorrect.');
       setIsLoading(false);
-    }, 400);
+      return;
+    }
+
+    try {
+      await authService.login({
+        login: cleanEmail,
+        password: cleanPassword,
+      });
+
+      localStorage.setItem('sen_event_gate_unlocked', 'true');
+      sessionStorage.setItem('sen_event_gate_unlocked', 'true');
+      localStorage.setItem('sunu_events_auth', 'true');
+      setIsUnlocked(true);
+    } catch (err: unknown) {
+      const message = (err as Error)?.message || 'Adresse email ou mot de passe incorrect.';
+      setErrorMessage(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isUnlocked) {
