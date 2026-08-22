@@ -49,8 +49,40 @@ function normalizeEvent(raw: any): EventItem {
       }))
     : [];
 
-  const poster = raw.poster_url || raw.posterUrl || raw.image || null;
-  const ambient = raw.ambient_color || raw.ambientColor || '#1E1B4B';
+  // Check poster: if poster_url is null or empty or if image is the generic placeholder
+  let poster: string | null = null;
+  if (raw.poster_url && typeof raw.poster_url === 'string' && raw.poster_url.trim().length > 0) {
+    poster = raw.poster_url.trim();
+  } else if (raw.posterUrl && typeof raw.posterUrl === 'string' && raw.posterUrl.trim().length > 0) {
+    poster = raw.posterUrl.trim();
+  } else if (
+    raw.image &&
+    typeof raw.image === 'string' &&
+    raw.poster_url !== null &&
+    !raw.image.includes('photo-1516450360452-9312f5e86fc7') &&
+    !raw.image.includes('placeholder')
+  ) {
+    poster = raw.image;
+  }
+
+  const defaultCategoryColors: Record<string, string> = {
+    sport: '#C9498E',
+    match: '#C9498E',
+    concert: '#4F46E5',
+    festival: '#EA580C',
+    theatre: '#9333EA',
+    formation: '#2563EB',
+    conference: '#0891B2',
+    soiree: '#D97706',
+    humour: '#E11D48',
+  };
+
+  const ambient =
+    raw.ambient_color ||
+    raw.ambientColor ||
+    defaultCategoryColors[rawType] ||
+    defaultCategoryColors[categoryKey] ||
+    '#1E1B4B';
 
   return {
     id: String(raw.id),
