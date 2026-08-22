@@ -48,6 +48,14 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
     }
   };
 
+  // Filtrage strict : même catégorie obligatoire et exclusion de l'événement courant
+  const trueSimilarEvents = (similarEvents || []).filter(
+    (e) =>
+      String(e.id) !== String(event.id) &&
+      e.slug !== event.slug &&
+      e.category === event.category
+  );
+
   return (
     <div className="w-full bg-white pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,10 +80,12 @@ export const EventDetailPage: React.FC<EventDetailPageProps> = ({
               <>
                 <EventAboutSection event={event} />
                 <EventLocationMap event={event} />
-                <SimilarEventsSection
-                  events={similarEvents}
-                  onSelectEvent={onSelectEvent}
-                />
+                {trueSimilarEvents.length > 0 && (
+                  <SimilarEventsSection
+                    events={trueSimilarEvents}
+                    onSelectEvent={onSelectEvent}
+                  />
+                )}
               </>
             )}
 

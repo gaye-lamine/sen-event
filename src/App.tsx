@@ -200,9 +200,7 @@ export const AppContent: React.FC = () => {
     }
   };
 
-  const similarEvents = allEvents.filter(
-    (e) => !selectedEvent || e.id !== selectedEvent.id
-  );
+  const similarEvents = allEvents;
 
   // 1. Vue Onboarding
   if (currentView === 'onboarding') {
