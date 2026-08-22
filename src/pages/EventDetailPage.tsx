@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { EventTabType, EventDetailPageProps } from '../types';
+import React, { useState, useEffect } from 'react';
+import { EventTabType, EventDetailPageProps, EventItem } from '../types';
 import { EventBreadcrumb } from '../components/event-detail/EventBreadcrumb';
 import { EventHeroBanner } from '../components/event-detail/EventHeroBanner';
 import { EventTabs } from '../components/event-detail/EventTabs';
@@ -8,21 +8,38 @@ import { EventLocationMap } from '../components/event-detail/EventLocationMap';
 import { SimilarEventsSection } from '../components/event-detail/SimilarEventsSection';
 import { TicketSelectionCard } from '../components/event-detail/TicketSelectionCard';
 import { EventFaqSection } from '../components/event-detail/EventFaqSection';
+import { eventService } from '../services/api/eventService';
 
 /**
  * @page EventDetailPage
  * @description Page de détail complète d'un événement orchestrant le fil d'Ariane,
- * la bannière immersive dorée, les onglets de contenu et la réservation latérale.
- * @param {EventDetailPageProps} props - Contrat de propriétés du composant
+ * la bannière immersive, les onglets de contenu et la réservation latérale.
  */
 export const EventDetailPage: React.FC<EventDetailPageProps> = ({
-  event,
+  event: initialEvent,
   similarEvents,
   onNavigateHome,
   onSelectEvent,
   onProceedToCheckout,
 }) => {
+  const [event, setEvent] = useState<EventItem>(initialEvent);
   const [activeTab, setActiveTab] = useState<EventTabType>('overview');
+
+  useEffect(() => {
+    setEvent(initialEvent);
+    const loadFreshEvent = async () => {
+      try {
+        const targetId = initialEvent.slug || initialEvent.id;
+        const fresh = await eventService.getEventById(targetId);
+        if (fresh) {
+          setEvent(fresh);
+        }
+      } catch (err) {
+        console.error('Erreur chargement détail événement:', err);
+      }
+    };
+    loadFreshEvent();
+  }, [initialEvent.id, initialEvent.slug]);
 
   const scrollToTickets = () => {
     const el = document.getElementById('ticket-selection-card');

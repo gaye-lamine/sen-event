@@ -26,9 +26,7 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
     }
   };
 
-  const hasAttendees = Boolean(event.attendeesCount && event.attendeesCount > 0);
-  const hasRating = Boolean(event.rating && event.rating > 0);
-  const showStats = hasAttendees || hasRating;
+  const count = Number(event.attendeesCount ?? 0);
 
   // Évite les doublons de date/heure si la date contient déjà l'heure
   const displayDate = event.date?.includes('•') || !event.time
@@ -135,28 +133,24 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
         </div>
       </div>
 
-      {/* Statistiques sous la bannière (affichées strictement si > 0) */}
-      {showStats ? (
-        <div className="flex items-center justify-center gap-8 py-5 text-xs sm:text-sm text-gray-500 font-medium">
-          {hasAttendees && (
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-gray-400" />
-              <span>
-                <strong className="text-gray-900 font-bold">{formatNumber(event.attendeesCount!)}</strong> {event.attendeesCount === 1 ? 'participant' : 'participants'}
-              </span>
-            </div>
-          )}
-          {hasRating && (
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-              <span>
-                <strong className="text-gray-900 font-bold">{formatRating(event.rating!)}</strong>
-                {event.reviewsCount ? <span className="text-gray-400 ml-1">({event.reviewsCount} avis)</span> : null}
-              </span>
-            </div>
-          )}
+      {/* Statistiques sous la bannière (conforme maquette) */}
+      <div className="flex items-center justify-center gap-8 py-5 text-xs sm:text-sm text-gray-500 font-medium">
+        <div className="flex items-center gap-2">
+          <Users className="w-4 h-4 text-gray-400" />
+          <span>
+            <strong className="text-gray-900 font-bold">{formatNumber(count)}</strong> {count > 1 ? 'participants' : 'participant'}
+          </span>
         </div>
-      ) : null}
+        {Boolean(event.rating && event.rating > 0) && (
+          <div className="flex items-center gap-2">
+            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+            <span>
+              <strong className="text-gray-900 font-bold">{formatRating(event.rating!)}</strong>
+              {event.reviewsCount ? <span className="text-gray-400 ml-1">({event.reviewsCount} avis)</span> : null}
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
