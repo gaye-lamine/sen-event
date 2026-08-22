@@ -38,15 +38,26 @@ function normalizeEvent(raw: any): EventItem {
 
   const rawTiers = raw.ticket_types || raw.ticketTiers || [];
   const ticketTiers: TicketTier[] = Array.isArray(rawTiers)
-    ? rawTiers.map((t: any, idx: number) => ({
-        id: String(t.id || idx + 1),
-        name: t.name || `Palier ${idx + 1}`,
-        price: Number(t.price || 0),
-        description: t.description || '',
-        available: (t.quantity_available ?? t.quantityAvailable ?? 1) > 0,
-        remainingCount: t.quantity_available ?? t.quantityAvailable ?? 0,
-        isSoldOut: (t.quantity_available ?? t.quantityAvailable ?? 0) <= 0,
-      }))
+    ? rawTiers.map((t: any, idx: number) => {
+        const rawAvail =
+          t.quantity_available !== undefined && t.quantity_available !== null
+            ? Number(t.quantity_available)
+            : t.quantityAvailable !== undefined && t.quantityAvailable !== null
+            ? Number(t.quantityAvailable)
+            : undefined;
+
+        const isSoldOut = rawAvail !== undefined ? rawAvail <= 0 : false;
+
+        return {
+          id: String(t.id || idx + 1),
+          name: t.name || `Palier ${idx + 1}`,
+          price: Number(t.price || 0),
+          description: t.description || '',
+          available: !isSoldOut,
+          remainingCount: rawAvail,
+          isSoldOut,
+        };
+      })
     : [];
 
   // Check poster: if poster_url is null or empty or if image is the generic placeholder
