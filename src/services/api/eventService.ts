@@ -208,19 +208,9 @@ export class EventService {
       if (res && Array.isArray((res as { data?: any[] }).data)) {
         return (res as { data: any[] }).data.map(normalizeEvent);
       }
-      const matches = MOCK_EVENTS.filter(
-        (e) => !e.isFeatured && e.dateCategory?.includes(filter)
-      );
-      return matches.length > 0
-        ? matches.slice(0, 4)
-        : MOCK_EVENTS.filter((e) => !e.isFeatured).slice(0, 4);
+      return [];
     } catch {
-      const matches = MOCK_EVENTS.filter(
-        (e) => !e.isFeatured && e.dateCategory?.includes(filter)
-      );
-      return matches.length > 0
-        ? matches.slice(0, 4)
-        : MOCK_EVENTS.filter((e) => !e.isFeatured).slice(0, 4);
+      return [];
     }
   }
 
@@ -230,74 +220,93 @@ export class EventService {
   public async getAllEvents(
     params: FilterParams = {},
     page = 1,
-    limit = 8
+    limit = 12
   ): Promise<PaginatedResponse<EventItem>> {
     try {
+      const searchTerm = (params.query || params.search || '').trim();
+      let mappedType: string | undefined = undefined;
+
+      if (params.category && params.category !== 'all') {
+        if (params.category === 'sport') {
+          mappedType = 'match';
+        } else {
+          mappedType = params.category;
+        }
+      }
+
+      const queryParams: Record<string, any> = {
+        page,
+        limit,
+        per_page: limit,
+      };
+
+      if (searchTerm) {
+        queryParams.search = searchTerm;
+        queryParams.q = searchTerm;
+      }
+      if (mappedType) {
+        queryParams.type = mappedType;
+        queryParams.category = mappedType;
+      }
+
       const res = await apiClient.get<
         PaginatedResponse<any> | { success?: boolean; data?: any[] | { data?: any[]; total?: number } }
-      >('/events', {
-        params: {
-          category: params.category,
-          dateFilter: params.dateFilter,
-          query: params.query,
-          page,
-          limit,
-        },
-      });
+      >('/events', { params: queryParams });
+
+      let rawList: any[] = [];
+      let totalCount = 0;
+      let hasMore = false;
 
       if (res && 'data' in res && Array.isArray((res as PaginatedResponse<any>).data)) {
-        const rawList = (res as PaginatedResponse<any>).data;
-        return {
-          ...(res as PaginatedResponse<any>),
-          data: rawList.map(normalizeEvent),
-        };
+        rawList = (res as PaginatedResponse<any>).data;
+        totalCount = (res as any).total ?? rawList.length;
+        hasMore = (res as any).hasMore !== undefined
+          ? Boolean((res as any).hasMore)
+          : (res as any).meta?.current_page < (res as any).meta?.last_page
+          ? true
+          : totalCount > page * limit;
+      } else if (res && 'data' in res && (res as { data?: { data?: any[] } }).data?.data) {
+        const inner = (res as { data: { data: any[]; total?: number; current_page?: number; last_page?: number } }).data;
+        rawList = inner.data;
+        totalCount = inner.total ?? rawList.length;
+        hasMore = Boolean(inner.last_page ? (inner.current_page ?? 1) < inner.last_page : totalCount > page * limit);
       }
 
-      if (res && 'data' in res && (res as { data?: { data?: any[] } }).data?.data) {
-        const inner = (res as { data: { data: any[]; total?: number; current_page?: number } }).data;
-        return {
-          data: inner.data.map(normalizeEvent),
-          total: inner.total || inner.data.length,
-          page: inner.current_page || page,
-          limit,
-          hasMore: (inner.total || 0) > page * limit,
-        };
+      let normalized = rawList.map(normalizeEvent);
+
+      // Filtrage de cohérence côté client
+      if (mappedType) {
+        normalized = normalized.filter((e) =>
+          e.category === params.category ||
+          (params.category === 'sport' && (e.category === 'sport' || (e as any).type === 'match'))
+        );
+      }
+      if (searchTerm) {
+        const q = searchTerm.toLowerCase();
+        normalized = normalized.filter((e) =>
+          e.title.toLowerCase().includes(q) ||
+          e.subtitle?.toLowerCase().includes(q) ||
+          e.location.toLowerCase().includes(q) ||
+          e.city.toLowerCase().includes(q) ||
+          e.description?.toLowerCase().includes(q)
+        );
       }
 
-      let results = [...MOCK_EVENTS];
-      if (params.category && params.category !== 'all') {
-        results = results.filter((e) => e.category === params.category);
-      }
       return {
-        data: results.slice(0, limit),
-        total: results.length,
+        data: normalized,
+        total: totalCount || normalized.length,
+        page,
+        limit,
+        hasMore,
+      };
+    } catch (err) {
+      console.error('Erreur getAllEvents:', err);
+      return {
+        data: [],
+        total: 0,
         page,
         limit,
         hasMore: false,
-      };
-    } catch {
-      let results = [...MOCK_EVENTS];
-      if (params.category && params.category !== 'all') {
-        results = results.filter((e) => e.category === params.category);
-      }
-      if (params.query && params.query.trim()) {
-        const q = params.query.toLowerCase().trim();
-        results = results.filter(
-          (e) =>
-            e.title.toLowerCase().includes(q) ||
-            e.subtitle?.toLowerCase().includes(q) ||
-            e.location.toLowerCase().includes(q)
-        );
-      }
-      const startIndex = (page - 1) * limit;
-      const pagedData = results.slice(0, startIndex + limit);
-
-      return {
-        data: pagedData,
-        total: results.length,
-        page,
-        limit,
-        hasMore: pagedData.length < results.length,
       };
     }
   }

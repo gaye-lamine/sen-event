@@ -76,6 +76,7 @@ export interface FilterParams {
   category?: EventCategory;
   dateFilter?: DateFilterType;
   query?: string;
+  search?: string;
   city?: string;
   page?: number;
   limit?: number;
