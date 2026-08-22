@@ -10,10 +10,7 @@ export const ProtectedAccessGate: React.FC<ProtectedAccessGateProps> = ({ childr
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
     const isLocalUnlocked = localStorage.getItem('sen_event_gate_unlocked') === 'true';
     const isSessionUnlocked = sessionStorage.getItem('sen_event_gate_unlocked') === 'true';
-    const currentUser = authService.getCurrentUser();
-    const isNtUser = currentUser?.email?.toLowerCase() === 'nt@gmail.com';
-
-    return (isLocalUnlocked || isSessionUnlocked) && isNtUser;
+    return isLocalUnlocked || isSessionUnlocked;
   });
 
   const [email, setEmail] = useState('');
@@ -30,17 +27,21 @@ export const ProtectedAccessGate: React.FC<ProtectedAccessGateProps> = ({ childr
     const cleanEmail = email.trim().toLowerCase();
     const cleanPassword = password.trim();
 
-    if (cleanEmail !== 'nt@gmail.com') {
-      setErrorMessage('Adresse email ou mot de passe incorrect.');
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      await authService.login({
+      const response = await authService.login({
         login: cleanEmail,
         password: cleanPassword,
       });
+
+      const user = response.data?.user;
+      const accessToken = response.data?.access_token;
+
+      // Si le rôle est organisateur, SSO immédiat vers le Back-Office !
+      if (user?.role === 'organizer') {
+        const handoff = await authService.createHandoff(accessToken);
+        authService.redirectToBackOfficeSso(handoff.handoff_token);
+        return;
+      }
 
       localStorage.setItem('sen_event_gate_unlocked', 'true');
       sessionStorage.setItem('sen_event_gate_unlocked', 'true');
