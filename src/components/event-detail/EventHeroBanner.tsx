@@ -142,7 +142,7 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-gray-400" />
               <span>
-                <strong className="text-gray-900 font-bold">{formatNumber(event.attendeesCount!)}</strong> intéressés
+                <strong className="text-gray-900 font-bold">{formatNumber(event.attendeesCount!)}</strong> {event.attendeesCount === 1 ? 'participant' : 'participants'}
               </span>
             </div>
           )}

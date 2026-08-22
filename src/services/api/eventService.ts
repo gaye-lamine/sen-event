@@ -96,6 +96,27 @@ function normalizeEvent(raw: any): EventItem {
     '#1E1B4B';
 
 
+  // Calcul dynamique réel du nombre de participants / billets vendus depuis la base de données
+  const totalSold = Array.isArray(rawTiers)
+    ? rawTiers.reduce((acc: number, t: any) => {
+        const total = Number(t.quantity_total ?? t.quantityTotal ?? 0);
+        const avail = Number(t.quantity_available ?? t.availableQuantity ?? t.quantityAvailable ?? total);
+        const sold = t.quantity_sold !== undefined ? Number(t.quantity_sold) : Math.max(0, total - avail);
+        return acc + sold;
+      }, 0)
+    : 0;
+
+  const attendeesCount =
+    raw.attendees_count !== undefined && raw.attendees_count !== null
+      ? Number(raw.attendees_count)
+      : raw.attendeesCount !== undefined && raw.attendeesCount !== null
+      ? Number(raw.attendeesCount)
+      : raw.total_sold !== undefined && raw.total_sold !== null
+      ? Number(raw.total_sold)
+      : raw.totalSold !== undefined && raw.totalSold !== null
+      ? Number(raw.totalSold)
+      : totalSold;
+
   return {
     id: String(raw.id),
     slug: raw.slug || String(raw.id),
@@ -116,7 +137,8 @@ function normalizeEvent(raw: any): EventItem {
     startingPrice: Number(raw.starting_price ?? raw.startingPrice ?? (ticketTiers[0]?.price ?? 0)),
     currency: raw.currency ?? 'XOF',
     isFeatured: Boolean(raw.is_featured ?? raw.isFeatured),
-    attendeesCount: raw.attendees_count ?? raw.attendeesCount ?? undefined,
+    isSoldOut: Boolean(raw.is_sold_out ?? raw.isSoldOut),
+    attendeesCount,
     rating: raw.rating ?? undefined,
     reviewsCount: raw.reviews_count ?? raw.reviewsCount ?? undefined,
     organizer: raw.organizer
