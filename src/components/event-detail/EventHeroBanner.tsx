@@ -117,24 +117,39 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
               )}
             </div>
 
-            {(formattedAttendees || rating) && (
-              <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-white/80">
-                {formattedAttendees && (
-                  <div className="flex items-center gap-1.5 bg-black/15 px-3 py-1.5 rounded-full">
-                    <Users className="w-3.5 h-3.5 text-amber-300" />
-                    <span>{formattedAttendees} participants</span>
-                  </div>
-                )}
+            {/* Badges métadonnées réelles */}
+            <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-white/90">
+              {/* Badge Organisateur réel */}
+              {event.organizer?.name && (
+                <div className="flex items-center gap-1.5 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                  <span className="text-white/70">Par :</span>
+                  <span className="font-bold text-white">{event.organizer.name}</span>
+                </div>
+              )}
 
-                {rating && (
-                  <div className="flex items-center gap-1.5 bg-black/15 px-3 py-1.5 rounded-full">
-                    <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-                    <span className="font-bold text-white">{rating}</span>
-                    {reviewsCount && <span className="text-white/60">({reviewsCount} avis)</span>}
-                  </div>
-                )}
+              {/* Badge Participants réels */}
+              <div className="flex items-center gap-1.5 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                <Users className="w-3.5 h-3.5 text-amber-300" />
+                <span>
+                  <strong className="text-white font-bold">{event.attendeesCount ?? 0}</strong> {(event.attendeesCount ?? 0) > 1 ? 'participants' : 'participant'}
+                </span>
               </div>
-            )}
+
+              {/* Badge Billetterie / Statut */}
+              <div className="flex items-center gap-1.5 bg-emerald-500/25 backdrop-blur-md px-3 py-1.5 rounded-full border border-emerald-400/30 text-emerald-200">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-semibold text-white">Billetterie ouverte</span>
+              </div>
+
+              {/* Note / Avis si disponibles */}
+              {rating && (
+                <div className="flex items-center gap-1.5 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                  <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                  <span className="font-bold text-white">{rating}</span>
+                  {reviewsCount && <span className="text-white/60">({reviewsCount} avis)</span>}
+                </div>
+              )}
+            </div>
 
             <div className="mt-6 flex flex-wrap items-center gap-4">
               <button
