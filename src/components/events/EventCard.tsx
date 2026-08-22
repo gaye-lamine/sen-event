@@ -42,13 +42,33 @@ export const EventCard: React.FC<EventCardProps> = ({
       onClick={handleCardClick}
       className="group cursor-pointer flex flex-col bg-white rounded-2xl sm:rounded-3xl p-1 sm:p-1.5 border border-transparent hover:border-[#FFC23C9C] hover:shadow-xl hover:shadow-[#FFC23C]/10 transition-all duration-300 hover:-translate-y-1.5 overflow-hidden"
     >
-      <div className="relative w-full aspect-[3/4] sm:aspect-[4/5] overflow-hidden rounded-2xl bg-gray-100 border border-transparent group-hover:border-[#FFC23C9C] transition-colors duration-300">
-        <img
-          src={event.image}
-          alt={event.title}
-          loading="lazy"
-          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
-        />
+      <div
+        className="relative w-full aspect-[3/4] sm:aspect-[4/5] overflow-hidden rounded-2xl bg-gray-100 border border-transparent group-hover:border-[#FFC23C9C] transition-colors duration-300 flex items-center justify-center"
+        style={{
+          background: event.image || event.posterUrl ? undefined : (event.ambientColor || 'linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%)'),
+        }}
+      >
+        {event.image || event.posterUrl ? (
+          <img
+            src={event.posterUrl || event.image || ''}
+            alt={event.title}
+            loading="lazy"
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+          />
+        ) : (
+          <div className="w-full h-full p-5 flex flex-col items-center justify-center text-center text-white relative overflow-hidden group-hover:scale-105 transition-transform duration-500">
+            <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+            <div className="w-14 h-14 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center shadow-lg mb-3 z-10 border border-white/20">
+              <IconHelper
+                name={event.categoryIcon || event.category}
+                className="w-7 h-7 text-white"
+              />
+            </div>
+            <span className="font-extrabold text-sm sm:text-base leading-snug line-clamp-2 z-10 uppercase tracking-tight">
+              {event.title}
+            </span>
+          </div>
+        )}
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/30 pointer-events-none" />
 

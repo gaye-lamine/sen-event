@@ -30,11 +30,20 @@ export const OrderSummaryCard: React.FC<OrderSummaryCardProps> = ({
   return (
     <div className="relative bg-white rounded-3xl sm:rounded-[32px] border border-gray-100/90 shadow-sm p-6 sm:p-7 text-left overflow-hidden">
       <div className="flex items-start gap-3.5 pb-5 border-b border-gray-100">
-        <img
-          src={event.image}
-          alt={event.title}
-          className="w-12 h-12 rounded-xl object-cover flex-shrink-0 shadow-xs border border-gray-100"
-        />
+        {event.image || event.posterUrl ? (
+          <img
+            src={event.posterUrl || event.image || ''}
+            alt={event.title}
+            className="w-12 h-12 rounded-xl object-cover flex-shrink-0 shadow-xs border border-gray-100"
+          />
+        ) : (
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-[10px] font-bold p-1 text-center flex-shrink-0"
+            style={{ background: event.ambientColor || '#1E1B4B' }}
+          >
+            <span className="line-clamp-2">{event.title}</span>
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <h3 className="font-extrabold text-sm text-gray-900 truncate leading-snug">
             {event.title}

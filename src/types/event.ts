@@ -43,7 +43,9 @@ export interface EventItem {
   category: EventCategory;
   categoryLabel: string;
   categoryIcon?: string;
-  image: string;
+  image?: string | null;
+  posterUrl?: string | null;
+  ambientColor?: string | null;
   location: string;
   venue: string;
   city: string;

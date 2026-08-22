@@ -56,12 +56,31 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-6 sm:gap-8 lg:gap-10">
           <div className="w-40 sm:w-48 md:w-56 lg:w-60 flex-shrink-0 mx-auto md:mx-0">
-            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/20 transform -rotate-1 hover:rotate-0 transition-transform duration-300">
-              <img
-                src={event.image}
-                alt={event.title}
-                className="w-full h-full object-cover object-center"
-              />
+            <div
+              className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/20 transform -rotate-1 hover:rotate-0 transition-transform duration-300 flex items-center justify-center"
+              style={{
+                background: event.image || event.posterUrl ? undefined : (event.ambientColor || 'linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%)'),
+              }}
+            >
+              {event.image || event.posterUrl ? (
+                <img
+                  src={event.posterUrl || event.image || ''}
+                  alt={event.title}
+                  className="w-full h-full object-cover object-center"
+                />
+              ) : (
+                <div className="w-full h-full p-4 flex flex-col items-center justify-center text-center text-white relative">
+                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg mb-2 border border-white/20">
+                    <IconHelper
+                      name={event.categoryIcon || event.category}
+                      className="w-7 h-7 text-white"
+                    />
+                  </div>
+                  <span className="font-extrabold text-xs sm:text-sm uppercase tracking-tight line-clamp-2">
+                    {event.title}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 

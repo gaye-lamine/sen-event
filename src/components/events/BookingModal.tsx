@@ -3,6 +3,7 @@ import { X, Calendar, MapPin, CheckCircle, ShieldCheck, Ticket, QrCode } from 'l
 import confetti from 'canvas-confetti';
 import { TicketTier, BookingConfirmation, BookingModalProps } from '../../types';
 import { eventService } from '../../services/api/eventService';
+import { IconHelper } from '../common/IconHelper';
 
 export const BookingModal: React.FC<BookingModalProps> = ({
   event,
@@ -158,13 +159,29 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             {/* ------------------------------------------------------------- */}
             {/* 1. DÉTAIL VISUEL DE L'ÉVÉNEMENT (IMAGE, TITRE, LIEU, DATE)    */}
             {/* ------------------------------------------------------------- */}
-            <div className="relative h-44 sm:h-52 bg-gray-100">
-              <img
-                src={event.image}
-                alt={event.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            <div
+              className="relative h-44 sm:h-52 bg-gray-100 flex items-center justify-center"
+              style={{
+                background: event.image || event.posterUrl ? undefined : (event.ambientColor || 'linear-gradient(135deg, #1E1B4B 0%, #0F172A 100%)'),
+              }}
+            >
+              {event.image || event.posterUrl ? (
+                <img
+                  src={event.posterUrl || event.image || ''}
+                  alt={event.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full p-4 flex flex-col items-center justify-center text-center text-white relative">
+                  <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg mb-2">
+                    <IconHelper
+                      name={event.categoryIcon || event.category}
+                      className="w-6 h-6 text-white"
+                    />
+                  </div>
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
               
               <div className="absolute bottom-4 left-4 right-4 text-white">
                 <span className="inline-block px-2.5 py-0.5 bg-amber-400 text-gray-950 font-bold text-[10px] uppercase rounded-full mb-1.5">

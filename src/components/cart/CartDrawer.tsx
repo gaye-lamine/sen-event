@@ -56,11 +56,20 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 key={`${item.event.id}-${item.tierName}-${idx}`}
                 className="flex gap-3 p-3 bg-gray-50 rounded-2xl border border-gray-100 relative group"
               >
-                <img
-                  src={item.event.image}
-                  alt={item.event.title}
-                  className="w-16 h-16 rounded-xl object-cover"
-                />
+                {item.event.image || item.event.posterUrl ? (
+                  <img
+                    src={item.event.posterUrl || item.event.image || ''}
+                    alt={item.event.title}
+                    className="w-16 h-16 rounded-xl object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-16 h-16 rounded-xl flex items-center justify-center text-white text-xs font-bold p-1 text-center"
+                    style={{ background: item.event.ambientColor || '#1E1B4B' }}
+                  >
+                    <span className="line-clamp-2">{item.event.title}</span>
+                  </div>
+                )}
                 <div className="flex-1 min-w-0">
                   <h4 className="font-bold text-xs text-gray-900 truncate">
                     {item.event.title}
