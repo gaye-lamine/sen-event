@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { Calendar, MapPin, Heart, ArrowRight, Users, Star } from 'lucide-react';
 import { EventHeroBannerProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
-import { formatNumber, formatRating, formatPrice } from '../../utils';
+import { formatNumber, formatRating } from '../../utils';
 import { dashboardService } from '../../services/api/dashboardService';
 
 /**
  * @component EventHeroBanner
- * @description Grande bannière dorée de la page détail d'un événement avec affiche 3D inclinée,
- * métadonnées d'audience, note moyenne et bouton d'action vers les billets.
- * @param {EventHeroBannerProps} props - Contrat de propriétés du composant
+ * @description Grande bannière immersive de la page détail d'un événement avec affiche 3D inclinée,
+ * métadonnées d'événement et bouton d'achat de billet conforme à la maquette.
  */
 export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
   event,
@@ -27,18 +26,14 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
     }
   };
 
-  const formattedAttendees = event.attendeesCount ? formatNumber(event.attendeesCount) : null;
-  const rating = event.rating ? formatRating(event.rating) : null;
-  const reviewsCount = event.reviewsCount || null;
-
   return (
     <div className="w-full">
       <div
-        className="relative overflow-hidden rounded-3xl lg:rounded-[32px] bg-gradient-to-br from-[#BE8423] via-[#C68D2B] to-[#996515] p-6 sm:p-8 lg:p-10 text-white shadow-xl shadow-amber-900/10"
+        className="relative overflow-hidden rounded-3xl lg:rounded-[32px] p-6 sm:p-8 lg:p-10 text-white shadow-xl shadow-amber-900/10"
         style={{
           background: event.ambientColor
             ? `linear-gradient(135deg, ${event.ambientColor} 0%, #12142B 100%)`
-            : undefined,
+            : 'linear-gradient(135deg, #C68D2B 0%, #996515 100%)',
         }}
       >
         <div
@@ -117,59 +112,42 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
               )}
             </div>
 
-            {/* Badges métadonnées réelles */}
-            <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-white/90">
-              {/* Badge Organisateur réel */}
-              {event.organizer?.name && (
-                <div className="flex items-center gap-1.5 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-                  <span className="text-white/70">Par :</span>
-                  <span className="font-bold text-white">{event.organizer.name}</span>
-                </div>
-              )}
-
-              {/* Badge Participants réels */}
-              <div className="flex items-center gap-1.5 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-                <Users className="w-3.5 h-3.5 text-amber-300" />
-                <span>
-                  <strong className="text-white font-bold">{event.attendeesCount ?? 0}</strong> {(event.attendeesCount ?? 0) > 1 ? 'participants' : 'participant'}
-                </span>
-              </div>
-
-              {/* Badge Billetterie / Statut */}
-              <div className="flex items-center gap-1.5 bg-emerald-500/25 backdrop-blur-md px-3 py-1.5 rounded-full border border-emerald-400/30 text-emerald-200">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-semibold text-white">Billetterie ouverte</span>
-              </div>
-
-              {/* Note / Avis si disponibles */}
-              {rating && (
-                <div className="flex items-center gap-1.5 bg-black/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-                  <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-                  <span className="font-bold text-white">{rating}</span>
-                  {reviewsCount && <span className="text-white/60">({reviewsCount} avis)</span>}
-                </div>
-              )}
-            </div>
-
-            <div className="mt-6 flex flex-wrap items-center gap-4">
+            <div className="mt-6">
               <button
                 onClick={onScrollToTickets}
                 type="button"
-                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 bg-white text-gray-950 text-xs sm:text-sm font-bold rounded-full hover:bg-amber-50 active:scale-95 transition-all shadow-lg cursor-pointer"
+                className="inline-flex items-center gap-2 px-7 py-3 bg-[#0F141C] hover:bg-black text-white text-xs sm:text-sm font-bold rounded-full active:scale-95 transition-all shadow-lg cursor-pointer"
               >
-                <span>Voir les billets</span>
+                <span>Acheter mon billet</span>
                 <ArrowRight className="w-4 h-4 stroke-[2.5]" />
               </button>
-
-              {event.startingPrice > 0 && (
-                <span className="text-xs sm:text-sm font-semibold text-white/90 bg-white/15 backdrop-blur-md px-4 py-2.5 rounded-full">
-                  À partir de <strong className="font-black text-white">{formatPrice(event.startingPrice, event.currency)}</strong>
-                </span>
-              )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Statistiques sous la bannière (affichées seulement si présentes) */}
+      {(event.attendeesCount || event.rating) && (
+        <div className="flex items-center justify-center gap-8 py-5 text-xs sm:text-sm text-gray-500 font-medium">
+          {event.attendeesCount && (
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-gray-400" />
+              <span>
+                <strong className="text-gray-900 font-bold">{formatNumber(event.attendeesCount)}</strong> intéressés
+              </span>
+            </div>
+          )}
+          {event.rating && (
+            <div className="flex items-center gap-2">
+              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+              <span>
+                <strong className="text-gray-900 font-bold">{formatRating(event.rating)}</strong>
+                {event.reviewsCount && <span className="text-gray-400 ml-1">({event.reviewsCount} avis)</span>}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
