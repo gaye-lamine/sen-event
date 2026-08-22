@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Calendar, MapPin, Heart, ArrowRight, Users, Star } from 'lucide-react';
 import { EventHeroBannerProps } from '../../types';
 import { IconHelper } from '../common/IconHelper';
-import { formatNumber, formatRating } from '../../utils';
+import { formatNumber, formatRating, formatPrice } from '../../utils';
 import { dashboardService } from '../../services/api/dashboardService';
 
 /**
@@ -27,15 +27,20 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
     }
   };
 
-  const formattedAttendees = event.attendeesCount
-    ? formatNumber(event.attendeesCount)
-    : '2 480';
-  const rating = event.rating ? formatRating(event.rating) : '4,8';
-  const reviewsCount = event.reviewsCount || 320;
+  const formattedAttendees = event.attendeesCount ? formatNumber(event.attendeesCount) : null;
+  const rating = event.rating ? formatRating(event.rating) : null;
+  const reviewsCount = event.reviewsCount || null;
 
   return (
     <div className="w-full">
-      <div className="relative overflow-hidden rounded-3xl lg:rounded-[32px] bg-gradient-to-br from-[#BE8423] via-[#C68D2B] to-[#996515] p-6 sm:p-8 lg:p-10 text-white shadow-xl shadow-amber-900/10">
+      <div
+        className="relative overflow-hidden rounded-3xl lg:rounded-[32px] bg-gradient-to-br from-[#BE8423] via-[#C68D2B] to-[#996515] p-6 sm:p-8 lg:p-10 text-white shadow-xl shadow-amber-900/10"
+        style={{
+          background: event.ambientColor
+            ? `linear-gradient(135deg, ${event.ambientColor} 0%, #12142B 100%)`
+            : undefined,
+        }}
+      >
         <div
           className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none"
           aria-hidden="true"
@@ -98,30 +103,40 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
             </h1>
 
             <div className="mt-4 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs sm:text-sm text-white/90">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-white/80" />
-                <span>{event.date}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-white/80" />
-                <span>{event.location}</span>
-              </div>
+              {event.date && (
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-white/80" />
+                  <span>{event.date} {event.time ? `• ${event.time}` : ''}</span>
+                </div>
+              )}
+              {event.location && (
+                <div className="flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4 text-white/80" />
+                  <span>{event.location}</span>
+                </div>
+              )}
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-white/80">
-              <div className="flex items-center gap-1.5 bg-black/15 px-3 py-1.5 rounded-full">
-                <Users className="w-3.5 h-3.5 text-amber-300" />
-                <span>{formattedAttendees} participants</span>
-              </div>
+            {(formattedAttendees || rating) && (
+              <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-white/80">
+                {formattedAttendees && (
+                  <div className="flex items-center gap-1.5 bg-black/15 px-3 py-1.5 rounded-full">
+                    <Users className="w-3.5 h-3.5 text-amber-300" />
+                    <span>{formattedAttendees} participants</span>
+                  </div>
+                )}
 
-              <div className="flex items-center gap-1.5 bg-black/15 px-3 py-1.5 rounded-full">
-                <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-                <span className="font-bold text-white">{rating}</span>
-                <span className="text-white/60">({reviewsCount} avis)</span>
+                {rating && (
+                  <div className="flex items-center gap-1.5 bg-black/15 px-3 py-1.5 rounded-full">
+                    <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                    <span className="font-bold text-white">{rating}</span>
+                    {reviewsCount && <span className="text-white/60">({reviewsCount} avis)</span>}
+                  </div>
+                )}
               </div>
-            </div>
+            )}
 
-            <div className="mt-6">
+            <div className="mt-6 flex flex-wrap items-center gap-4">
               <button
                 onClick={onScrollToTickets}
                 type="button"
@@ -130,6 +145,12 @@ export const EventHeroBanner: React.FC<EventHeroBannerProps> = ({
                 <span>Voir les billets</span>
                 <ArrowRight className="w-4 h-4 stroke-[2.5]" />
               </button>
+
+              {event.startingPrice > 0 && (
+                <span className="text-xs sm:text-sm font-semibold text-white/90 bg-white/15 backdrop-blur-md px-4 py-2.5 rounded-full">
+                  À partir de <strong className="font-black text-white">{formatPrice(event.startingPrice, event.currency)}</strong>
+                </span>
+              )}
             </div>
           </div>
         </div>

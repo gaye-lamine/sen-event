@@ -14,36 +14,9 @@ export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
   event,
   onProceedToCheckout,
 }) => {
-  const tiers: TicketTier[] = event.ticketTiers || [
-    {
-      id: 'standard',
-      name: 'Standard',
-      description: 'Accès général, places debout',
-      price: event.startingPrice || 10000,
-      available: true,
-    },
-    {
-      id: 'vip',
-      name: 'VIP',
-      description: 'Zone VIP, boisson offerte + accès rapide',
-      price: 25000,
-      available: true,
-      remainingCount: 42,
-    },
-    {
-      id: 'loge',
-      name: 'Place Réservée',
-      description: 'Premières loges + rencontre backstage',
-      price: 50000,
-      available: false,
-      isSoldOut: true,
-    },
-  ];
+  const tiers: TicketTier[] = event.ticketTiers || [];
 
-  const [quantities, setQuantities] = useState<Record<string, number>>({
-    standard: 2,
-    vip: 1,
-  });
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   const handleUpdateQuantity = (tierId: string, delta: number) => {
     setQuantities((prev) => {
@@ -91,7 +64,12 @@ export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
       </div>
 
       <div className="space-y-3">
-        {tiers.map((tier) => {
+        {tiers.length === 0 ? (
+          <div className="p-5 text-center bg-gray-50 rounded-2xl border border-gray-100 text-xs text-gray-500 font-medium">
+            Aucun palier de billet disponible pour le moment.
+          </div>
+        ) : (
+          tiers.map((tier) => {
           const qty = quantities[tier.id] || 0;
           const isSoldOut = tier.isSoldOut || !tier.available;
 
@@ -161,7 +139,8 @@ export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
               </div>
             </div>
           );
-        })}
+        })
+      )}
       </div>
 
       <div className="pt-2 border-t border-gray-200/80 space-y-2 text-xs">
