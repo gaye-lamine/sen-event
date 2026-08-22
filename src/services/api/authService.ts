@@ -119,6 +119,16 @@ export class AuthService {
    */
   public async login(payload: LoginPayload): Promise<LoginResponse> {
     const response = await apiClient.post<LoginResponse>('/auth/login', payload);
+    const user = response.data?.user;
+
+    // Si le rôle est organisateur, on ne stocke pas de session B2C
+    if (user?.role === 'organizer') {
+      localStorage.removeItem('sen_event_auth_token');
+      localStorage.removeItem('sen_event_user');
+      localStorage.removeItem('sunu_events_auth');
+      return response;
+    }
+
     if (response.data?.access_token) {
       localStorage.setItem('sen_event_auth_token', response.data.access_token);
     }
@@ -131,6 +141,31 @@ export class AuthService {
       localStorage.setItem('sunu_events_auth', 'true');
     }
     return response;
+  }
+
+  /**
+   * Crée un jeton SSO temporaire (handoff token) auprès de l'API Laravel
+   */
+  public async createHandoff(token?: string): Promise<{ handoff_token: string; expires_in: number }> {
+    const jwt = token || localStorage.getItem('sen_event_auth_token') || '';
+    const res = await apiClient.post<{ success: boolean; data: { handoff_token: string; expires_in: number } }>(
+      '/auth/handoff/create',
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      }
+    );
+    return res.data;
+  }
+
+  /**
+   * Redirige immédiatement vers le Back-Office avec le jeton SSO
+   */
+  public redirectToBackOfficeSso(handoffToken: string): void {
+    const backofficeUrl = import.meta.env.VITE_BACKOFFICE_URL || 'https://sunu-event-bo.netlify.app';
+    window.location.href = `${backofficeUrl}/sso?handoff=${encodeURIComponent(handoffToken)}`;
   }
 
   /**

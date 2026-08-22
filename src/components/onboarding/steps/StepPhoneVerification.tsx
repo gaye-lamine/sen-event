@@ -108,10 +108,24 @@ export const StepPhoneVerification: React.FC<StepPhoneVerificationProps> = ({
     setIsVerifying(true);
 
     try {
-      await authService.verifyOtp({
+      const res = await authService.verifyOtp({
         phone: getFormattedPhone(),
         otp_code: code,
       });
+
+      const user = res.data?.user;
+      const accessToken = res.data?.access_token;
+
+      // Si le rôle est organisateur : saute StepPreferences, crée le handoff et redirige vers le Back-Office
+      if (user?.role === 'organizer' || formData.role === 'organizer') {
+        localStorage.removeItem('sen_event_auth_token');
+        localStorage.removeItem('sen_event_user');
+        localStorage.removeItem('sunu_events_auth');
+        const handoff = await authService.createHandoff(accessToken);
+        authService.redirectToBackOfficeSso(handoff.handoff_token);
+        return;
+      }
+
       onNext();
     } catch (err: unknown) {
       const message =

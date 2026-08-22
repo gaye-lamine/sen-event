@@ -55,7 +55,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         password,
       });
 
-      const user = response.data.user;
+      const user = response.data?.user;
+      const accessToken = response.data?.access_token;
+
+      // Redirection SSO immédiate vers le Back-Office si le rôle est organisateur
+      if (user?.role === 'organizer') {
+        const handoff = await authService.createHandoff(accessToken);
+        authService.redirectToBackOfficeSso(handoff.handoff_token);
+        return;
+      }
+
       onLoginSuccess?.({
         email: user.email,
         name: `${user.first_name} ${user.last_name}`.trim() || 'Utilisateur Sunu Events',
