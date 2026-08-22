@@ -92,8 +92,14 @@ export const TicketSelectionCard: React.FC<TicketSelectionCardProps> = ({
                       <h4 className="font-bold text-xs sm:text-sm text-gray-900">
                         {tier.name}
                       </h4>
-                      {Boolean(tier.remainingCount !== undefined && tier.remainingCount > 0 && tier.remainingCount <= 50) && (
-                        <span className="text-[10px] text-amber-700 bg-amber-100 font-bold px-2 py-0.5 rounded-full">
+                      {Boolean(tier.remainingCount !== undefined && tier.remainingCount > 0) && (
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            tier.remainingCount! <= 50
+                              ? 'text-amber-700 bg-amber-100'
+                              : 'text-emerald-700 bg-emerald-100'
+                          }`}
+                        >
                           {tier.remainingCount} RESTANTES
                         </span>
                       )}
