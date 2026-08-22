@@ -84,6 +84,24 @@ function normalizeEvent(raw: any): EventItem {
     defaultCategoryColors[categoryKey] ||
     '#1E1B4B';
 
+  // Calcul dynamique réel du nombre de participants / billets vendus depuis les paliers
+  const totalSoldFromTiers = Array.isArray(rawTiers)
+    ? rawTiers.reduce((acc: number, t: any) => {
+        const total = Number(t.quantity_total ?? t.quantityTotal ?? 0);
+        const avail = Number(t.quantity_available ?? t.quantityAvailable ?? total);
+        return acc + Math.max(0, total - avail);
+      }, 0)
+    : 0;
+
+  const attendeesCount =
+    raw.attendees_count !== undefined && raw.attendees_count !== null
+      ? Number(raw.attendees_count)
+      : raw.attendeesCount !== undefined && raw.attendeesCount !== null
+      ? Number(raw.attendeesCount)
+      : totalSoldFromTiers > 0
+      ? totalSoldFromTiers
+      : undefined;
+
   return {
     id: String(raw.id),
     slug: raw.slug || String(raw.id),
@@ -105,7 +123,7 @@ function normalizeEvent(raw: any): EventItem {
     currency: raw.currency ?? 'XOF',
     isFeatured: Boolean(raw.is_featured ?? raw.isFeatured),
     isSoldOut: Boolean(raw.is_sold_out ?? raw.isSoldOut),
-    attendeesCount: raw.attendees_count ?? raw.attendeesCount ?? undefined,
+    attendeesCount,
     rating: raw.rating ?? undefined,
     reviewsCount: raw.reviews_count ?? raw.reviewsCount ?? undefined,
     organizer: raw.organizer
