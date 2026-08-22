@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EventItem, SelectedTierItem, AppView, AuthMode, OnboardingRole } from './types';
 import { useEvents, useCart } from './hooks';
+import { eventService } from './services/api/eventService';
 import { Navbar } from './components/layout/Navbar';
 import { CategoryPills } from './components/hero/CategoryPills';
 import { HeroSection } from './components/hero/HeroSection';
@@ -18,15 +19,46 @@ import { DashboardPage } from './pages/DashboardPage';
 import { ProtectedAccessGate } from './components/auth/ProtectedAccessGate';
 
 /**
+ * Analyse l'URL courante pour déterminer la vue et les paramètres
+ */
+function parseRouteFromUrl(): { view: AppView; slug?: string } {
+  if (typeof window === 'undefined') return { view: 'home' };
+  const pathname = window.location.pathname.replace(/^\/+|\/+$/g, '');
+
+  if (!pathname || pathname === 'home') {
+    return { view: 'home' };
+  }
+  if (pathname.startsWith('events/') || pathname.startsWith('event/')) {
+    const slug = pathname.replace(/^(events|event)\//, '');
+    return { view: 'event-detail', slug };
+  }
+  if (pathname === 'checkout' || pathname.startsWith('checkout/')) {
+    const slug = pathname.replace(/^checkout\/?/, '');
+    return { view: 'checkout', slug: slug || undefined };
+  }
+  if (pathname === 'dashboard' || pathname === 'vue-d-ensemble' || pathname === 'mon-espace') {
+    return { view: 'dashboard' };
+  }
+  if (pathname === 'login' || pathname === 'connexion') {
+    return { view: 'login' };
+  }
+  if (pathname === 'onboarding') {
+    return { view: 'onboarding' };
+  }
+  return { view: 'home' };
+}
+
+/**
  * @component AppContent
- * @description Contenu principal et orchestrateur d'état de l'application Sunu Events.
+ * @description Contenu principal et orchestrateur d'état et de routage URL de Sunu Events.
  */
 export const AppContent: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem('sunu_events_auth') === 'true';
   });
 
-  const [currentView, setCurrentView] = useState<AppView>('dashboard');
+  const initialRoute = parseRouteFromUrl();
+  const [currentView, setCurrentView] = useState<AppView>(initialRoute.view);
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [selectedCheckoutTiers, setSelectedCheckoutTiers] = useState<SelectedTierItem[]>([]);
   const [authMode, setAuthMode] = useState<AuthMode>('login');
@@ -57,23 +89,54 @@ export const AppContent: React.FC = () => {
     removeItem,
   } = useCart();
 
+  // Chargement direct de l'événement si l'utilisateur arrive directement sur /events/:slug
+  useEffect(() => {
+    const route = parseRouteFromUrl();
+    if (route.view === 'event-detail' && route.slug) {
+      eventService.getEventById(route.slug).then((ev) => {
+        if (ev) setSelectedEvent(ev);
+      });
+    }
+  }, []);
+
+  // Synchronisation avec les boutons Précédent / Suivant du navigateur
+  useEffect(() => {
+    const handlePopState = () => {
+      const route = parseRouteFromUrl();
+      setCurrentView(route.view);
+      if (route.view === 'event-detail' && route.slug) {
+        eventService.getEventById(route.slug).then((ev) => {
+          if (ev) setSelectedEvent(ev);
+        });
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const handleNavigateHome = () => {
+    window.history.pushState({}, '', '/');
     setCurrentView('home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleOpenDashboard = () => {
+    window.history.pushState({}, '', '/dashboard');
     setCurrentView('dashboard');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleOpenAuth = (mode: AuthMode = 'login') => {
     setAuthMode(mode);
+    window.history.pushState({}, '', '/login');
     setCurrentView('login');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleOpenOnboarding = () => {
+    window.history.pushState({}, '', '/onboarding');
     setCurrentView('onboarding');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -81,6 +144,7 @@ export const AppContent: React.FC = () => {
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
     localStorage.setItem('sunu_events_auth', 'true');
+    window.history.pushState({}, '', '/dashboard');
     setCurrentView('dashboard');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -89,6 +153,7 @@ export const AppContent: React.FC = () => {
     setIsAuthenticated(true);
     localStorage.setItem('sunu_events_auth', 'true');
     localStorage.setItem('sunu_events_user_role', role);
+    window.history.pushState({}, '', '/dashboard');
     setCurrentView('dashboard');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -97,11 +162,14 @@ export const AppContent: React.FC = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('sunu_events_auth');
     setAuthMode('login');
+    window.history.pushState({}, '', '/login');
     setCurrentView('login');
   };
 
   const handleOpenEventDetail = (event: EventItem) => {
     setSelectedEvent(event);
+    const targetUrl = `/events/${event.slug || event.id}`;
+    window.history.pushState({}, '', targetUrl);
     setCurrentView('event-detail');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -110,6 +178,8 @@ export const AppContent: React.FC = () => {
     if (tiers) {
       setSelectedCheckoutTiers(tiers);
     }
+    const targetUrl = selectedEvent ? `/checkout/${selectedEvent.slug || selectedEvent.id}` : '/checkout';
+    window.history.pushState({}, '', targetUrl);
     setCurrentView('checkout');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -117,6 +187,7 @@ export const AppContent: React.FC = () => {
   const handleSelectCategoryAndNavigate = (cat: typeof selectedCategory) => {
     handleCategorySelect(cat);
     if (currentView !== 'home') {
+      window.history.pushState({}, '', '/');
       setCurrentView('home');
     }
   };
@@ -124,6 +195,7 @@ export const AppContent: React.FC = () => {
   const handleSearchAndNavigate = (q: string) => {
     handleSearch(q);
     if (currentView !== 'home' && q.trim()) {
+      window.history.pushState({}, '', '/');
       setCurrentView('home');
     }
   };
@@ -132,7 +204,7 @@ export const AppContent: React.FC = () => {
     (e) => !selectedEvent || e.id !== selectedEvent.id
   );
 
-  // 1. Vue Onboarding (Étape 1 à 5)
+  // 1. Vue Onboarding
   if (currentView === 'onboarding') {
     return (
       <OnboardingPage
